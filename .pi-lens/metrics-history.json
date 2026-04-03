@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "files": {
+    "src/lib/core.ts": {
+      "latest": {
+        "commit": "ea44dbe",
+        "timestamp": "2026-04-03T17:37:07.098Z",
+        "mi": 5,
+        "cognitive": 530,
+        "nesting": 7,
+        "lines": 1030,
+        "maxCyclomatic": 78,
+        "entropy": 7.52
+      },
+      "history": [
+        {
+          "commit": "ea44dbe",
+          "timestamp": "2026-04-03T17:37:07.098Z",
+          "mi": 5,
+          "cognitive": 530,
+          "nesting": 7,
+          "lines": 1030,
+          "maxCyclomatic": 78,
+          "entropy": 7.52
+        }
+      ],
+      "trend": "stable"
+    },
+    "src/lib/security.ts": {
+      "latest": {
+        "commit": "ea44dbe",
+        "timestamp": "2026-04-03T17:41:22.333Z",
+        "mi": 42.7,
+        "cognitive": 27,
+        "nesting": 3,
+        "lines": 123,
+        "maxCyclomatic": 9,
+        "entropy": 6.39
+      },
+      "history": [
+        {
+          "commit": "ea44dbe",
+          "timestamp": "2026-04-03T17:41:22.333Z",
+          "mi": 42.7,
+          "cognitive": 27,
+          "nesting": 3,
+          "lines": 123,
+          "maxCyclomatic": 9,
+          "entropy": 6.39
+        }
+      ],
+      "trend": "stable"
+    },
+    "src/lib/profile-pipeline.ts": {
+      "latest": {
+        "commit": "ea44dbe",
+        "timestamp": "2026-04-03T17:51:55.165Z",
+        "mi": 29.7,
+        "cognitive": 134,
+        "nesting": 10,
+        "lines": 197,
+        "maxCyclomatic": 23,
+        "entropy": 6.3
+      },
+      "history": [
+        {
+          "commit": "ea44dbe",
+          "timestamp": "2026-04-03T17:51:55.165Z",
+          "mi": 29.7,
+          "cognitive": 134,
+          "nesting": 10,
+          "lines": 197,
+          "maxCyclomatic": 23,
+          "entropy": 6.3
+        }
+      ],
+      "trend": "stable"
+    }
+  },
+  "capturedAt": "2026-04-03T17:52:00.165Z"
+}
