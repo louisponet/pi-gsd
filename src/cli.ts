@@ -855,10 +855,15 @@ async function runCommand(
 
 		case "scan-sessions": {
 			const { cmdScanSessions } = await import("./lib/profile-pipeline.js");
-			const pathIdx = args.indexOf("--path");
+			const pathIdx = args.indexOf("--path"),
+				harnessIdx = args.indexOf("--harness");
 			await cmdScanSessions(
 				pathIdx !== -1 ? args[pathIdx + 1] : null,
-				{ verbose: args.includes("--verbose"), json: args.includes("--json") },
+				{
+					verbose: args.includes("--verbose"),
+					json: args.includes("--json"),
+					harness: harnessIdx !== -1 ? args[harnessIdx + 1] : null,
+				},
 				raw,
 			);
 			break;
@@ -869,7 +874,11 @@ async function runCommand(
 			const sessionIdx = args.indexOf("--session"),
 				limitIdx = args.indexOf("--limit"),
 				pathIdx = args.indexOf("--path");
-			if (!args[1] || args[1].startsWith("--"))
+			// Pi project directories are named "--<path>--" (starts AND ends with "--").
+			// Treat those as valid project args; reject only option flags (start with "--" but no closing "--").
+			const isPiDirArg = (s: string) =>
+				s.startsWith("--") && s.endsWith("--") && s.length > 4;
+			if (!args[1] || (args[1].startsWith("--") && !isPiDirArg(args[1])))
 				gsdError(
 					"Usage: gsd-tools extract-messages <project> [--session <id>] [--limit N] [--path <dir>]",
 				);
@@ -890,13 +899,15 @@ async function runCommand(
 			const pathIdx = args.indexOf("--path"),
 				limitIdx = args.indexOf("--limit"),
 				maxPerIdx = args.indexOf("--max-per-project"),
-				maxCharsIdx = args.indexOf("--max-chars");
+				maxCharsIdx = args.indexOf("--max-chars"),
+				harnessIdx2 = args.indexOf("--harness");
 			await cmdProfileSample(
 				pathIdx !== -1 ? args[pathIdx + 1] : null,
 				{
 					limit: limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 150,
 					maxPerProject:
 						maxPerIdx !== -1 ? parseInt(args[maxPerIdx + 1], 10) : null,
+					harness: harnessIdx2 !== -1 ? args[harnessIdx2 + 1] : null,
 					maxChars:
 						maxCharsIdx !== -1 ? parseInt(args[maxCharsIdx + 1], 10) : 500,
 				},
