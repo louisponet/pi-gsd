@@ -41,3 +41,4 @@ boundaries:
 
 engine: "pi"
 max_retries: 3
+pre_commit: "prek"
