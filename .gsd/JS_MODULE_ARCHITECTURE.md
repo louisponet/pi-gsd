@@ -170,7 +170,7 @@ profile     → profile-pipeline / profile-output commands
 | `findProjectRoot(cwd)` | Walks ancestor dirs looking for `.planning/config.json`; stops at `$HOME` |
 | `resolveWorktreeRoot(cwd)` | Detects git worktree and returns main working tree root |
 | `loadConfig(cwd)` | Reads `config.json`, merges `~/.gsd/defaults.json`, applies defaults |
-| `resolveModel(agentType, config)` | Resolves agent → model alias using priority chain (see §4.6) |
+| `resolveModelInternal(cwd, agentType)` | Loads config internally then resolves agent → model alias using priority chain (see §4.7) |
 | `output(data, raw)` | Writes JSON (or raw string) to stdout; >50 KB → temp file |
 | `normalizeMd(text)` | Enforces MD022/031/032/012/047 markdownlint rules |
 | `withPlanningLock(cwd, fn)` | Acquires `.planning/.lock` for concurrent-worktree safety |
@@ -223,18 +223,20 @@ const MODEL_ALIAS_MAP = {
 
 **HARNESS_CONFIG** — 8 supported runtimes:
 
-| Key | Runtime name | Command prefix |
-|-----|-------------|----------------|
+| Key | Intended runtime | Command prefix |
+|-----|-----------------|----------------|
 | `claude` | Claude Code | `/gsd:` |
-| `gemini` | Gemini CLI | `/gsd-` |
+| `gemini` | Gemini CLI | `/gsd:` |
 | `cursor` | Cursor | `/gsd-` |
 | `windsurf` | Windsurf | `/gsd-` |
 | `agent` | Generic agent | `/gsd-` |
 | `github` | GitHub Copilot | `/gsd-` |
-| `opencode` | OpenCode | `$gsd-` |
+| `opencode` | OpenCode | `/gsd-` |
 | `codex` | OpenAI Codex | `$gsd-` |
 
 Each harness entry also carries: `cmdPrefix`, `providerHeader`, `providerIntro`, `rationaleAlias`, `nonRuntimeHeading`, `nonRuntimeIntro`.
+
+> **Source note — `runtimeName` field:** The *Intended runtime* column above describes each harness's conceptual identity. In the actual source (`model-profiles.cjs:48–112`) the `runtimeName` field is currently set to `'Claude'` for **all** eight entries, including `gemini`, `cursor`, `windsurf`, `opencode`, and `codex`. The `gemini` entry in particular also retains `cmdPrefix: '/gsd:'` and Anthropic-specific prose identical to the `claude` entry, indicating it is an incomplete stub. The `runtimeName` values will diverge from `'Claude'` once per-harness customisation is completed. Do not rely on `runtimeName` as a harness discriminator in code — use the harness **key** (`gemini`, `opencode`, etc.) instead.
 
 ---
 
@@ -761,8 +763,8 @@ gsd-tools init execute-phase 4
   │    agents_installed, missing_agents
   │
   ├─ loadConfig(cwd)
-  ├─ resolveModel('gsd-executor', config) → model string
-  ├─ resolveModel('gsd-verifier', config) → verifier model string
+  ├─ resolveModelInternal(cwd, 'gsd-executor') → model string
+  ├─ resolveModelInternal(cwd, 'gsd-verifier') → verifier model string
   ├─ findPhaseInternal(cwd, 4)
   ├─ cmdPhasePlanIndex(cwd, 4)  → ordered PLAN.md list
   ├─ getMilestoneInfo(cwd)
@@ -778,15 +780,21 @@ gsd-tools init execute-phase 4
 ### 4.7 Model resolution priority chain
 
 ```
-resolveModel(agentType, config)
+resolveModelInternal(cwd, agentType)          [core.cjs:1000]
   │
-  ├─ 1. config.model_overrides[agentType]  → use override alias if present
-  ├─ 2. config.resolve_model_ids === 'omit' → return '' (suppress model param)
-  ├─ 3. MODEL_PROFILES[agentType][config.model_profile]  → get alias (opus/sonnet/haiku)
+  ├─ loadConfig(cwd)                          → config object (internal; not a parameter)
+  │
+  ├─ 1. config.model_overrides?.[agentType]   → return override directly if set
+  ├─ 2. config.resolve_model_ids === 'omit'   → return '' (suppress model param)
+  ├─ 3. MODEL_PROFILES[agentType][profile]    → alias (opus/sonnet/haiku/inherit)
+  │       where profile = config.model_profile ?? 'balanced'
+  │       missing agentType → falls back to 'sonnet'
   └─ 4. config.resolve_model_ids === true
          ? MODEL_ALIAS_MAP[alias]   → 'claude-opus-4-0' / 'claude-sonnet-4-5' / 'claude-haiku-3-5'
          : alias                    → 'opus' / 'sonnet' / 'haiku'
 ```
+
+> `resolveModelInternal` is the **internal** implementation exported directly; callers pass `(cwd, agentType)` and the function loads `config` itself. The `core.cjs` export table lists it as `resolveModelInternal` (not `resolveModel`). The §3.2 export table entry `resolveModel(agentType, config)` was a documentation error — the correct signature is `resolveModelInternal(cwd, agentType)`.
 
 ### 4.8 `progress table`
 
