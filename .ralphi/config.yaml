@@ -15,7 +15,8 @@ commands:
   build: "npm run build"
 
   # Model-profiles markdown must stay in sync with model-profiles.cjs across all 8 harnesses
-  validate: "node scripts/validate-model-profiles.cjs"
+  # NOTE: validate requires assembled harnesses — run manually before publish, not pre-commit
+  # validate: "node scripts/validate-model-profiles.cjs"
 
   # Full cross-harness integrity suite — run before publishing
   # check: "node scripts/validate-harness-sync.cjs"

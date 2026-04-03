@@ -7,3 +7,6 @@ coverage
 .DS_Store
 .idea
 .pi/suggester
+# ralphi
+.ralphi/*
+!.ralphi/config.yaml
