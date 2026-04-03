@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // gsd-hook-version: 1.30.0
+// SHARED CANONICAL FILE — hardlinked into all harness hooks/ directories.
+// Harness is auto-detected from process.env at runtime (GEMINI_API_KEY -> AfterTool).
+// Do NOT add harness-specific if/else blocks here. See HOOKS_ARCHITECTURE.md.
 // Context Monitor - PostToolUse/AfterTool hook (Gemini uses AfterTool)
 // Reads context metrics from the statusline bridge file and injects
 // warnings when context usage is high. This makes the AGENT aware of

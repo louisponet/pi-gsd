@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // gsd-hook-version: 1.30.0
+// SHARED CANONICAL FILE — hardlinked into all harness hooks/ directories.
+// Harness config dir is auto-detected from __dirname at runtime.
+// Do NOT hardcode harness-specific paths here. See HOOKS_ARCHITECTURE.md.
 // GSD Workflow Guard — PreToolUse hook
 // Detects when Claude attempts file edits outside a GSD workflow context
 // (no active /gsd: command or Task subagent) and injects an advisory warning.

@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // gsd-hook-version: 1.30.0
+// SHARED CANONICAL FILE — hardlinked into all harness hooks/ directories.
+// Harness config dir is auto-detected from __dirname at runtime.
+// Do NOT hardcode harness-specific paths here. See HOOKS_ARCHITECTURE.md.
 // GSD Prompt Injection Guard — PreToolUse hook
 // Scans file content being written to .planning/ for prompt injection patterns.
 // Defense-in-depth: catches injected instructions before they enter agent context.
