@@ -70,142 +70,12 @@ export const VALID_PROFILES: ProfileKey[] = Object.keys(
     MODEL_PROFILES["gsd-planner"],
 ) as ProfileKey[];
 
-// ─── Harness configuration ────────────────────────────────────────────────────
+// ─── Pi harness constants (pi-only) ─────────────────────────────────────────
 
-export interface HarnessConfig {
-    runtimeName: string;
-    cmdPrefix: string;
-    providerHeader: string;
-    providerIntro: string;
-    rationaleAlias: string;
-    nonRuntimeHeading: string;
-    nonRuntimeIntro: string;
-}
+const PI_CMD_PREFIX = "/gsd-";
+const PI_RUNTIME = "pi";
 
-export const HARNESS_CONFIG: Record<string, HarnessConfig> = {
-    claude: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd:",
-        providerHeader:
-            "Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Claude Code",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    gemini: {
-        runtimeName: "Gemini CLI",
-        cmdPrefix: "/gsd:",
-        providerHeader:
-            "Using Gemini CLI with Non-Google Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Gemini CLI with OpenRouter, a local model, or any non-Google provider, set the `inherit` profile to prevent GSD from calling Google models for subagents:",
-        rationaleAlias: "Gemini CLI",
-        nonRuntimeHeading:
-            "Using Non-Gemini-CLI Runtimes (Codex, OpenCode, Claude Code)",
-        nonRuntimeIntro:
-            'When installed for a non-Gemini-CLI runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    cursor: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd-",
-        providerHeader:
-            "Using Cursor with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Cursor with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Cursor",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    windsurf: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd-",
-        providerHeader:
-            "Using Windsurf with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Windsurf with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Windsurf",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    agent: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd-",
-        providerHeader:
-            "Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Claude Code",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    github: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd-",
-        providerHeader:
-            "Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Claude Code",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    opencode: {
-        runtimeName: "Claude",
-        cmdPrefix: "/gsd-",
-        providerHeader:
-            "Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Claude Code",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    codex: {
-        runtimeName: "Claude",
-        cmdPrefix: "$gsd-",
-        providerHeader:
-            "Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:",
-        rationaleAlias: "Claude Code",
-        nonRuntimeHeading:
-            "Using Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-Claude runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-    pi: {
-        runtimeName: "pi",
-        cmdPrefix: "/gsd-",
-        providerHeader: "Using pi with Non-Default Providers (OpenRouter, Local)",
-        providerIntro:
-            "If you're using pi with OpenRouter, a local model, or any non-default provider, set the `inherit` profile to prevent GSD from calling default models for subagents:",
-        rationaleAlias: "pi",
-        nonRuntimeHeading:
-            "Using Non-pi Runtimes (Claude Code, Codex, OpenCode, Gemini CLI)",
-        nonRuntimeIntro:
-            'When installed for a non-pi runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime\'s default model. No manual setup is needed.',
-    },
-};
 
-// ─── Utility functions ────────────────────────────────────────────────────────
-
-/**
- * Returns a mapping from agent name to model alias for the given profile.
- */
 export function getAgentToModelMapForProfile(
     profile: ProfileKey,
 ): Record<AgentName, ModelAlias> {
@@ -244,17 +114,9 @@ export function formatAgentToModelMapAsTable(
 /**
  * Generate the full `references/model-profiles.md` content.
  */
-export function generateModelProfilesMd(harness = "agent"): string {
-    const cfg = HARNESS_CONFIG[harness] ?? HARNESS_CONFIG["agent"];
-    const {
-        runtimeName,
-        cmdPrefix,
-        providerHeader,
-        providerIntro,
-        rationaleAlias,
-        nonRuntimeHeading,
-        nonRuntimeIntro,
-    } = cfg;
+export function generateModelProfilesMd(): string {
+    const runtimeName = PI_RUNTIME;
+    const cmdPrefix = PI_CMD_PREFIX;
 
     const profiles = VALID_PROFILES;
     const agents = Object.keys(MODEL_PROFILES);
@@ -278,7 +140,7 @@ export function generateModelProfilesMd(harness = "agent"): string {
 
     return `<!-- AUTO-GENERATED - do not edit by hand.
      Source of truth: src/lib/model-profiles.ts
-     Regenerate with: node dist/gsd-tools.js generate-model-profiles-md --harness ${harness}
+     Regenerate with: pi-gsd-tools generate-model-profiles-md
 -->
 # Model Profiles
 
@@ -312,9 +174,9 @@ ${profileTable}
 - **Required when using non-Anthropic providers** (OpenRouter, local models, etc.) - otherwise GSD may call Anthropic models directly, incurring unexpected costs
 - Use when: you want GSD to follow your currently selected runtime model
 
-## ${nonRuntimeHeading}
+## Using pi with Other Providers
 
-${nonRuntimeIntro}
+pi supports any provider via its settings. Set the \`inherit\` profile when using non-default models to ensure GSD routes subagents through your active session model.
 
 To assign different models to different agents, add \`model_overrides\` with model IDs your runtime recognizes:
 
@@ -332,9 +194,9 @@ To assign different models to different agents, add \`model_overrides\` with mod
 
 The same tiering logic applies: stronger models for planning and debugging, cheaper models for execution and mapping.
 
-## ${providerHeader}
+## Using Non-Default Providers (OpenRouter, Local)
 
-${providerIntro}
+If you're using pi with OpenRouter or a local model, set the \`inherit\` profile to prevent GSD from calling specific model APIs directly:
 
 \`\`\`bash
 # Via settings command
@@ -402,7 +264,7 @@ Verification requires goal-backward reasoning - checking if code *delivers* what
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
 
 **Why \`inherit\` instead of passing \`opus\` directly?**
-${rationaleAlias}'s \`"opus"\` alias maps to a specific model version. Organizations may block older opus versions while allowing newer ones. GSD returns \`"inherit"\` for opus-tier agents, causing them to use whatever opus version the user has configured in their session. This avoids version conflicts and silent fallbacks to Sonnet.
+pi's \`"opus"\` alias maps to a specific model version. Organizations may block older opus versions while allowing newer ones. GSD returns \`"inherit"\` for opus-tier agents, causing them to use whatever opus version the user has configured in their session. This avoids version conflicts and silent fallbacks to Sonnet.
 
 **Why \`inherit\` profile?**
 Some runtimes (including OpenCode) let users switch models at runtime (\`/model\`). The \`inherit\` profile keeps all GSD subagents aligned to that live selection.
