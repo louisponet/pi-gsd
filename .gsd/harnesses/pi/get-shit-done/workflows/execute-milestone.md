@@ -167,9 +167,30 @@ Announce: `✓ Phase ${N} complete — UAT: ${pass_rate}%  Scope: ${scope_status
 
 ---
 
-## Lifecycle — Audit → Complete → Cleanup
+## After All Phases — Mode Split
 
-When all phases are executed, run the mandatory lifecycle sequence.
+### Interactive mode
+
+Do NOT auto-invoke the lifecycle. Surface the execution summary and hand back to the user:
+
+```
+━━ execute-milestone: all phases done ━━━━━━━━━━━━
+✓ Phases:   ${done}/${total} complete
+📊 Avg UAT: ${avg_uat}%
+⚠ Scope:   ${scope_flag_count} flag(s) (details above)
+
+Next: /gsd-audit-milestone when you are ready to review
+      and close the milestone.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Stop. The user owns the audit decision.
+
+---
+
+### Silent mode — Auto Lifecycle
+
+Only in silent mode: automatically invoke audit → complete → cleanup.
 
 Display transition banner:
 ```
@@ -178,61 +199,66 @@ Display transition banner:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Step 1 — Audit
+#### Step 1 — Audit
 
 ```
 Skill(skill="gsd-audit-milestone")
 ```
 
-After audit completes, detect `AUDIT_STATUS` from the audit result file:
+Read `AUDIT_STATUS` from the audit result file.
 
-**If no result / malformed:** → Recovery loop (§F). Message: "Audit did not produce results."
+**If no result / malformed:**
+→ Write HANDOFF (§G), stop.
+Message: "Audit did not produce a result. Run /gsd-audit-milestone manually."
 
 **If `passed`:**
-> Audit ✅ passed — proceeding to complete milestone
+Display `Audit ✅ passed` and proceed to Step 2.
 
 **If `gaps_found`:**
-Display gap summary. Ask:
-> "Milestone audit found gaps. How to proceed?"
-> - **Fix gaps** — Stop here. Run /gsd-plan-milestone-gaps then re-run /gsd-execute-milestone
-> - **Continue anyway** — Accept gaps, proceed to complete
+Critical requirements are unsatisfied. Do NOT proceed to complete-milestone.
+Display the gap summary clearly:
+```
+━━ AUDIT: gaps found — milestone NOT complete ━━━━
+The following requirements are unsatisfied:
+[gap list from audit file]
 
-In **silent mode**: stop, write HANDOFF.json with `stop_reason: "audit_gaps_found"`, await user.
+Do NOT run /gsd-complete-milestone yet.
+Fix path:
+  1. /gsd-plan-milestone-gaps   — plan gap-closure phases
+  2. /gsd-execute-milestone     — re-run execution
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+Write HANDOFF with `stop_reason: "audit_gaps_found"`. Stop.
 
 **If `tech_debt`:**
-Display tech debt summary. Ask:
-> "Milestone audit found tech debt. How to proceed?"
-> - **Address tech debt** — Stop here
-> - **Continue with tech debt noted** — Proceed to complete
+Non-critical. Display the tech debt summary, then proceed to Step 2 with a note.
 
-In **silent mode**: stop, write HANDOFF.json with `stop_reason: "audit_tech_debt"`, await user.
-
-### Step 2 — Complete Milestone
+#### Step 2 — Complete Milestone
 
 ```
 Skill(skill="gsd-complete-milestone", args="${milestone_version}")
 ```
 
-Verify it produced the archive file:
+Verify archive file produced:
 ```bash
 ls .planning/milestones/v${milestone_version}-ROADMAP.md 2>/dev/null || true
 ```
-If absent → Recovery loop. Message: "complete-milestone did not produce expected archive files."
+If absent → Write HANDOFF, stop. Message: "complete-milestone did not produce archive files."
 
-### Step 3 — Cleanup
+#### Step 3 — Cleanup
 
 ```
 Skill(skill="gsd-cleanup")
 ```
 
-Cleanup handles its own dry-run + user confirmation internally (acceptable pause — explicit decision about file deletion).
+Cleanup handles its own dry-run and user confirmation internally.
 
 ---
 
-## Worktree Merge
+## Worktree Merge (both modes, after lifecycle or summary)
 
 If running in an isolated worktree, ask:
-> "Milestone complete. Merge this worktree back to your main branch? (y/n, default: y)"
+> "Merge this worktree back to your main branch? (y/n, default: y)"
 
 If yes:
 ```bash
@@ -241,11 +267,11 @@ git merge --no-ff milestone-exec -m "feat: complete milestone ${milestone_versio
 git worktree remove milestone-exec
 ```
 
-If no: leave worktree open, tell user how to merge manually.
+If no: leave the worktree open. Tell the user how to merge manually.
 
 ---
 
-## Final Summary
+## Final Banner (silent mode only, after full lifecycle)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
