@@ -20,7 +20,8 @@
 		"scripts/postinstall.js",
 		".gsd/extensions",
 		"README.md",
-		"LICENSE"
+		"LICENSE",
+		"prompts"
 	],
 	"engines": {
 		"node": ">=18.0.0"
@@ -57,6 +58,9 @@
 	"pi": {
 		"skills": [
 			"./skills"
+		],
+		"prompts": [
+			"./prompts"
 		]
 	},
 	"dependencies": {

@@ -136,8 +136,8 @@ Switch profile: `/gsd-set-profile <profile>`
 |             Compile-time type safety |     ❌     |   ⚡    | Fully typed - no `any`, only Zod-inferred types                                                      |
 |             Runtime validation (Zod) |     ❌     |   ⚡    | Schema-driven `validate health` with field-path errors                                               |
 |                   Smarter `--repair` |     ❌     |   ⚡    | Zod schema defaults fill all missing/invalid fields at once                                          |
-|       Instant commands (no LLM cost) |     ❌     |   🚧    | `/gsd-progress`, `/gsd-stats`, `/gsd-help`, `/gsd-health` via pi extension commands                  |
-|       Prompt-dispatch for all skills |     ❌     |   🚧    | Pi prompt templates replace skill dispatch - clean autocomplete + arg hints                          |
+|       Instant commands (no LLM cost) |     ❌     |   ✔️    | `/gsd-progress`, `/gsd-stats`, `/gsd-health`, `/gsd-help` — formatted output + deterministic next steps, zero LLM |
+|       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates — clean autocomplete, arg hints, direct workflow dispatch                   |
 
 <!-- |        Pi harness config entry |     ❌     |   ✔️    | `HARNESS_CONFIG` pi entry - generates `AGENTS.md` via `/gsd-profile-user`           | -->
 <!-- |          Toon output in skills |     ❌     |   ✔️    | `gsd-progress`, `gsd-stats`, `gsd-health` use `--output toon`                       | -->

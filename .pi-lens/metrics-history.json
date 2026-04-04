@@ -335,7 +335,32 @@
         }
       ],
       "trend": "stable"
+    },
+    ".gsd/extensions/gsd-hooks.ts": {
+      "latest": {
+        "commit": "de51db1",
+        "timestamp": "2026-04-04T11:54:39.863Z",
+        "mi": 33.6,
+        "cognitive": 153,
+        "nesting": 9,
+        "lines": 183,
+        "maxCyclomatic": 65,
+        "entropy": 5.9
+      },
+      "history": [
+        {
+          "commit": "de51db1",
+          "timestamp": "2026-04-04T11:54:39.863Z",
+          "mi": 33.6,
+          "cognitive": 153,
+          "nesting": 9,
+          "lines": 183,
+          "maxCyclomatic": 65,
+          "entropy": 5.9
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-03T23:23:33.674Z"
+  "capturedAt": "2026-04-04T11:54:44.925Z"
 }
