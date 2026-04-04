@@ -140,7 +140,7 @@ Switch profile: `/gsd-set-profile <profile>`
 |             `/gsd-next` auto-advance |     ❌     |   ✔️    | Deterministic phase routing, pre-fills editor with the correct next command                      |
 |       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates — clean autocomplete, arg hints, direct workflow dispatch                 |
 |        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all unplanned phases — one mode question, scope pre-check per phase, context-safe checkpoint |
-|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases — scope guardian (pre+post), UAT gates, recovery loop, worktree isolation + merge |
+|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases + full lifecycle (audit→complete→cleanup), scope guardian, UAT gates, worktree merge |
 
 Legend: ✔️ done · ⚡ enhanced · ⚠️ in progress · 📃 planned · ❌ not available
 

@@ -167,12 +167,72 @@ Announce: `✓ Phase ${N} complete — UAT: ${pass_rate}%  Scope: ${scope_status
 
 ---
 
-## Completion — Worktree Merge
+## Lifecycle — Audit → Complete → Cleanup
 
-When all phases are complete:
+When all phases are executed, run the mandatory lifecycle sequence.
 
-Ask the user:
-> "All phases complete. Merge this worktree back to your main branch? (y/n, default: y)"
+Display transition banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ All phases complete → Starting lifecycle: audit → complete → cleanup
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Step 1 — Audit
+
+```
+Skill(skill="gsd-audit-milestone")
+```
+
+After audit completes, detect `AUDIT_STATUS` from the audit result file:
+
+**If no result / malformed:** → Recovery loop (§F). Message: "Audit did not produce results."
+
+**If `passed`:**
+> Audit ✅ passed — proceeding to complete milestone
+
+**If `gaps_found`:**
+Display gap summary. Ask:
+> "Milestone audit found gaps. How to proceed?"
+> - **Fix gaps** — Stop here. Run /gsd-plan-milestone-gaps then re-run /gsd-execute-milestone
+> - **Continue anyway** — Accept gaps, proceed to complete
+
+In **silent mode**: stop, write HANDOFF.json with `stop_reason: "audit_gaps_found"`, await user.
+
+**If `tech_debt`:**
+Display tech debt summary. Ask:
+> "Milestone audit found tech debt. How to proceed?"
+> - **Address tech debt** — Stop here
+> - **Continue with tech debt noted** — Proceed to complete
+
+In **silent mode**: stop, write HANDOFF.json with `stop_reason: "audit_tech_debt"`, await user.
+
+### Step 2 — Complete Milestone
+
+```
+Skill(skill="gsd-complete-milestone", args="${milestone_version}")
+```
+
+Verify it produced the archive file:
+```bash
+ls .planning/milestones/v${milestone_version}-ROADMAP.md 2>/dev/null || true
+```
+If absent → Recovery loop. Message: "complete-milestone did not produce expected archive files."
+
+### Step 3 — Cleanup
+
+```
+Skill(skill="gsd-cleanup")
+```
+
+Cleanup handles its own dry-run + user confirmation internally (acceptable pause — explicit decision about file deletion).
+
+---
+
+## Worktree Merge
+
+If running in an isolated worktree, ask:
+> "Milestone complete. Merge this worktree back to your main branch? (y/n, default: y)"
 
 If yes:
 ```bash
@@ -181,19 +241,21 @@ git merge --no-ff milestone-exec -m "feat: complete milestone ${milestone_versio
 git worktree remove milestone-exec
 ```
 
-If no: leave worktree open, inform user how to merge manually.
+If no: leave worktree open, tell user how to merge manually.
 
 ---
 
 ## Final Summary
 
 ```
-━━ execute-milestone complete ━━━━━━━━━━━━━━━━━━━━━
-✓ Phases executed: [list]
-📊 Avg UAT pass:   [X]%
-⚠ Scope flags:    [count — details above]
-↳ Next: /gsd-audit-milestone
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► EXECUTE-MILESTONE ▸ COMPLETE 🎉
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ Milestone: ${milestone_version} — ${milestone_name}
+ Phases:    ${done}/${total} complete
+ Avg UAT:   ${avg_uat}%
+ Lifecycle: audit ✅ → complete ✅ → cleanup ✅
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
-
-Route to `/gsd-audit-milestone`.

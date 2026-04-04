@@ -1,6 +1,6 @@
 ---
 name: gsd-execute-milestone
-description: Execute all planned phases in the milestone — scope guardian, UAT gates, recovery loop
+description: Execute all planned phases + full milestone lifecycle (audit → complete → cleanup)
 ---
 
 <objective>
