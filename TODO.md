@@ -13,7 +13,7 @@ Format compatibility with original GSD v1.30.0 `.planning/` data is a hard const
 
 ---
 
-## #1 — Fix skill execution_context paths (BUG)
+## #1 - Fix skill execution_context paths (BUG)
 
 **Problem:** All 130 `execution_context` blocks in skills hardcode `@.agent/get-shit-done/…`
 but pi installs GSD to `.pi/get-shit-done/…`. Pi users load workflow files from the wrong path.
@@ -25,14 +25,14 @@ but pi installs GSD to `.pi/get-shit-done/…`. Pi users load workflow files fro
 
 ---
 
-## #2 — Hook registration for pi (BUG)
+## #2 - Hook registration for pi (BUG)
 
 **Problem:** Pi uses TypeScript **extensions** for hooks (not command-based like Claude Code).
-The GSD `.js` hook files are silently inert in pi — they never fire.
+The GSD `.js` hook files are silently inert in pi - they never fire.
 
 **Two-part fix:**
 
-### #2a — postinstall: write hook entries into `.pi/settings.json`
+### #2a - postinstall: write hook entries into `.pi/settings.json`
 Pi's settings.json does not support Claude-style `hooks` keys. Instead hooks must be
 implemented as pi extensions. postinstall should install a generated `.pi/extensions/gsd-hooks.ts`
 that wraps the GSD hook logic using pi's extension API (`pi.on(event, handler)`).
@@ -45,7 +45,7 @@ that wraps the GSD hook logic using pi's extension API (`pi.on(event, handler)`)
 - [ ] Wire postinstall to copy/generate it into `.pi/extensions/`
 - [ ] Register it in `.pi/settings.json` `extensions` array
 
-### #2b — `/gsd-setup-pi` skill
+### #2b - `/gsd-setup-pi` skill
 Fallback for when postinstall is skipped (bun installs, manual installs).
 Interactive skill that checks hook wiring, repairs if needed, then routes to `/gsd-new-project`.
 
@@ -53,7 +53,7 @@ Interactive skill that checks hook wiring, repairs if needed, then routes to `/g
 
 ---
 
-## #3 — Pi harness entry in HARNESS_CONFIG
+## #3 - Pi harness entry in HARNESS_CONFIG
 
 **Problem:** No `pi` key in `HARNESS_CONFIG`. Falls back to `agent`, producing
 `CLAUDE.md`-branded profile output for pi users.
@@ -71,7 +71,7 @@ Interactive skill that checks hook wiring, repairs if needed, then routes to `/g
 
 ---
 
-## #4 — Toon output in skills (context optimization)
+## #4 - Toon output in skills (context optimization)
 
 **Decision:** Skills may use `--output toon` and `--pick` for richer/more efficient output,
 as long as the underlying data and `.planning/` files remain harness-neutral.
@@ -84,7 +84,7 @@ Users switching from pi to opencode (or back) must not lose any data.
 
 ---
 
-## #5 — Runtime validation with Zod (BUG PREVENTION)
+## #5 - Runtime validation with Zod (BUG PREVENTION)
 
 **Rationale:** LLMs write `.planning/` files and can deviate from schema.
 Silent corruption breaks workflows mid-execution. Adding Zod preserves full
@@ -103,7 +103,7 @@ format compatibility while catching deviations early.
 
 ---
 
-## #6 — TypeScript types for .planning/ structures
+## #6 - TypeScript types for .planning/ structures
 
 Subsumed into #5. Zod schemas generate the TypeScript types automatically via `z.infer<>`.
 Separate loose-typing cleanup may still be needed in places that don't touch .planning/ data.
@@ -114,7 +114,7 @@ Separate loose-typing cleanup may still be needed in places that don't touch .pl
 
 ---
 
-## #7 — Pi session history ingestion for `/gsd-profile-user`
+## #7 - Pi session history ingestion for `/gsd-profile-user`
 
 **Problem:** `profile-pipeline.ts` looks for Claude Code session history
 (`~/.claude/projects`). Pi stores sessions differently.

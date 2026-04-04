@@ -1,4 +1,4 @@
-# PRD: pi-gsd TODO Backlog — Fixes & Enhancements
+# PRD: pi-gsd TODO Backlog - Fixes & Enhancements
 
 **Created:** 2026-04-03  
 **Status:** Ready for implementation  
@@ -46,7 +46,7 @@ The work is complete when:
 
 ---
 
-### US-002a: Pi hook extension — postinstall wiring
+### US-002a: Pi hook extension - postinstall wiring
 
 **Description:** As a pi user, I want GSD's background hooks (context monitor, workflow guard, statusline, prompt guard, update checker) to actually fire during my pi sessions so that I get context warnings and workflow guidance.
 
@@ -59,7 +59,7 @@ The work is complete when:
   - `tool_before` (Write/Edit tools) → runs `gsd-workflow-guard.js` logic  
   - `tool_after` → runs `gsd-context-monitor.js` logic
 - [ ] `.pi/settings.json` `extensions` array is updated to include the extension path
-- [ ] Extension is non-blocking — failures are silent, never prevent tool execution
+- [ ] Extension is non-blocking - failures are silent, never prevent tool execution
 - [ ] `ralphi check` passes after change
 
 ---
@@ -108,7 +108,7 @@ The work is complete when:
 - [ ] `skills/gsd-stats/SKILL.md` instructs the agent to call `gsd-tools stats --output toon`
 - [ ] `skills/gsd-health/SKILL.md` instructs the agent to call `gsd-tools validate health --output toon`
 - [ ] Each skill includes fallback: if toon output fails, fall back to plain JSON
-- [ ] No `.planning/` file format changes — only presentation layer changes
+- [ ] No `.planning/` file format changes - only presentation layer changes
 - [ ] `ralphi check` passes after change
 
 ---
@@ -174,8 +174,8 @@ The work is complete when:
 - **FR-2:** All Zod schemas must accept all valid GSD v1.30.0 `.planning/` files without error.
 - **FR-3:** `ralphi check` (typecheck + build) must pass after every TODO item.
 - **FR-4:** Tier-1 binary modules (`model-profiles.cjs` and others) must remain byte-identical across all 8 harnesses after any change.
-- **FR-5:** Hook extension for pi must be non-blocking — hook failures must never prevent tool execution or break the agent session.
-- **FR-6:** Skills output format changes (toon) must not change underlying `.planning/` data — only the presentation layer.
+- **FR-5:** Hook extension for pi must be non-blocking - hook failures must never prevent tool execution or break the agent session.
+- **FR-6:** Skills output format changes (toon) must not change underlying `.planning/` data - only the presentation layer.
 
 ---
 
@@ -183,7 +183,7 @@ The work is complete when:
 
 - Do not add any new GSD commands or workflows beyond the 57 existing ones
 - Do not change the `.planning/` data format
-- Do not add multi-harness "auto-detection" magic — pi is the primary target
+- Do not add multi-harness "auto-detection" magic - pi is the primary target
 - Do not port the original GSD CJS modules to a new format (TypeScript port is done)
 - Do not add a test suite (typecheck is the quality gate)
 
@@ -203,7 +203,7 @@ The work is complete when:
 
 - `grep -r "\.agent/get-shit-done" skills/` → 0 results
 - `ralphi check` passes clean after every item
-- README comparison table has no ⬜ (unknown) entries — every row is honest ✔️, ❌, or ⚠️
+- README comparison table has no ⬜ (unknown) entries - every row is honest ✔️, ❌, or ⚠️
 - `node scripts/validate-model-profiles.cjs` passes after #3
 - `zod` in `package.json` dependencies after #5
 

@@ -34,7 +34,7 @@ src/
 ├── cli.ts              # Entry point
 ├── output.ts           # Output formatting
 └── lib/                # Core modules (commands, config, core, state, ...)
-skills/                 # 57 GSD skill definitions (gsd-*/SKILL.md) — published
+skills/                 # 57 GSD skill definitions (gsd-*/SKILL.md) - published
 scripts/                # Build + validation pipeline
 .pi/                    # Tier-2 modules and hooks
 dist/                   # Build output (gitignored)

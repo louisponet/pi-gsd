@@ -1,5 +1,5 @@
 # ralphi configuration
-# Auto-generated — edit as needed
+# Auto-generated - edit as needed
 
 project:
   name: "pi-gsd"
@@ -15,10 +15,10 @@ commands:
   build: "npm run build"
 
   # Model-profiles markdown must stay in sync with model-profiles.cjs across all 8 harnesses
-  # NOTE: validate requires assembled harnesses — run manually before publish, not pre-commit
+  # NOTE: validate requires assembled harnesses - run manually before publish, not pre-commit
   # validate: "node scripts/validate-model-profiles.cjs"
 
-  # Full cross-harness integrity suite — run before publishing
+  # Full cross-harness integrity suite - run before publishing
   # check: "node scripts/validate-harness-sync.cjs"
 
   # Assemble .gsd/harnesses/ for npm publish
@@ -26,10 +26,10 @@ commands:
 
 rules:
   - "Tier-1 binary modules (frontmatter.cjs, milestone.cjs, model-profiles.cjs, roadmap.cjs, security.cjs, state.cjs, template.cjs, uat.cjs, init.cjs) must stay byte-identical across all 8 harnesses"
-  - "Tier-2 modules vary by harness — however, we only support pi"
+  - "Tier-2 modules vary by harness - however, we only support pi"
   - "Hook files in .pi/ only"
-  - "The /gsd:<name> colon-prefix is an internal Claude/Gemini dispatch mechanism — never emit it in generated artefacts, ROADMAP entries, or error messages"
-  - "We publish skills/ and scripts/ — the package.json 'files' field controls what ships; don't add harness runtime files to it"
+  - "The /gsd:<name> colon-prefix is an internal Claude/Gemini dispatch mechanism - never emit it in generated artefacts, ROADMAP entries, or error messages"
+  - "We publish skills/ and scripts/ - the package.json 'files' field controls what ships; don't add harness runtime files to it"
   - "*.lock and .env* files must never be touched"
 
 boundaries:
