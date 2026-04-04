@@ -16,7 +16,6 @@
 		"prepublishOnly": "npm run build"
 	},
 	"files": [
-		"skills",
 		"dist",
 		"scripts/postinstall.js",
 		".gsd/extensions",
@@ -59,9 +58,6 @@
 	"pi": {
 		"extensions": [
 			"./.gsd/extensions"
-		],
-		"skills": [
-			"./skills"
 		],
 		"prompts": [
 			"./prompts"
