@@ -117,30 +117,32 @@ Switch profile: `/gsd-set-profile <profile>`
 
 ## Comparison with GSD v1.30.0
 
-|                              Feature | gsd v1.30 | pi-gsd | Details                                                                                          |
-| -----------------------------------: | :-------: | :----: | :----------------------------------------------------------------------------------------------- |
-|             `.planning/` data format |     ✔️     |   ✔️    | 100% compatible - projects are portable across tools                                             |
-|                          Workstreams |     ✔️     |   ✔️    | Full workstream isolation                                                                        |
-|                     4 model profiles |     ✔️     |   ✔️    | quality / balanced / budget / inherit                                                            |
-|                         18 subagents |     ✔️     |   ✔️    | Identical agent definitions                                                                      |
-|                        55 GSD skills |     ✔️     |   ✔️    | All commands available via pi prompt dispatcher (replaces skill system)                          |
-|        Different skills paths for pi |     ✔️     |   ⚡    | All 55 skills moved to `.pi/gsd/` to enable advanced pi-gsd-tools integration                    |
-|                  pi harness (`.pi/`) |     ❌     |   ✔️    | New - GSD installs into pi's config dir                                                          |
-|                Background hooks (pi) |     ❌     |   ✔️    | TypeScript extension (`gsd-hooks.ts`) installed via postinstall                                  |
-|         Pi session history ingestion |     ❌     |   ✔️    | `/gsd-profile-user` reads pi JSONL sessions from `~/.pi/agent/sessions/`                         |
-|           `/gsd-setup-pi` onboarding |     ❌     |   ✔️    | Setup skill for `bun install` where postinstall is skipped   (default untrusted behavior)        |
-|     `gsd-tools` → `pi-gsd-tools` CLI |     ✔️     |   ⚡    | Same commands basic signatures as original (`gsd-tools`) but enhanced                            |
-| `[-o\|--output] [toon\|json]` output |     ❌     |   ⚡    | Token-efficient toon renderer output (or json, if LLM absolutely needs it...)                    |
-| `[-p\|--pick] {JSONPath}` extraction |     ❌     |   ⚡    | Field extraction from CLI output                                                                 |
-|                    TypeScript source |     ❌     |   ⚡    | Full TS port of gsd-tools (~9k lines)                                                            |
-|             Compile-time type safety |     ❌     |   ✔️    | Full TypeScript — only `FrontmatterObject` root type retains `any` (intentional, documented)      |
-|             Runtime validation (Zod) |     ❌     |   ✔️    | Zod schemas for all `.planning/` types; `validate health` checks `config.json` (W005) + `STATE.md` (W011) |
-|                   Smarter `--repair` |     ❌     |   ✔️    | Schema defaults fill missing `config.json` fields; W011 STATE.md issues trigger regeneration     |
-|       Instant commands (no LLM cost) |     ❌     |   ✔️    | `/gsd-progress`, `/gsd-stats`, `/gsd-health`, `/gsd-help`, `/gsd-next` — zero LLM, editor pivot  |
-|             `/gsd-next` auto-advance |     ❌     |   ✔️    | Deterministic phase routing, pre-fills editor with the correct next command                      |
-|       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates — clean autocomplete, arg hints, direct workflow dispatch                 |
-|        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all unplanned phases — one mode question, scope pre-check per phase, context-safe checkpoint |
-|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases + scope guardian + auto gap/debt retry loop (insert-phase) + audit→complete→cleanup |
+|                              Feature | gsd v1.30 | pi-gsd | Details                                                                                                   |
+| -----------------------------------: | :-------: | :----: | :-------------------------------------------------------------------------------------------------------- |
+|             `.planning/` data format |     ✔️     |   ✔️    | 100% compatible - projects are portable across tools                                                      |
+|                          Workstreams |     ✔️     |   ✔️    | Full workstream isolation                                                                                 |
+|                     4 model profiles |     ✔️     |   ✔️    | quality / balanced / budget / inherit                                                                     |
+|                         18 subagents |     ✔️     |   ✔️    | Identical agent definitions                                                                               |
+|                        55 GSD skills |     ✔️     |   ✔️    | All commands available via pi prompt dispatcher (replaces skill system)                                   |
+|        Different skills paths for pi |     ✔️     |   ⚡    | All 55 skills moved to `.pi/gsd/` to enable advanced pi-gsd-tools integration                             |
+|                  pi harness (`.pi/`) |     ❌     |   ✔️    | New - GSD installs into pi's config dir                                                                   |
+|                Background hooks (pi) |     ❌     |   ✔️    | TypeScript extension (`gsd-hooks.ts`) installed via postinstall                                           |
+|         Pi session history ingestion |     ❌     |   ✔️    | `/gsd-profile-user` reads pi JSONL sessions from `~/.pi/agent/sessions/`                                  |
+|           `/gsd-setup-pi` onboarding |     ❌     |   ✔️    | Setup skill for `bun install` where postinstall is skipped   (default untrusted behavior)                 |
+|     `gsd-tools` → `pi-gsd-tools` CLI |     ✔️     |   ⚡    | Same commands basic signatures as original (`gsd-tools`) but enhanced                                     |
+| `[-o\|--output] [toon\|json]` output |     ❌     |   ⚡    | Token-efficient toon renderer output (or json, if LLM absolutely needs it...)                             |
+| `[-p\|--pick] {JSONPath}` extraction |     ❌     |   ⚡    | Field extraction from CLI output                                                                          |
+|                    TypeScript source |     ❌     |   ⚡    | Full TS port of gsd-tools (~9k lines)                                                                     |
+|             Compile-time type safety |     ❌     |   ⚡    | Full TypeScript - only `FrontmatterObject` root type retains `any` (intentional, documented)              |
+|             Runtime validation (Zod) |     ❌     |   ⚡    | Zod schemas for all `.planning/` types; `validate health` checks `config.json` (W005) + `STATE.md` (W011) |
+|                   Smarter `--repair` |     ❌     |   ✔️    | Schema defaults fill missing `config.json` fields; W011 STATE.md issues trigger regeneration              |
+|       Instant commands (no LLM cost) |     ❌     |   ✔️    | `/gsd-progress`, `/gsd-stats`, `/gsd-health`, `/gsd-help`, `/gsd-next` - zero LLM, editor pivot           |
+|             `/gsd-next` auto-advance |     ❌     |   ✔️    | Deterministic phase routing, pre-fills editor with the correct next command                               |
+|       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates - clean autocomplete, arg hints, direct workflow dispatch                          |
+| `ui-brand` context modularity        |     ❌     |   ✔️    | `<core>` tag splits ui-brand.md — planning gets 103 lines, UI commands get full 166                      |
+|      `syncReferenceToCore` utility   |     ❌     |   ✔️    | Auto-derives `-core.md` from any `<core>`-tagged reference; syncs on session start + after tool writes   |
+|        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all unplanned phases - one mode question, scope pre-check per phase, context-safe checkpoint         |
+|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases + scope guardian + auto gap/debt retry loop (insert-phase) + audit→complete→cleanup    |
 
 Legend: ✔️ done · ⚡ enhanced · ❌ not available
 
@@ -173,7 +175,7 @@ node scripts/validate-model-profiles.cjs
 ### Pre-commit hook
 
 The pre-commit hook runs `ralphi check` (typecheck + build) via [prek](https://github.com/j178/prek).
-prek is a dev-only tool — install it once:
+prek is a dev-only tool - install it once:
 
 ```sh
 # macOS / Linux (Homebrew)
