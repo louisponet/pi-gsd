@@ -294,8 +294,7 @@ export function loadConfig(cwd: string): GSDConfig {
 
 	try {
 		const raw = fs.readFileSync(configPath, "utf-8");
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- deep config object; full typed refactor tracked in TODO #6
-		const parsed: any = JSON.parse(raw);
+		const parsed: Record<string, unknown> = JSON.parse(raw) as Record<string, unknown>;
 
 		// Migrate deprecated "depth" → "granularity"
 		if ("depth" in parsed && !("granularity" in parsed)) {
@@ -304,7 +303,7 @@ export function loadConfig(cwd: string): GSDConfig {
 				standard: "standard",
 				comprehensive: "fine",
 			};
-			parsed.granularity = map[parsed.depth] || parsed.depth;
+			parsed.granularity = map[parsed.depth as string] || parsed.depth;
 			delete parsed.depth;
 			try {
 				fs.writeFileSync(configPath, JSON.stringify(parsed, null, 2), "utf-8");
@@ -319,13 +318,13 @@ export function loadConfig(cwd: string): GSDConfig {
 		if (
 			parsed.multiRepo === true &&
 			!parsed.sub_repos &&
-			!parsed.planning?.sub_repos
+			!(parsed.planning as Record<string, unknown>)?.sub_repos
 		) {
 			const detected = detectSubRepos(cwd);
 			if (detected.length > 0) {
 				parsed.sub_repos = detected;
 				if (!parsed.planning) parsed.planning = {};
-				parsed.planning.commit_docs = false;
+				(parsed.planning as Record<string, unknown>).commit_docs = false;
 				delete parsed.multiRepo;
 				configDirty = true;
 			}
@@ -333,7 +332,8 @@ export function loadConfig(cwd: string): GSDConfig {
 
 		// Keep sub_repos in sync
 		const current: string[] =
-			parsed.sub_repos || parsed.planning?.sub_repos || [];
+			(parsed.sub_repos as string[] | undefined) ||
+			((parsed.planning as Record<string, unknown>)?.sub_repos as string[] | undefined) || [];
 		if (Array.isArray(current) && current.length > 0) {
 			const detected = detectSubRepos(cwd);
 			if (detected.length > 0) {
@@ -353,20 +353,20 @@ export function loadConfig(cwd: string): GSDConfig {
 			}
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- local lookup helper; full typed refactor tracked in TODO #6
-		function get(
+		function get<T>(
 			key: string,
 			nested?: { section: string; field: string },
-		): any {
-			if (parsed[key] !== undefined) return parsed[key];
-			if (nested && parsed[nested.section]?.[nested.field] !== undefined) {
-				return parsed[nested.section][nested.field];
-			}
+		): T | undefined {
+			type Section = Record<string, unknown>;
+			if (parsed[key] !== undefined) return parsed[key] as T;
+			const section = parsed[nested?.section ?? ""] as Section | undefined;
+			if (nested && section?.[nested.field] !== undefined)
+				return section[nested.field] as T;
 			return undefined;
 		}
 
 		const parallelization = (() => {
-			const val = get("parallelization");
+			const val = get<boolean | { enabled?: boolean }>("parallelization");
 			if (typeof val === "boolean") return val;
 			if (typeof val === "object" && val !== null && "enabled" in val)
 				return Boolean(val.enabled);
@@ -374,9 +374,9 @@ export function loadConfig(cwd: string): GSDConfig {
 		})();
 
 		return {
-			model_profile: get("model_profile") ?? defaults.model_profile,
+			model_profile: get<typeof defaults.model_profile>("model_profile") ?? defaults.model_profile,
 			commit_docs: (() => {
-				const explicit = get("commit_docs", {
+				const explicit = get<boolean>("commit_docs", {
 					section: "planning",
 					field: "commit_docs",
 				});
@@ -385,59 +385,59 @@ export function loadConfig(cwd: string): GSDConfig {
 				return defaults.commit_docs;
 			})(),
 			search_gitignored:
-				get("search_gitignored", {
+				get<boolean>("search_gitignored", {
 					section: "planning",
 					field: "search_gitignored",
 				}) ?? defaults.search_gitignored,
 			branching_strategy:
-				get("branching_strategy", {
+				get<typeof defaults.branching_strategy>("branching_strategy", {
 					section: "git",
 					field: "branching_strategy",
 				}) ?? defaults.branching_strategy,
 			phase_branch_template:
-				get("phase_branch_template", {
+				get<string>("phase_branch_template", {
 					section: "git",
 					field: "phase_branch_template",
 				}) ?? defaults.phase_branch_template,
 			milestone_branch_template:
-				get("milestone_branch_template", {
+				get<string>("milestone_branch_template", {
 					section: "git",
 					field: "milestone_branch_template",
 				}) ?? defaults.milestone_branch_template,
 			quick_branch_template:
-				get("quick_branch_template", {
+				get<string | null>("quick_branch_template", {
 					section: "git",
 					field: "quick_branch_template",
 				}) ?? defaults.quick_branch_template,
 			research:
-				get("research", { section: "workflow", field: "research" }) ??
+				get<boolean>("research", { section: "workflow", field: "research" }) ??
 				defaults.research,
 			plan_checker:
-				get("plan_checker", { section: "workflow", field: "plan_check" }) ??
+				get<boolean>("plan_checker", { section: "workflow", field: "plan_check" }) ??
 				defaults.plan_checker,
 			verifier:
-				get("verifier", { section: "workflow", field: "verifier" }) ??
+				get<boolean>("verifier", { section: "workflow", field: "verifier" }) ??
 				defaults.verifier,
 			nyquist_validation:
-				get("nyquist_validation", {
+				get<boolean>("nyquist_validation", {
 					section: "workflow",
 					field: "nyquist_validation",
 				}) ?? defaults.nyquist_validation,
 			parallelization,
-			brave_search: get("brave_search") ?? defaults.brave_search,
-			firecrawl: get("firecrawl") ?? defaults.firecrawl,
-			exa_search: get("exa_search") ?? defaults.exa_search,
+			brave_search: get<boolean>("brave_search") ?? defaults.brave_search,
+			firecrawl: get<boolean>("firecrawl") ?? defaults.firecrawl,
+			exa_search: get<boolean>("exa_search") ?? defaults.exa_search,
 			text_mode:
-				get("text_mode", { section: "workflow", field: "text_mode" }) ??
+				get<boolean>("text_mode", { section: "workflow", field: "text_mode" }) ??
 				defaults.text_mode,
 			sub_repos:
-				get("sub_repos", { section: "planning", field: "sub_repos" }) ??
+				get<string[]>("sub_repos", { section: "planning", field: "sub_repos" }) ??
 				defaults.sub_repos,
-			resolve_model_ids: get("resolve_model_ids") ?? defaults.resolve_model_ids,
-			context_window: get("context_window") ?? defaults.context_window,
-			phase_naming: get("phase_naming") ?? defaults.phase_naming,
-			model_overrides: parsed.model_overrides || null,
-			agent_skills: parsed.agent_skills || {},
+			resolve_model_ids: get<typeof defaults.resolve_model_ids>("resolve_model_ids") ?? defaults.resolve_model_ids,
+			context_window: get<number>("context_window") ?? defaults.context_window,
+			phase_naming: get<typeof defaults.phase_naming>("phase_naming") ?? defaults.phase_naming,
+			model_overrides: (parsed.model_overrides as Record<string, string> | null) ?? null,
+			agent_skills: (parsed.agent_skills as Record<string, unknown>) || {},
 		};
 	} catch {
 		return defaults;

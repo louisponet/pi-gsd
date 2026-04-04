@@ -245,8 +245,7 @@ export function parseMustHavesBlock(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const items: unknown[] = [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- YAML list parser; current can be object OR scalar
-    let current: any = null;
+    let current: FrontmatterObject | string | null = null;
     let listItemIndent = -1;
 
     for (const line of blockLines) {

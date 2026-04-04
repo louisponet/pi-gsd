@@ -63,7 +63,7 @@ Smarter `--repair`:
 
 ---
 
-## [~] #6 — TypeScript types for .planning/ structures
+## [x] #6 — TypeScript types for .planning/ structures
 
 Fixed 18 of 25 `any` casts. Remaining 3 need bigger refactors (tracked below):
 
