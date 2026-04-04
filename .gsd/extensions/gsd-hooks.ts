@@ -503,7 +503,6 @@ export default function (pi: ExtensionAPI) {
 					"  /gsd-progress           Progress + next steps",
 					"  /gsd-stats              Full statistics",
 					"  /gsd-health [--repair]  .planning/ integrity",
-					"  /gsd-milestone          Milestone status dashboard",
 					"  /gsd-help               This list",
 					"",
 					"Management:",
@@ -518,71 +517,6 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerCommand("gsd-milestone", {
-		description:
-			"Milestone status dashboard — plan vs execute routing (instant)",
-		handler: async (_args, ctx) => {
-			const progress = runJson<GsdProgress>("progress json", ctx.cwd);
-			if (!progress) {
-				ctx.ui.notify(
-					"❌ No GSD project found. Run /gsd-new-project to initialise.",
-					"error",
-				);
-				ctx.ui.setEditorText("/gsd-new-project");
-				return;
-			}
-
-			const phases = progress.phases;
-			const total = phases.length;
-			const done = phases.filter((p) => p.status === "Complete").length;
-			const unplanned = phases.filter(
-				(p) => p.status !== "Complete" && p.plans === 0,
-			).length;
-			const planned = phases.filter(
-				(p) => p.status !== "Complete" && p.plans > 0,
-			).length;
-			const phasePct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-			// Determine recommended next milestone-level action
-			let recommendation: string;
-			let action: string;
-			if (total === 0) {
-				recommendation = "No phases defined yet";
-				action = "/gsd-new-project";
-			} else if (done === total) {
-				recommendation = "All phases complete — ready to audit";
-				action = "/gsd-audit-milestone";
-			} else if (unplanned > 0 && planned === 0) {
-				recommendation = `${unplanned} unplanned phase${unplanned > 1 ? "s" : ""} — plan the milestone first`;
-				action = "/gsd-plan-milestone";
-			} else if (unplanned > 0) {
-				recommendation = `${planned} planned, ${unplanned} still unplanned — finish planning first`;
-				action = "/gsd-plan-milestone";
-			} else {
-				recommendation = `${planned} phase${planned > 1 ? "s" : ""} ready to execute`;
-				action = "/gsd-execute-milestone";
-			}
-
-			const lines = [
-				`━━ GSD Milestone ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-				`🎯  ${progress.milestone_name} (${progress.milestone_version})`,
-				``,
-				`Phases  ${bar(phasePct)}  ${done}/${total} (${phasePct}%)`,
-				``,
-				`🟢 Complete:   ${done}`,
-				`🟡 Planned:    ${planned}`,
-				`🔴 Unplanned:  ${unplanned}`,
-				``,
-				`⚡  ${recommendation}`,
-				`→   ${action}`,
-				``,
-				`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-			];
-
-			ctx.ui.notify(lines.join("\n"), "info");
-			ctx.ui.setEditorText(action);
-		},
-	});
 
 	// ── tool_result: context usage monitor ───────────────────────────────────
 	const WARNING_THRESHOLD = 35; // warn when remaining % ≤ 35
