@@ -157,15 +157,30 @@ Projects started with the original GSD work without migration.
 ## Development
 
 ```sh
-# Type-check
+# Type-check (covers src/ + .gsd/extensions/)
 npm run typecheck
 
 # Build CLI (TypeScript → dist/pi-gsd-tools.js)
 npm run build
 
+# Unified gate: typecheck + build
+npm run check
+
 # Validate integrity
 node scripts/validate-model-profiles.cjs
 ```
+
+### Pre-commit hook
+
+The pre-commit hook runs `ralphi check` (typecheck + build) via [prek](https://github.com/j178/prek).
+prek is a dev-only tool — install it once:
+
+```sh
+# macOS / Linux (Homebrew)
+brew install prek
+```
+
+The hook fires automatically on `git commit`. Without prek installed, commits still work but the gate is skipped.
 
 ---
 
