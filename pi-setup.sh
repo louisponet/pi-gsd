@@ -25,7 +25,14 @@ PACKAGES=(
     "npm:@ifi/pi-spec"
     
     "npm:pi-markdown-preview"
-    "npm:@guwidoe/pi-prompt-suggester"
+    # "npm:@guwidoe/pi-prompt-suggester"
+    # REMOVED: pi-prompt-suggester has two serious drawbacks that outweigh the benefit of inline suggestions:
+    #   1. SLOW STARTUP - on every session start it runs an agentic codebase seeder (up to 16 Claude API
+    #      calls via claude-sonnet-4.6) to rebuild its seed.json whenever key files change. This adds
+    #      several seconds of latency before the input field is even usable.
+    #   2. SILENT AUTO-SUBMIT - the suggester pre-fills the input with its predicted next user message
+    #      (e.g. 'detect_project'). If you hit Enter before noticing, it submits without your consent
+    #      and there is no way to interrupt it once the session has started.
     "npm:pi-interview"
     "npm:pi-mermaid"
     "npm:pi-mcp-adapter"
@@ -35,7 +42,6 @@ PACKAGES=(
     "npm:pi-ask-user"
     "npm:pi-tool-display"
     "npm:pi-annotate"
-    "npm:@0xkobold/pi-learn"
     "npm:pi-animations"
     # "npm:@0xkobold/pi-ollama"
 )

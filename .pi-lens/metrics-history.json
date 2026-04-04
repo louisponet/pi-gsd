@@ -53,14 +53,14 @@
     },
     "src/lib/profile-pipeline.ts": {
       "latest": {
-        "commit": "ea44dbe",
-        "timestamp": "2026-04-03T17:51:55.165Z",
-        "mi": 29.7,
-        "cognitive": 134,
+        "commit": "0f612c7",
+        "timestamp": "2026-04-03T23:23:28.253Z",
+        "mi": 29.9,
+        "cognitive": 130,
         "nesting": 10,
-        "lines": 197,
+        "lines": 188,
         "maxCyclomatic": 23,
-        "entropy": 6.3
+        "entropy": 6.29
       },
       "history": [
         {
@@ -72,6 +72,16 @@
           "lines": 197,
           "maxCyclomatic": 23,
           "entropy": 6.3
+        },
+        {
+          "commit": "0f612c7",
+          "timestamp": "2026-04-03T23:23:28.253Z",
+          "mi": 29.9,
+          "cognitive": 130,
+          "nesting": 10,
+          "lines": 188,
+          "maxCyclomatic": 23,
+          "entropy": 6.29
         }
       ],
       "trend": "stable"
@@ -327,5 +337,5 @@
       "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-03T23:14:47.186Z"
+  "capturedAt": "2026-04-03T23:23:33.674Z"
 }

@@ -714,7 +714,7 @@ export function cmdValidateHealth(
 						"warning",
 						"W005",
 						`config.json: field "${fieldPath}" — ${issue.message}`,
-						"Run gsd-tools validate health --repair to fix using schema defaults",
+						"Run pi-gsd-tools validate health --repair to fix using schema defaults",
 						true,
 						{
 							field: fieldPath,
@@ -731,7 +731,7 @@ export function cmdValidateHealth(
 				"error",
 				"E005",
 				`config.json: JSON parse error - ${(err as Error).message}`,
-				"Run gsd-tools validate health --repair to reset to defaults",
+				"Run pi-gsd-tools validate health --repair to reset to defaults",
 				true,
 			);
 			repairs.push("resetConfig");

@@ -199,7 +199,7 @@ export const UatCheckpointSchema = z
 export type UatCheckpoint = z.infer<typeof UatCheckpointSchema>;
 
 /**
- * Schema for the full structured UAT audit result (as returned by gsd-tools).
+ * Schema for the full structured UAT audit result (as returned by pi-gsd-tools).
  */
 export const UatAuditResultSchema = z
 	.object({

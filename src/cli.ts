@@ -2,7 +2,7 @@
 /**
  * cli.ts — GSD Tools CLI entry point.
  *
- * Faithfully ports gsd-tools.cjs to TypeScript.
+ * Faithfully ports gsd-tools.cjs to TypeScript (published as pi-gsd-tools).
  * Every command, flag, and subcommand is preserved exactly.
  */
 
@@ -159,7 +159,7 @@ async function main(): Promise<void> {
 	const command = args[0];
 	if (!command) {
 		gsdError(
-			"Usage: gsd-tools <command> [args] [--raw] [--output json|toon] [--pick <path>] [--cwd <path>] [--ws <name>]\n" +
+			"Usage: pi-gsd-tools <command> [args] [--raw] [--output json|toon] [--pick <path>] [--cwd <path>] [--ws <name>]\n" +
 				"Commands: state, resolve-model, find-phase, commit, verify, frontmatter, template, " +
 				"generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init, workstream, " +
 				"phase, roadmap, milestone, scaffold, progress, audit-uat, uat, validate, stats, todo, frontmatter, verify-summary",
@@ -880,7 +880,7 @@ async function runCommand(
 				s.startsWith("--") && s.endsWith("--") && s.length > 4;
 			if (!args[1] || (args[1].startsWith("--") && !isPiDirArg(args[1])))
 				gsdError(
-					"Usage: gsd-tools extract-messages <project> [--session <id>] [--limit N] [--path <dir>]",
+					"Usage: pi-gsd-tools extract-messages <project> [--session <id>] [--limit N] [--path <dir>]",
 				);
 			await cmdExtractMessages(
 				args[1],

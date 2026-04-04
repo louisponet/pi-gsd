@@ -23,6 +23,11 @@
     },
     {
       "type": "file",
+      "name": ".gsd/extensions/gsd-hooks.ts",
+      "file": ".gsd/extensions/gsd-hooks.ts"
+    },
+    {
+      "type": "file",
       "name": ".gsd/hooks/gsd-check-update.js",
       "file": ".gsd/hooks/gsd-check-update.js"
     },
@@ -45,6 +50,11 @@
       "type": "file",
       "name": ".gsd/hooks/gsd-workflow-guard.js",
       "file": ".gsd/hooks/gsd-workflow-guard.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/gsd-hooks.ts",
+      "file": ".pi/extensions/gsd-hooks.ts"
     },
     {
       "type": "file",
@@ -1503,12 +1513,6 @@
       "line": 64
     },
     {
-      "type": "devDependency",
-      "name": "tsup",
-      "file": "package.json",
-      "line": 68
-    },
-    {
       "type": "export",
       "name": "MODEL_ALIAS_MAP",
       "file": "src/lib/core.ts",
@@ -1704,13 +1708,13 @@
       "type": "export",
       "name": "ensureConfigFile",
       "file": "src/lib/config.ts",
-      "line": 186
+      "line": 187
     },
     {
       "type": "export",
       "name": "setConfigValue",
       "file": "src/lib/config.ts",
-      "line": 211
+      "line": 212
     },
     {
       "type": "export",
@@ -1723,6 +1727,108 @@
       "name": "buildCheckpoint",
       "file": "src/lib/uat.ts",
       "line": 183
+    },
+    {
+      "type": "export",
+      "name": "StateFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 24
+    },
+    {
+      "type": "export",
+      "name": "RoadmapPhaseEntrySchema",
+      "file": "src/lib/schemas.ts",
+      "line": 66
+    },
+    {
+      "type": "export",
+      "name": "PlanFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 93
+    },
+    {
+      "type": "export",
+      "name": "SummaryFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 134
+    },
+    {
+      "type": "export",
+      "name": "VerificationFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 156
+    },
+    {
+      "type": "export",
+      "name": "UatCheckpointSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 180
+    },
+    {
+      "type": "export",
+      "name": "UatAuditResultSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 204
+    },
+    {
+      "type": "export",
+      "name": "StateFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 56
+    },
+    {
+      "type": "export",
+      "name": "RoadmapPhaseEntry",
+      "file": "src/lib/schemas.ts",
+      "line": 83
+    },
+    {
+      "type": "export",
+      "name": "PlanFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 129
+    },
+    {
+      "type": "export",
+      "name": "SummaryFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 151
+    },
+    {
+      "type": "export",
+      "name": "VerificationFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 169
+    },
+    {
+      "type": "export",
+      "name": "UatCheckpoint",
+      "file": "src/lib/schemas.ts",
+      "line": 199
+    },
+    {
+      "type": "export",
+      "name": "UatAuditResult",
+      "file": "src/lib/schemas.ts",
+      "line": 216
+    },
+    {
+      "type": "export",
+      "name": "GitConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 284
+    },
+    {
+      "type": "export",
+      "name": "WorkflowConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 285
+    },
+    {
+      "type": "export",
+      "name": "HooksConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 286
     },
     {
       "type": "export",
@@ -1946,13 +2052,13 @@
       "type": "export",
       "name": "ensureConfigFile",
       "file": "src/lib/config.ts",
-      "line": 186
+      "line": 187
     },
     {
       "type": "export",
       "name": "setConfigValue",
       "file": "src/lib/config.ts",
-      "line": 211
+      "line": 212
     },
     {
       "type": "export",
@@ -1965,6 +2071,108 @@
       "name": "buildCheckpoint",
       "file": "src/lib/uat.ts",
       "line": 183
+    },
+    {
+      "type": "export",
+      "name": "StateFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 24
+    },
+    {
+      "type": "export",
+      "name": "RoadmapPhaseEntrySchema",
+      "file": "src/lib/schemas.ts",
+      "line": 66
+    },
+    {
+      "type": "export",
+      "name": "PlanFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 93
+    },
+    {
+      "type": "export",
+      "name": "SummaryFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 134
+    },
+    {
+      "type": "export",
+      "name": "VerificationFrontmatterSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 156
+    },
+    {
+      "type": "export",
+      "name": "UatCheckpointSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 180
+    },
+    {
+      "type": "export",
+      "name": "UatAuditResultSchema",
+      "file": "src/lib/schemas.ts",
+      "line": 204
+    },
+    {
+      "type": "export",
+      "name": "StateFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 56
+    },
+    {
+      "type": "export",
+      "name": "RoadmapPhaseEntry",
+      "file": "src/lib/schemas.ts",
+      "line": 83
+    },
+    {
+      "type": "export",
+      "name": "PlanFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 129
+    },
+    {
+      "type": "export",
+      "name": "SummaryFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 151
+    },
+    {
+      "type": "export",
+      "name": "VerificationFrontmatter",
+      "file": "src/lib/schemas.ts",
+      "line": 169
+    },
+    {
+      "type": "export",
+      "name": "UatCheckpoint",
+      "file": "src/lib/schemas.ts",
+      "line": 199
+    },
+    {
+      "type": "export",
+      "name": "UatAuditResult",
+      "file": "src/lib/schemas.ts",
+      "line": 216
+    },
+    {
+      "type": "export",
+      "name": "GitConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 284
+    },
+    {
+      "type": "export",
+      "name": "WorkflowConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 285
+    },
+    {
+      "type": "export",
+      "name": "HooksConfig",
+      "file": "src/lib/schemas.ts",
+      "line": 286
     },
     {
       "type": "export",
@@ -2014,6 +2222,11 @@
     },
     {
       "type": "file",
+      "name": ".gsd/extensions/gsd-hooks.ts",
+      "file": ".gsd/extensions/gsd-hooks.ts"
+    },
+    {
+      "type": "file",
       "name": ".gsd/hooks/gsd-check-update.js",
       "file": ".gsd/hooks/gsd-check-update.js"
     },
@@ -2036,6 +2249,11 @@
       "type": "file",
       "name": ".gsd/hooks/gsd-workflow-guard.js",
       "file": ".gsd/hooks/gsd-workflow-guard.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/gsd-hooks.ts",
+      "file": ".pi/extensions/gsd-hooks.ts"
     },
     {
       "type": "file",
@@ -3494,14 +3712,8 @@
       "name": "commander",
       "file": "package.json",
       "line": 64
-    },
-    {
-      "type": "devDependency",
-      "name": "tsup",
-      "file": "package.json",
-      "line": 68
     }
   ],
   "unlistedDeps": [],
-  "summary": "Found 341 issues"
+  "summary": "Found 359 issues"
 }

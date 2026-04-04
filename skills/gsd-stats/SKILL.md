@@ -12,9 +12,9 @@ Display comprehensive project statistics including phase progress, plan executio
 </execution_context>
 
 <process>
-1. Run: `gsd-tools stats --output toon`
+1. Run: `pi-gsd-tools stats --output toon`
    - If successful, present the toon output to the user.
-   - If the command fails or toon output is unavailable, fall back to: `gsd-tools stats` (plain JSON output).
+   - If the command fails or toon output is unavailable, fall back to: `pi-gsd-tools stats` (plain JSON output).
 
 2. Execute the stats workflow from @.pi/get-shit-done/workflows/stats.md end-to-end.
 </process>

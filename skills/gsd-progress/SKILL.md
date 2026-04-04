@@ -14,9 +14,9 @@ Provides situational awareness before continuing work.
 </execution_context>
 
 <process>
-1. Run: `gsd-tools progress --output toon`
+1. Run: `pi-gsd-tools progress --output toon`
    - If successful, present the toon output to the user.
-   - If the command fails or toon output is unavailable, fall back to: `gsd-tools progress` (plain JSON output).
+   - If the command fails or toon output is unavailable, fall back to: `pi-gsd-tools progress` (plain JSON output).
 
 2. Execute the progress workflow from @.pi/get-shit-done/workflows/progress.md end-to-end.
    Preserve all routing logic (Routes A through F) and edge case handling.
