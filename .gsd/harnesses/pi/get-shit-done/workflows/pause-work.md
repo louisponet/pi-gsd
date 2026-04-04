@@ -45,7 +45,7 @@ Report any summaries with placeholder content as incomplete items.
 **Write structured handoff to `.planning/HANDOFF.json`:**
 
 ```bash
-timestamp=$(node ".pi/gsd/bin/gsd-tools.cjs" current-timestamp full --raw)
+timestamp=$(pi-gsd-tools current-timestamp full --raw)
 ```
 
 ```json
@@ -137,13 +137,13 @@ Be specific enough for a fresh the agent to understand immediately.
 
 Use `current-timestamp` for last_updated field. You can use init todos (which provides timestamps) or call directly:
 ```bash
-timestamp=$(node ".pi/gsd/bin/gsd-tools.cjs" current-timestamp full --raw)
+timestamp=$(pi-gsd-tools current-timestamp full --raw)
 ```
 </step>
 
 <step name="commit">
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md .planning/HANDOFF.json
+pi-gsd-tools commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md .planning/HANDOFF.json
 ```
 </step>
 

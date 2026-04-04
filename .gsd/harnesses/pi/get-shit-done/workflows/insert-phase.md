@@ -34,7 +34,7 @@ Validate first argument is an integer.
 Load phase operation context:
 
 ```bash
-INIT=$(node ".pi/gsd/bin/gsd-tools.cjs" init phase-op "${after_phase}")
+INIT=$(pi-gsd-tools init phase-op "${after_phase}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -49,7 +49,7 @@ Exit.
 **Delegate the phase insertion to gsd-tools:**
 
 ```bash
-RESULT=$(node ".pi/gsd/bin/gsd-tools.cjs" phase insert "${after_phase}" "${description}")
+RESULT=$(pi-gsd-tools phase insert "${after_phase}" "${description}")
 ```
 
 The CLI handles:

@@ -259,7 +259,7 @@ gh issue create \
 ## Step 8: Update STATE.md
 
 ```bash
-gsd-tools.cjs state record-session \
+pi-gsd-tools state record-session \
   --stopped-at "Forensic investigation complete" \
   --resume-file ".planning/forensics/report-{timestamp}.md"
 ```

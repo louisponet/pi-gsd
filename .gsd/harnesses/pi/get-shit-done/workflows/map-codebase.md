@@ -31,9 +31,9 @@ Documents are reference material for the agent when planning/executing. Always i
 Load codebase mapping context:
 
 ```bash
-INIT=$(node ".pi/gsd/bin/gsd-tools.cjs" init map-codebase)
+INIT=$(pi-gsd-tools init map-codebase)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_MAPPER=$(node ".pi/gsd/bin/gsd-tools.cjs" agent-skills gsd-codebase-mapper 2>/dev/null)
+AGENT_SKILLS_MAPPER=$(pi-gsd-tools agent-skills gsd-codebase-mapper 2>/dev/null)
 ```
 
 Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`.
@@ -312,7 +312,7 @@ Continue to commit_codebase_map.
 Commit the codebase map:
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" commit "docs: map existing codebase" --files .planning/codebase/*.md
+pi-gsd-tools commit "docs: map existing codebase" --files .planning/codebase/*.md
 ```
 
 Continue to offer_next.

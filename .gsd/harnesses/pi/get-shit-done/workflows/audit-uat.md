@@ -8,7 +8,7 @@ Cross-phase audit of all UAT and verification files. Finds every outstanding ite
 Run the CLI audit:
 
 ```bash
-AUDIT=$(node ".pi/gsd/bin/gsd-tools.cjs" audit-uat --raw)
+AUDIT=$(pi-gsd-tools audit-uat --raw)
 ```
 
 Parse JSON for `results` array and `summary` object.

@@ -19,10 +19,10 @@ Valid GSD subagent types (use exact names - do not fall back to 'general-purpose
 ## 1. Initialize
 
 ```bash
-INIT=$(node ".pi/gsd/bin/gsd-tools.cjs" init plan-phase "$PHASE")
+INIT=$(pi-gsd-tools init plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI=$(node ".pi/gsd/bin/gsd-tools.cjs" agent-skills gsd-ui-researcher 2>/dev/null)
-AGENT_SKILLS_UI_CHECKER=$(node ".pi/gsd/bin/gsd-tools.cjs" agent-skills gsd-ui-checker 2>/dev/null)
+AGENT_SKILLS_UI=$(pi-gsd-tools agent-skills gsd-ui-researcher 2>/dev/null)
+AGENT_SKILLS_UI_CHECKER=$(pi-gsd-tools agent-skills gsd-ui-checker 2>/dev/null)
 ```
 
 Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_context`, `has_research`, `commit_docs`.
@@ -32,14 +32,14 @@ Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded
 Resolve UI agent models:
 
 ```bash
-UI_RESEARCHER_MODEL=$(node ".pi/gsd/bin/gsd-tools.cjs" resolve-model gsd-ui-researcher --raw)
-UI_CHECKER_MODEL=$(node ".pi/gsd/bin/gsd-tools.cjs" resolve-model gsd-ui-checker --raw)
+UI_RESEARCHER_MODEL=$(pi-gsd-tools resolve-model gsd-ui-researcher --raw)
+UI_CHECKER_MODEL=$(pi-gsd-tools resolve-model gsd-ui-checker --raw)
 ```
 
 Check config:
 
 ```bash
-UI_ENABLED=$(node ".pi/gsd/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
+UI_ENABLED=$(pi-gsd-tools config-get workflow.ui_phase 2>/dev/null || echo "true")
 ```
 
 **If `UI_ENABLED` is `false`:**
@@ -55,7 +55,7 @@ Exit workflow.
 Extract phase number from $ARGUMENTS. If not provided, detect next unplanned phase.
 
 ```bash
-PHASE_INFO=$(node ".pi/gsd/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
+PHASE_INFO=$(pi-gsd-tools roadmap get-phase "${PHASE}")
 ```
 
 **If `found` is false:** Error with available phases.
@@ -273,13 +273,13 @@ Dimensions: 6/6 passed
 ## 11. Commit (if configured)
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI design contract" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
+pi-gsd-tools commit "docs(${padded_phase}): UI design contract" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```
 
 ## 12. Update State
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" state record-session \
+pi-gsd-tools state record-session \
   --stopped-at "Phase ${PHASE} UI-SPEC approved" \
   --resume-file "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```

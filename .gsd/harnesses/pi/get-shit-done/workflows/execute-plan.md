@@ -20,7 +20,7 @@ Valid GSD subagent types (use exact names - do not fall back to 'general-purpose
 Load execution context (paths only to minimize orchestrator context):
 
 ```bash
-INIT=$(node ".pi/gsd/bin/gsd-tools.cjs" init execute-phase "${PHASE}")
+INIT=$(pi-gsd-tools init execute-phase "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -130,7 +130,7 @@ This IS the execution instructions. Follow exactly. If plan references CONTEXT.m
 
 <step name="previous_phase_check">
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" phases list --type summaries --raw
+pi-gsd-tools phases list --type summaries --raw
 # Extract the second-to-last summary from the JSON result
 ```
 If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: AskUserQuestion(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
@@ -285,7 +285,7 @@ git add src/types/user.ts
 **Sub-repos mode:** If `sub_repos` is configured (non-empty array from init context), use `commit-to-subrepo` instead of standard git commit. This routes files to their correct sub-repo based on path prefix.
 
 ```bash
-node .pi/gsd/bin/gsd-tools.cjs commit-to-subrepo "{type}({phase}-{plan}): {description}" --files file1 file2 ...
+pi-gsd-tools commit-to-subrepo "{type}({phase}-{plan}): {description}" --files file1 file2 ...
 ```
 
 The command groups files by sub-repo prefix and commits atomically to each. Returns JSON: `{ committed: true, repos: { "backend": { hash: "abc", files: [...] }, ... } }`.
@@ -341,7 +341,7 @@ If verification fails:
 
 **Check if node repair is enabled** (default: on):
 ```bash
-NODE_REPAIR=$(node "./.pi/gsd/bin/gsd-tools.cjs" config-get workflow.node_repair 2>/dev/null || echo "true")
+NODE_REPAIR=$(pi-gsd-tools config-get workflow.node_repair 2>/dev/null || echo "true")
 ```
 
 If `NODE_REPAIR` is `true`: invoke `@./.pi/gsd/workflows/node-repair.md` with:
@@ -400,13 +400,13 @@ Update STATE.md using gsd-tools:
 
 ```bash
 # Advance plan counter (handles last-plan edge case)
-node ".pi/gsd/bin/gsd-tools.cjs" state advance-plan
+pi-gsd-tools state advance-plan
 
 # Recalculate progress bar from disk state
-node ".pi/gsd/bin/gsd-tools.cjs" state update-progress
+pi-gsd-tools state update-progress
 
 # Record execution metrics
-node ".pi/gsd/bin/gsd-tools.cjs" state record-metric \
+pi-gsd-tools state record-metric \
   --phase "${PHASE}" --plan "${PLAN}" --duration "${DURATION}" \
   --tasks "${TASK_COUNT}" --files "${FILE_COUNT}"
 ```
@@ -418,11 +418,11 @@ From SUMMARY: Extract decisions and add to STATE.md:
 ```bash
 # Add each decision from SUMMARY key-decisions
 # Prefer file inputs for shell-safe text (preserves `$`, `*`, etc. exactly)
-node ".pi/gsd/bin/gsd-tools.cjs" state add-decision \
+pi-gsd-tools state add-decision \
   --phase "${PHASE}" --summary-file "${DECISION_TEXT_FILE}" --rationale-file "${RATIONALE_FILE}"
 
 # Add blockers if any found
-node ".pi/gsd/bin/gsd-tools.cjs" state add-blocker --text-file "${BLOCKER_TEXT_FILE}"
+pi-gsd-tools state add-blocker --text-file "${BLOCKER_TEXT_FILE}"
 ```
 </step>
 
@@ -430,7 +430,7 @@ node ".pi/gsd/bin/gsd-tools.cjs" state add-blocker --text-file "${BLOCKER_TEXT_F
 Update session info using gsd-tools:
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" state record-session \
+pi-gsd-tools state record-session \
   --stopped-at "Completed ${PHASE}-${PLAN}-PLAN.md" \
   --resume-file "None"
 ```
@@ -444,7 +444,7 @@ If SUMMARY "Issues Encountered" ≠ "None": yolo → log and continue. Interacti
 
 <step name="update_roadmap">
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE}"
+pi-gsd-tools roadmap update-plan-progress "${PHASE}"
 ```
 Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct count and status (`In Progress` or `Complete` with date).
 </step>
@@ -453,7 +453,7 @@ Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct co
 Mark completed requirements from the PLAN.md frontmatter `requirements:` field:
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" requirements mark-complete ${REQ_IDS}
+pi-gsd-tools requirements mark-complete ${REQ_IDS}
 ```
 
 Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-01, AUTH-02]`). If no requirements field, skip.
@@ -463,7 +463,7 @@ Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-
 Task code already committed per-task. Commit plan metadata:
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
+pi-gsd-tools commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
 ```
 </step>
 
@@ -478,7 +478,7 @@ git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null || true
 Update only structural changes: new src/ dir → STRUCTURE.md | deps → STACK.md | file pattern → CONVENTIONS.md | API client → INTEGRATIONS.md | config → STACK.md | renamed → update paths. Skip code-only/bugfix/content changes.
 
 ```bash
-node ".pi/gsd/bin/gsd-tools.cjs" commit "" --files .planning/codebase/*.md --amend
+pi-gsd-tools commit "" --files .planning/codebase/*.md --amend
 ```
 </step>
 
