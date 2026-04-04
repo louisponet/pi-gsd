@@ -227,17 +227,21 @@ function main() {
 		else totalSkipped++;
 	});
 
-	// ── Pi prompt templates (.pi/prompts/gsd-*.md) ──────────────────────────────
-	const promptsSrc = path.join(PKG_DIR, "prompts");
+	// ── Pi prompt templates — cleanup stale local copies ───────────────────────
+	// Prompts are served directly from the npm package (user scope).
+	// Local copies in .pi/prompts/ cause collision warnings on every pi update.
+	// Remove any gsd-*.md files previously installed there.
 	const promptsDest = path.join(PROJECT_ROOT, ".pi", "prompts");
-	if (fs.existsSync(promptsSrc)) {
-		const p = copyDir(promptsSrc, promptsDest, FORCE);
-		totalCopied += p.copied;
-		totalSkipped += p.skipped;
-		if (p.copied > 0) {
-			log("ok", `.pi/prompts  (${p.copied} template${p.copied === 1 ? "" : "s"} installed)`);
-		} else {
-			log("skip", `.pi/prompts  (already up-to-date)`);
+	if (fs.existsSync(promptsDest)) {
+		const stale = fs
+			.readdirSync(promptsDest)
+			.filter((f) => f.startsWith("gsd-") && f.endsWith(".md"));
+		if (stale.length > 0) {
+			for (const f of stale) fs.rmSync(path.join(promptsDest, f));
+			log(
+				"ok",
+				`.pi/prompts  (removed ${stale.length} stale local gsd-*.md — served from package instead)`,
+			);
 		}
 	}
 
