@@ -14,9 +14,9 @@ you could describe in one sentence and execute in under 2 minutes.
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/fast.md
+@.pi/gsd/workflows/fast.md
 </execution_context>
 
 <process>
-Execute the fast workflow from @.pi/get-shit-done/workflows/fast.md end-to-end.
+Execute the fast workflow from @.pi/gsd/workflows/fast.md end-to-end.
 </process>

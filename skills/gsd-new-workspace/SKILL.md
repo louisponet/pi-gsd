@@ -31,11 +31,11 @@ Create a physical workspace directory containing copies of specified git repos (
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/new-workspace.md
-@.pi/get-shit-done/references/ui-brand.md
+@.pi/gsd/workflows/new-workspace.md
+@.pi/gsd/references/ui-brand.md
 </execution_context>
 
 <process>
-Execute the new-workspace workflow from @.pi/get-shit-done/workflows/new-workspace.md end-to-end.
+Execute the new-workspace workflow from @.pi/gsd/workflows/new-workspace.md end-to-end.
 Preserve all workflow gates (validation, approvals, commits, routing).
 </process>

@@ -61,22 +61,22 @@ const PROJECT_ROOT = process.env.INIT_CWD || process.cwd();
  *   hooks - whether this platform supports GSD hooks (copied from .gsd/hooks/)
  */
 const HARNESSES = [
-	{ src: "agent", dest: ".agent", hooks: true },
-	{ src: "agent", dest: ".pi", hooks: true },
-	{ src: "claude", dest: ".claude", hooks: true },
-	{ src: "codex", dest: ".codex", hooks: false },
-	{ src: "cursor", dest: ".cursor", hooks: false },
-	{ src: "gemini", dest: ".gemini", hooks: true },
-	{ src: "github", dest: ".github", hooks: false },
-	{ src: "opencode", dest: ".opencode", hooks: true },
-	{ src: "windsurf", dest: ".windsurf", hooks: false },
+	{ src: "agent", dest: ".agent", hooks: true, subdir: "get-shit-done" },
+	{ src: "agent", dest: ".pi", hooks: true, subdir: "gsd" },
+	{ src: "claude", dest: ".claude", hooks: true, subdir: "get-shit-done" },
+	{ src: "codex", dest: ".codex", hooks: false, subdir: "get-shit-done" },
+	{ src: "cursor", dest: ".cursor", hooks: false, subdir: "get-shit-done" },
+	{ src: "gemini", dest: ".gemini", hooks: true, subdir: "get-shit-done" },
+	{ src: "github", dest: ".github", hooks: false, subdir: "get-shit-done" },
+	{ src: "opencode", dest: ".opencode", hooks: true, subdir: "get-shit-done" },
+	{ src: "windsurf", dest: ".windsurf", hooks: false, subdir: "get-shit-done" },
 ];
 
 /**
  * Subdirectory name used inside each harness's dest folder for
  * GSD-specific content (workflows, bin, references, templates …).
  */
-const GSD_SUBDIR = "get-shit-done";
+// subdir is now per-harness (see harness config above)
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -173,11 +173,11 @@ function main() {
 		const destHarness = path.join(PROJECT_ROOT, harness.dest);
 
 		// ── get-shit-done/ content ──────────────────────────────────────────────
-		const srcGsd = path.join(srcHarness, GSD_SUBDIR);
-		const destGsd = path.join(destHarness, GSD_SUBDIR);
+		const srcGsd = path.join(srcHarness, harness.subdir);
+		const destGsd = path.join(destHarness, harness.subdir);
 
 		if (!fs.existsSync(srcHarness)) {
-			log("skip", `${harness.dest}/${GSD_SUBDIR}  (source absent - skipped)`);
+			log("skip", `${harness.dest}/${harness.subdir}  (source absent - skipped)`);
 			continue;
 		}
 
@@ -188,12 +188,12 @@ function main() {
 		if (copied > 0 || skipped === 0) {
 			log(
 				"ok",
-				`${harness.dest}/${GSD_SUBDIR}  (${copied} file${copied === 1 ? "" : "s"} installed)`,
+				`${harness.dest}/${harness.subdir}  (${copied} file${copied === 1 ? "" : "s"} installed)`,
 			);
 		} else {
 			log(
 				"skip",
-				`${harness.dest}/${GSD_SUBDIR}  (already up-to-date, ${skipped} file${skipped === 1 ? "" : "s"} skipped)`,
+				`${harness.dest}/${harness.subdir}  (already up-to-date, ${skipped} file${skipped === 1 ? "" : "s"} skipped)`,
 			);
 		}
 

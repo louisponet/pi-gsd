@@ -8,9 +8,9 @@ Generate a structured SESSION_REPORT.md document capturing session outcomes, wor
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/session-report.md
+@.pi/gsd/workflows/session-report.md
 </execution_context>
 
 <process>
-Execute the session-report workflow from @.pi/get-shit-done/workflows/session-report.md end-to-end.
+Execute the session-report workflow from @.pi/gsd/workflows/session-report.md end-to-end.
 </process>

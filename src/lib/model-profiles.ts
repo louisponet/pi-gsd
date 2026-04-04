@@ -2,7 +2,7 @@
  * model-profiles.ts — MODEL_PROFILES data + resolution + markdown generation.
  *
  * This is the single source of truth for model profiles. The markdown reference
- * file at `get-shit-done/references/model-profiles.md` is auto-generated from
+ * file at `gsd/references/model-profiles.md (pi) or get-shit-done/references/model-profiles.md (other harnesses)` is auto-generated from
  * this data via:
  *
  *   node dist/gsd-tools.js generate-model-profiles-md [--harness <name>]

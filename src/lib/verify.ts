@@ -746,7 +746,7 @@ export function cmdValidateHealth(
 				agentStatus.installed_agents.length === 0
 					? `No GSD agents found in ${agentStatus.agents_dir}`
 					: `Missing ${agentStatus.missing_agents.length} GSD agents: ${agentStatus.missing_agents.join(", ")}`,
-				"Run the GSD installer: npx get-shit-done-cc@latest",
+				"Run the GSD installer: pi install npm:pi-gsd",
 			);
 	} catch {
 		/* non-blocking */

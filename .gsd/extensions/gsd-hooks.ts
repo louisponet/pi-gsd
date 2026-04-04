@@ -64,8 +64,8 @@ export default function (pi: ExtensionAPI) {
 					// Resolve installed version from project or global GSD install
 					let installed = "0.0.0";
 					const versionPaths = [
-						join(ctx.cwd, ".pi", "get-shit-done", "VERSION"),
-						join(homedir(), ".pi", "get-shit-done", "VERSION"),
+						join(ctx.cwd, ".pi", "gsd", "VERSION"),
+						join(homedir(), ".pi", "gsd", "VERSION"),
 					];
 					for (const vp of versionPaths) {
 						if (existsSync(vp)) {

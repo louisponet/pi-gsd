@@ -11,8 +11,8 @@ Routes to the profile-user workflow which orchestrates the full flow: consent ga
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/profile-user.md
-@.pi/get-shit-done/references/ui-brand.md
+@.pi/gsd/workflows/profile-user.md
+@.pi/gsd/references/ui-brand.md
 </execution_context>
 
 <context>

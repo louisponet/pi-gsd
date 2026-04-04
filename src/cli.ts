@@ -1040,7 +1040,7 @@ async function runCommand(
 			const outputOverride = outputIdx2 !== -1 ? args[outputIdx2 + 1] : null;
 			if (!harness) {
 				const binDir = __dirname;
-				const match = binDir.match(/\.([a-z]+)\/get-shit-done\/bin/);
+				const match = binDir.match(/\.([a-z]+)\/gsd\/bin/);
 				harness = match ? match[1] : "agent";
 			}
 			if (!HARNESS_CONFIG[harness])

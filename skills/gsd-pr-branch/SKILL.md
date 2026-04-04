@@ -12,9 +12,9 @@ changes that are irrelevant to code review.
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/pr-branch.md
+@.pi/gsd/workflows/pr-branch.md
 </execution_context>
 
 <process>
-Execute the pr-branch workflow from @.pi/get-shit-done/workflows/pr-branch.md end-to-end.
+Execute the pr-branch workflow from @.pi/gsd/workflows/pr-branch.md end-to-end.
 </process>

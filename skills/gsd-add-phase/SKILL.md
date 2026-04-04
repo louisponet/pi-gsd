@@ -15,7 +15,7 @@ Routes to the add-phase workflow which handles:
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/add-phase.md
+@.pi/gsd/workflows/add-phase.md
 </execution_context>
 
 <context>
@@ -25,7 +25,7 @@ Roadmap and state are resolved in-workflow via `init phase-op` and targeted tool
 </context>
 
 <process>
-**Follow the add-phase workflow** from `@.pi/get-shit-done/workflows/add-phase.md`.
+**Follow the add-phase workflow** from `@.pi/gsd/workflows/add-phase.md`.
 
 The workflow handles all logic including:
 1. Argument parsing and validation

@@ -13,8 +13,8 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 <execution_context>
 **Load these files NOW (before proceeding):**
 
-- @.pi/get-shit-done/workflows/complete-milestone.md (main workflow)
-- @.pi/get-shit-done/templates/milestone-archive.md (archive template)
+- @.pi/gsd/workflows/complete-milestone.md (main workflow)
+- @.pi/gsd/templates/milestone-archive.md (archive template)
   </execution_context>
 
 <context>

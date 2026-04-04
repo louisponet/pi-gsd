@@ -13,7 +13,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/map-codebase.md
+@.pi/gsd/workflows/map-codebase.md
 </execution_context>
 
 <context>

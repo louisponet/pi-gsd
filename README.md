@@ -126,7 +126,8 @@ Switch profile: `/gsd-set-profile <profile>`
 |                     18 subagents |     ✔️     |   ✔️    | Identical agent definitions                                               |
 |                 4 model profiles |     ✔️     |   ✔️    | quality / balanced / budget / inherit                                     |
 |                      Workstreams |     ✔️     |   ✔️    | Full workstream isolation                                                 |
-|            Multi-harness install |     ✔️     |   ✔️    | 8 harnesses via postinstall; `.pi/gsd/` for pi, `get-shit-done/` for rest |
+|            Multi-harness install |     ✔️     |   ✔️    | 8 harnesses via postinstall                                               |
+|     Clean dir name (`.pi/gsd/`) |     ❌     |   ✔️    | pi uses `.pi/gsd/`; other harnesses keep `get-shit-done/` for compat      |
 |              pi harness (`.pi/`) |     ❌     |   ✔️    | New — GSD installs into pi's config dir                                   |
 | Background hooks (Claude/Gemini) |     ✔️     |   ✔️    | All 5 hooks, hardlinked                                                   |
 |            Background hooks (pi) |     ❌     |   ✔️    | TypeScript extension (`gsd-hooks.ts`) installed via postinstall           |

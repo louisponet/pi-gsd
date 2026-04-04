@@ -10,7 +10,7 @@ Provides situational awareness before continuing work.
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/progress.md
+@.pi/gsd/workflows/progress.md
 </execution_context>
 
 <process>
@@ -18,6 +18,6 @@ Provides situational awareness before continuing work.
    - If successful, present the toon output to the user.
    - If the command fails or toon output is unavailable, fall back to: `pi-gsd-tools progress` (plain JSON output).
 
-2. Execute the progress workflow from @.pi/get-shit-done/workflows/progress.md end-to-end.
+2. Execute the progress workflow from @.pi/gsd/workflows/progress.md end-to-end.
    Preserve all routing logic (Routes A through F) and edge case handling.
 </process>

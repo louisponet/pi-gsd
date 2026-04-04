@@ -23,8 +23,8 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/execute-phase.md
-@.pi/get-shit-done/references/ui-brand.md
+@.pi/gsd/workflows/execute-phase.md
+@.pi/gsd/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -48,6 +48,6 @@ Context files are resolved inside the workflow via `pi-gsd-tools init execute-ph
 </context>
 
 <process>
-Execute the execute-phase workflow from @.pi/get-shit-done/workflows/execute-phase.md end-to-end.
+Execute the execute-phase workflow from @.pi/gsd/workflows/execute-phase.md end-to-end.
 Preserve all workflow gates (wave execution, checkpoint handling, verification, state updates, routing).
 </process>

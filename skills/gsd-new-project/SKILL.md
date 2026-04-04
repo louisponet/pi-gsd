@@ -24,14 +24,14 @@ Initialize a new project through unified flow: questioning → research (optiona
 </objective>
 
 <execution_context>
-@.pi/get-shit-done/workflows/new-project.md
-@.pi/get-shit-done/references/questioning.md
-@.pi/get-shit-done/references/ui-brand.md
-@.pi/get-shit-done/templates/project.md
-@.pi/get-shit-done/templates/requirements.md
+@.pi/gsd/workflows/new-project.md
+@.pi/gsd/references/questioning.md
+@.pi/gsd/references/ui-brand.md
+@.pi/gsd/templates/project.md
+@.pi/gsd/templates/requirements.md
 </execution_context>
 
 <process>
-Execute the new-project workflow from @.pi/get-shit-done/workflows/new-project.md end-to-end.
+Execute the new-project workflow from @.pi/gsd/workflows/new-project.md end-to-end.
 Preserve all workflow gates (validation, approvals, commits, routing).
 </process>
