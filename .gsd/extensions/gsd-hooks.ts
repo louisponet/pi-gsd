@@ -254,18 +254,15 @@ export default function (pi: ExtensionAPI) {
 		return lines;
 	};
 
-	const formatProgress = (cwd: string): string => {
+	const formatProgress = (cwd: string): { text: string; data: GsdProgress | null } => {
 		const data = runJson<GsdProgress>("progress json", cwd);
 		if (!data)
-			return "❌ No GSD project found. Run /gsd-new-project to initialise.";
+			return { text: "❌ No GSD project found. Run /gsd-new-project to initialise.", data: null };
 
-		const phasePct = data.percent ?? 0;
-		const planPct =
-			data.total_plans > 0
-				? Math.round((data.total_summaries / data.total_plans) * 100)
-				: 0;
 		const done = data.phases.filter((p) => p.status === "Complete").length;
 		const total = data.phases.length;
+		const phasePct = total > 0 ? Math.round((done / total) * 100) : 0;
+		const planPct =
 
 		const lines = [
 			`━━ GSD Progress ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
@@ -279,13 +276,13 @@ export default function (pi: ExtensionAPI) {
 			``,
 			`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
 		];
-		return lines.join("\n");
+		return { text: lines.join("\n"), data };
 	};
 
-	const formatStats = (cwd: string): string => {
+	const formatStats = (cwd: string): { text: string; data: GsdStats | null } => {
 		const data = runJson<GsdStats>("stats json", cwd);
 		if (!data)
-			return "❌ No GSD project found. Run /gsd-new-project to initialise.";
+			return { text: "❌ No GSD project found. Run /gsd-new-project to initialise.", data: null };
 
 		const reqPct =
 			data.requirements_total > 0
@@ -311,7 +308,7 @@ export default function (pi: ExtensionAPI) {
 			``,
 			`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
 		];
-		return lines.join("\n");
+		return { text: lines.join("\n"), data };
 	};
 
 	const formatHealth = (cwd: string, repair: boolean): string => {
@@ -349,17 +346,40 @@ export default function (pi: ExtensionAPI) {
 		return lines.join("\n");
 	};
 
+	/** Derive the suggested next command string from phase data. */
+	const nextCommand = (phases: GsdPhase[]): string | null => {
+		const pending = phases.filter((p) => p.status !== "Complete");
+		if (pending.length === 0) return "/gsd-audit-milestone";
+		const next = pending[0];
+		const n = next.number;
+		if (next.plans === 0) return `/gsd-discuss-phase ${n}`;
+		if (next.summaries < next.plans) return `/gsd-execute-phase ${n}`;
+		return `/gsd-verify-work ${n}`;
+	};
+
 	pi.registerCommand("gsd-progress", {
 		description: "Show project progress with next steps (instant)",
 		handler: async (_args, ctx) => {
-			ctx.ui.notify(formatProgress(ctx.cwd), "info");
+			const { text, data } = formatProgress(ctx.cwd);
+			ctx.ui.notify(text, "info");
+			// Pivot affordance: pre-fill the editor with the most relevant next action
+			// so the user can run it, modify it, or just type something else entirely
+			if (data) {
+				const cmd = nextCommand(data.phases);
+				if (cmd) ctx.ui.setEditorText(cmd);
+			}
 		},
 	});
 
 	pi.registerCommand("gsd-stats", {
 		description: "Show project statistics (instant)",
 		handler: async (_args, ctx) => {
-			ctx.ui.notify(formatStats(ctx.cwd), "info");
+			const { text, data } = formatStats(ctx.cwd);
+			ctx.ui.notify(text, "info");
+			if (data) {
+				const cmd = nextCommand(data.phases);
+				if (cmd) ctx.ui.setEditorText(cmd);
+			}
 		},
 	});
 
@@ -371,6 +391,67 @@ export default function (pi: ExtensionAPI) {
 		getArgumentCompletions: (prefix) => {
 			const options = [{ value: "--repair", label: "--repair  Auto-fix issues" }];
 			return options.filter((o) => o.value.startsWith(prefix));
+		},
+	});
+
+	pi.registerCommand("gsd-next", {
+		description: "Auto-advance to the next GSD action (instant, no LLM)",
+		handler: async (_args, ctx) => {
+			const data = runJson<GsdProgress>("progress json", ctx.cwd);
+			if (!data) {
+				ctx.ui.notify(
+					"❌ No GSD project found. Run /gsd-new-project to initialise.",
+					"error",
+				);
+				ctx.ui.setEditorText("/gsd-new-project");
+				return;
+			}
+
+			const pending = data.phases.filter((p) => p.status !== "Complete");
+
+			if (pending.length === 0) {
+				ctx.ui.notify(
+					[
+						`━━ GSD Next ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+						`✅  All phases complete!`,
+						`→   /gsd-audit-milestone`,
+						`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+					].join("\n"),
+					"info",
+				);
+				ctx.ui.setEditorText("/gsd-audit-milestone");
+				return;
+			}
+
+			const next = pending[0];
+			const n = next.number;
+			let action: string;
+			let reason: string;
+
+			if (next.plans === 0) {
+				action = `/gsd-discuss-phase ${n}`;
+				reason = `Phase ${n} has no plans yet — start with discussion`;
+			} else if (next.summaries < next.plans) {
+				action = `/gsd-execute-phase ${n}`;
+				reason = `Phase ${n}: ${next.summaries}/${next.plans} plans done — continue execution`;
+			} else {
+				action = `/gsd-verify-work ${n}`;
+				reason = `Phase ${n}: all plans done — verify UAT`;
+			}
+
+			ctx.ui.notify(
+				[
+					`━━ GSD Next ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+					`⏩  ${reason}`,
+					`→   ${action}`,
+					...(pending.length > 1
+						? [`    (${pending.length - 1} more phase${pending.length > 2 ? "s" : ""} pending after this)`]
+						: []),
+					`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+				].join("\n"),
+				"info",
+			);
+			ctx.ui.setEditorText(action);
 		},
 	});
 
