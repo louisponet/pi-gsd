@@ -57,6 +57,9 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"pi": {
+		"extensions": [
+			"./.gsd/extensions"
+		],
 		"skills": [
 			"./skills"
 		],

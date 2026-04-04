@@ -219,14 +219,31 @@ function main() {
 		installed++;
 	}
 
-	// ── Pi extension (.pi/extensions/pi-gsd-hooks.ts) ─────────────────────────────
-	// Install the GSD pi lifecycle extension (session_start, tool_call, tool_result hooks).
-	// The extension is auto-discovered by pi from .pi/extensions/ - no manual wiring needed.
-	installPiExtension(PROJECT_ROOT, PKG_DIR, FORCE, (copied) => {
-		if (copied) totalCopied++;
-		else totalSkipped++;
-	});
-
+	// ── Pi extension — served from npm package via pi.extensions in package.json ─────
+	// No local copying needed. Cleanup stale files from old install approach.
+	const extDir = path.join(PROJECT_ROOT, ".pi", "extensions");
+	const staleExts = ["gsd-hooks.ts", "pi-gsd-hooks.ts"];
+	for (const name of staleExts) {
+		const stale = path.join(extDir, name);
+		if (fs.existsSync(stale)) {
+			fs.rmSync(stale);
+			log("ok", `.pi/extensions/${name}  (removed — extension now served from package)`);
+		}
+	}
+	const settingsFile2 = path.join(PROJECT_ROOT, ".pi", "settings.json");
+	if (fs.existsSync(settingsFile2)) {
+		try {
+			const settings2 = JSON.parse(fs.readFileSync(settingsFile2, "utf8"));
+			if (Array.isArray(settings2.extensions)) {
+				const cleaned2 = settings2.extensions.filter((e) => !staleExts.some((n) => e.endsWith(n)));
+				if (cleaned2.length !== settings2.extensions.length) {
+					settings2.extensions = cleaned2;
+					fs.writeFileSync(settingsFile2, JSON.stringify(settings2, null, "\t"), "utf8");
+					log("ok", ".pi/settings.json  (removed stale extension entries)");
+				}
+			}
+		} catch { /* ignore */ }
+	}
 	// ── Pi prompt templates — cleanup stale local copies ───────────────────────
 	// Prompts are served directly from the npm package (user scope).
 	// Local copies in .pi/prompts/ cause collision warnings on every pi update.
@@ -394,7 +411,11 @@ function installPiExtension(projectRoot, pkgDir, force, callback) {
 		} else if (cleaned.length !== extensions.length) {
 			// Removed stale entry but extDest already present
 			settings.extensions = cleaned;
-			fs.writeFileSync(settingsFile, JSON.stringify(settings, null, "\t"), "utf8");
+			fs.writeFileSync(
+				settingsFile,
+				JSON.stringify(settings, null, "\t"),
+				"utf8",
+			);
 			log("ok", ".pi/settings.json  (removed stale gsd-hooks.ts entry)");
 		}
 	} catch (e) {
