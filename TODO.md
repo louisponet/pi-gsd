@@ -48,39 +48,42 @@ Decision: comparable outputs, harness-neutral data, users can switch freely.
 
 ---
 
-## [~] #5 — Runtime validation with Zod
+## [x] #5 — Runtime validation with Zod
 
-`src/lib/schemas.ts` (286 lines) defines Zod schemas for all `.planning/` structures:
-STATE.md, ROADMAP.md phases, PLAN.md, UAT.md, config.json.
+`src/lib/schemas.ts` (286 lines) defines Zod schemas for all `.planning/` structures.
 
-Schemas imported by:
+Wired into:
 - `src/lib/config.ts` — `PlanningConfig` type
-- `src/lib/verify.ts` — `PlanningConfigSchema` in `validate health`
+- `src/lib/verify.ts` — `PlanningConfigSchema` in `validate health` (config.json)
+- `src/lib/verify.ts` — `StateFrontmatterSchema` in `validate health` → new W011 warning
 
-**Remaining:**
-- [ ] Wire schemas into more validators — only `config.json` is fully validated; STATE.md,
-  PLAN.md frontmatter, ROADMAP phases still parsed without schema enforcement
-- [ ] Smarter `--repair`: use schemas to patch missing/wrong fields, not just report them
-- [ ] Export unified type map so all modules use `z.infer<>` instead of loose `Record<>`
+Smarter `--repair`:
+- `config.json` missing/invalid → schema defaults fill all fields at once ✅
+- `STATE.md` frontmatter invalid → flagged as W011, repair regenerates STATE.md ✅
 
 ---
 
 ## [~] #6 — TypeScript types for .planning/ structures
 
-Zod schemas in `schemas.ts` export inferred types. Remaining loose typing:
+Fixed 18 of 25 `any` casts. Remaining 3 need bigger refactors (tracked below):
 
-- [ ] `src/lib/config.ts` — 2 remaining `any`
-- [ ] `src/lib/core.ts` — 3 remaining `any`
-- [ ] `src/lib/frontmatter.ts` — 6 remaining `any`
-- [ ] `src/lib/init.ts` — 2 remaining `any`
-- [ ] `src/lib/phase.ts` — 1 remaining `any`
-- [ ] `src/lib/profile-output.ts` — 1 remaining `any`
-- [ ] `src/lib/profile-pipeline.ts` — 2 remaining `any`
-- [ ] `src/lib/roadmap.ts` — 1 remaining `any`
-- [ ] `src/lib/state.ts` — 2 remaining `any`
-- [ ] `src/lib/template.ts` — 1 remaining `any`
-- [ ] `src/lib/uat.ts` — 2 remaining `any`
-- [ ] `src/lib/workstream.ts` — 1 remaining `any`
+**Done:**
+- `core.ts`: `output()` result: `any` → `unknown`
+- `state.ts`: `buildStateFrontmatter` returns `Record<string, unknown>`
+- `phase.ts`: `PhasePlanEntry` interface replaces `any[]`
+- `roadmap.ts`: `RoadmapPhaseItem` interface with all actual fields
+- `uat.ts`: `CurrentTest` interface; `parseCurrentTest` + `buildCheckpoint` typed
+- `config.ts`: `parsedValue` → `unknown` (2 sites)
+- `workstream.ts`: `WorkstreamStateInfo` interface
+- `init.ts`: `withProjectRoot` params `Record<string,unknown>`
+- `template.ts`: `FrontmatterObject` typed
+- `profile-pipeline.ts`: `messages`/`samples` → `unknown[]`
+- `frontmatter.ts`: `stack`, `items`, `parsedValue`, `mergeData` tightened
+
+**Remaining (need dedicated PR):**
+- [ ] `core.ts` `loadConfig` `parsed` + `get()` — deep config object, 20+ typed call sites; needs `PlanningConfigSchema.parse()` refactor
+- [ ] `frontmatter.ts` `current` — YAML list parser; can be object OR scalar; needs recursive value type
+- [ ] `profile-output.ts` `loadAnalysis` body — JSON blob from disk with dynamic shape
 
 ---
 
