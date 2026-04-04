@@ -139,9 +139,8 @@ Switch profile: `/gsd-set-profile <profile>`
 |       Instant commands (no LLM cost) |     ❌     |   ✔️    | `/gsd-progress`, `/gsd-stats`, `/gsd-health`, `/gsd-help`, `/gsd-next` — zero LLM, editor pivot  |
 |             `/gsd-next` auto-advance |     ❌     |   ✔️    | Deterministic phase routing, pre-fills editor with the correct next command                      |
 |       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates — clean autocomplete, arg hints, direct workflow dispatch                 |
-|        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all phases at once — one mode question, scope pre-check, context-safe checkpointing        |
-|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases with scope guardian, UAT gates, recovery loop, worktree isolation            |
-|    `/gsd-milestone` instant command |     ❌     |   ✔️    | Milestone dashboard — plan vs execute routing, pre-fills editor with correct next command       |
+|        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all unplanned phases — one mode question, scope pre-check per phase, context-safe checkpoint |
+|     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases — scope guardian (pre+post), UAT gates, recovery loop, worktree isolation + merge |
 
 Legend: ✔️ done · ⚡ enhanced · ⚠️ in progress · 📃 planned · ❌ not available
 

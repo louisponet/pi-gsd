@@ -2,30 +2,30 @@
 
 Plan all unplanned phases in the current milestone in a single orchestrated session.
 
+---
+
 ## Mode Selection (step 0 — always first)
 
-Before any planning, ask the user ONE question:
+Ask the user ONE binary question:
 
-> **"Can I ask you questions during planning, or should I churn through all phases silently and flag doubts at the end?"**
+> **"Should I ask you questions during planning, or plan everything silently and flag doubts at the end?"**
 >
-> Options:
 > - **Interactive** — I'll ask targeted questions per phase when I hit real ambiguity
-> - **Silent** — Plan everything autonomously; collect flags for review at the end
+> - **Silent** — Plan autonomously; collect flags for review at the end
 
-Store the answer as `MODE` (interactive | silent). Do not ask again for the rest of the session.
+Store the answer as `MODE` (interactive | silent). Do not ask again.
 
 ---
 
 ## Phase Discovery
 
-```
+```bash
 pi-gsd-tools roadmap analyze --raw
 pi-gsd-tools state json --raw
 ```
 
-Identify all phases that have **no PLAN.md files** in their phase directory.
-Skip phases that are already Complete or already have plans.
-Work in roadmap order.
+Identify all phases with **no PLAN.md files** in their phase directory.
+Skip phases already Complete or already planned. Work in roadmap order.
 
 ---
 
@@ -33,45 +33,49 @@ Work in roadmap order.
 
 For each unplanned phase `N`:
 
-### 1. Pre-check (lightweight scope alignment)
+### 1. Scope Pre-check
 
-Read:
-- `.planning/REQUIREMENTS.md`
-- The phase entry from ROADMAP.md (goal + success criteria)
+Read `.planning/REQUIREMENTS.md` and the phase entry from ROADMAP.md (goal + success criteria).
 
-Check: Does the phase goal align with active requirements? Flag any mismatch.
-If critical misalignment found and `MODE=interactive`: surface it, ask before continuing.
-If `MODE=silent`: note the flag, continue.
+Ask internally: *"Does executing this phase risk implementing anything not covered by active requirements, or conflict with what previous phases were meant to deliver?"*
 
-### 2. Plan the phase
+Classify risk:
+- **low** — continue silently
+- **medium** — log in scope-notes, continue
+- **high + interactive** — surface to user before proceeding, ask whether to adjust or continue
+- **high + silent** — log prominently, continue, surface in final summary
 
-Invoke `Skill(skill="gsd-plan-phase", args="${N} --skip-research")` unless:
-- Research directory is empty or absent → drop `--skip-research`
-- User in interactive mode requested research → invoke without flag
+### 2. Plan the Phase
 
-In **interactive mode**: the gsd-plan-phase skill will ask normally.
-In **silent mode**: append `--auto` to suppress discussion questions.
+Invoke:
+```
+Skill(skill="gsd-plan-phase", args="${N} --skip-research")
+```
+Unless the phase has no RESEARCH.md yet → drop `--skip-research`.
+In **silent** mode, append `--auto` to suppress discussion prompts inside plan-phase.
 
 ### 3. Checkpoint
 
 After each phase plan is committed:
-```
+```bash
 pi-gsd-tools state update current_phase ${N}
 ```
-Announce: `✓ Phase ${N} planned — ${plans_created} plan(s) created`
 
-Check context remaining. If < 25%: stop, emit summary of planned/remaining, recommend `/gsd-plan-milestone` to continue.
+Announce: `✓ Phase ${N} planned — ${plan_count} plan(s) created`
+
+Check context remaining. If < 25%: stop immediately, emit summary of planned vs remaining phases, suggest `/gsd-plan-milestone --from ${next_unplanned}` to continue.
 
 ---
 
 ## Final Summary
 
 ```
-━━ plan-milestone complete ━━━━━━━━━━━━━━━━━━━━━━
-✓ Planned: [list of phases]
-⚠ Flags:   [any scope/ambiguity notes]
+━━ plan-milestone complete ━━━━━━━━━━━━━━━━━━━━━━━
+✓ Planned:  [phase list]
+⚠ Flags:   [scope notes from high-risk pre-checks]
 ↳ Next: /gsd-execute-milestone
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-If flags exist: present them for user review before suggesting execute-milestone.
+If flags exist and `MODE=interactive`: present them for user review before suggesting execute-milestone.
+If flags exist and `MODE=silent`: present all flags together at the end.
