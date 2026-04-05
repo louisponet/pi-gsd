@@ -78,20 +78,108 @@ const ensureHarnessSymlink = (cwd: string): void => {
 
 
 export default function (pi: ExtensionAPI) {
-	// ── input: <gsd-include> injection ───────────────────────────────────
-	// Replaces <gsd-include path="..." /> tags with actual file contents.
-	// Supports selectors: tag:NAME, heading:TEXT, lines:N-M
-	// Valid chains: tag|heading, tag|lines, heading|lines, heading|tag
-	// On ANY failure: red error + abort (action:"handled"). No partial injection.
-	pi.on("input", async (event, ctx) => {
-		if (event.source === "extension") return { action: "continue" };
+/** Resolve a single <gsd-include> match: file lookup + selector extraction. */
+function resolveGsdInclude(
+	match: RegExpMatchArray,
+	cwd: string,
+	pkgHarness: string,
+	errors: string[],
+): string | null {
+	const filePath = match[1];
+	const selectExpr = match[2] ?? "";
 
-		const text = event.text;
+	// ── Resolve file path ───────────────────────────────────────
+	const subPath = filePath.replace(/^\.pi\/gsd\//, "");
+	const candidates = [
+		join(cwd, filePath),
+		...(filePath.startsWith(".pi/gsd/") && pkgHarness
+			? [join(pkgHarness, subPath)]
+			: []),
+	];
+
+	let raw: string | null = null;
+	for (const c of candidates) {
+		try {
+			if (existsSync(c)) {
+				raw = readFileSync(c, "utf8");
+				break;
+			}
+		} catch {
+			/* try next */
+		}
+	}
+	if (raw === null) {
+		errors.push("File not found: " + filePath);
+		return null;
+	}
+
+	// ── Apply selector ─────────────────────────────────────────
+	let result = raw;
+	if (!selectExpr) return result;
+
+	const parts = selectExpr.split("|");
+	if (parts.length > 2) {
+		errors.push("Invalid selector (max 2 segments): " + selectExpr);
+		return null;
+	}
+	if (parts.length > 1 && parts.some((p) => p.trim().startsWith("lines:"))) {
+		errors.push("lines: cannot be chained — use it alone: " + selectExpr);
+		return null;
+	}
+
+	for (const part of parts) {
+		const p = part.trim();
+
+		if (p.startsWith("tag:")) {
+			const tagName = p.slice(4);
+			const tagRe = new RegExp("<" + tagName + ">([\\s\\S]*?)</" + tagName + ">", "i");
+			const tagMatch = result.match(tagRe);
+			if (!tagMatch) {
+				errors.push("Tag <" + tagName + "> not found in " + filePath);
+				return null;
+			}
+			result = tagMatch[1].trim();
+		} else if (p.startsWith("heading:")) {
+			const headingText = p.slice(8);
+			const escaped = headingText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			const headingRe = new RegExp("(^|\\n)(#{1,6})\\s+" + escaped + "\\s*\\n");
+			const hMatch = result.match(headingRe);
+			if (!hMatch) {
+				errors.push('Heading "' + headingText + '" not found in ' + filePath);
+				return null;
+			}
+			const level = hMatch[2].length;
+			const startIdx = (hMatch.index ?? 0) + hMatch[0].length;
+			const nextHeading = result.slice(startIdx).search(new RegExp("\\n#{1," + level + "}\\s"));
+			result =
+				nextHeading === -1
+					? result.slice(startIdx).trim()
+					: result.slice(startIdx, startIdx + nextHeading).trim();
+		} else if (p.startsWith("lines:")) {
+			const rangeMatch = p.match(/^lines:(\d+)-(\d+)$/);
+			if (!rangeMatch) {
+				errors.push("Invalid lines selector: " + p);
+				return null;
+			}
+			const start = parseInt(rangeMatch[1], 10) - 1;
+			const end = parseInt(rangeMatch[2], 10);
+			result = result.split("\n").slice(start, end).join("\n");
+		} else {
+			errors.push("Unknown selector: " + p);
+			return null;
+		}
+	}
+
+	return result;
+}
+
+	// ── context: <gsd-include> injection ────────────────────────────────────────
+	// Fires AFTER template expansion, before each LLM call.
+	// Scans user messages for <gsd-include path="..." select="..." /> tags,
+	// resolves files, applies selectors, replaces tags with content.
+	// On ANY failure: red error + return empty messages to block the LLM call.
+	pi.on("context", async (event, ctx) => {
 		const includePattern = /<gsd-include\s+path="([^"]+)"(?:\s+select="([^"]*)")?\s*\/>/g;
-		const includes = [...text.matchAll(includePattern)];
-		ctx.ui.notify("[GSD] len=" + String(text?.length) + " inc=" + includes.length + " txt=[" + String(text).slice(0, 250) + "]", "info");
-		if (includes.length === 0) return { action: "continue" };
-
 
 		// Package harness fallback path
 		const extFile = typeof __filename !== "undefined" ? __filename : "";
@@ -100,116 +188,46 @@ export default function (pi: ExtensionAPI) {
 			: "";
 
 		const errors: string[] = [];
-		let transformed = text;
+		const messages = event.messages;
 
-		for (const match of includes) {
-			const fullMatch = match[0];
-			const filePath = match[1];
-			const selectExpr = match[2] ?? "";
+		for (const msg of messages) {
+			if (msg.role !== "user") continue;
 
-			// ── Resolve file path ───────────────────────────────────────
-			const subPath = filePath.replace(/^\.pi\/gsd\//, "");
-			const candidates = [
-				join(ctx.cwd, filePath),
-				...(filePath.startsWith(".pi/gsd/") && pkgHarness
-					? [join(pkgHarness, subPath)]
-					: []),
-			];
+			// Handle both string content and content block arrays
+			if (typeof msg.content === "string") {
+				const includes = [...msg.content.matchAll(includePattern)];
+				if (includes.length === 0) continue;
 
-			let raw: string | null = null;
-			for (const c of candidates) {
-				try {
-					if (existsSync(c)) { raw = readFileSync(c, "utf8"); break; }
-				} catch { /* try next */ }
-			}
-			if (raw === null) {
-				errors.push(`File not found: ${filePath}`);
-				continue;
-			}
-
-			// ── Apply selector ─────────────────────────────────────────
-			let result = raw;
-			if (selectExpr) {
-				const parts = selectExpr.split("|");
-				if (parts.length > 2) {
-					errors.push(`Invalid selector (max 2 segments): ${selectExpr}`);
-					continue;
+				let transformed = msg.content;
+				for (const match of includes) {
+					const replacement = resolveGsdInclude(match, ctx.cwd, pkgHarness, errors);
+					if (replacement === null) continue;
+					transformed = transformed.replace(match[0], replacement);
 				}
-				// lines: must be standalone — reject any chain involving lines
-				if (parts.length > 1 && parts.some((p) => p.trim().startsWith("lines:"))) {
-					errors.push(`lines: cannot be chained — use it alone: ${selectExpr}`);
-					continue;
-				}
+				msg.content = transformed;
+			} else if (Array.isArray(msg.content)) {
+				for (const block of msg.content) {
+					if (block.type !== "text" || !block.text) continue;
+					const includes = [...block.text.matchAll(includePattern)];
+					if (includes.length === 0) continue;
 
-				for (let i = 0; i < parts.length; i++) {
-					const part = parts[i].trim();
-					const prev = i > 0 ? parts[i - 1].trim().split(":")[0] : null;
-
-					if (part.startsWith("tag:")) {
-						const tagName = part.slice(4);
-						const tagRe = new RegExp(
-							`<${tagName}>([\\s\\S]*?)</${tagName}>`,
-							"i",
-						);
-						const tagMatch = result.match(tagRe);
-						if (!tagMatch) {
-							errors.push(`Tag <${tagName}> not found in ${filePath}`);
-							result = "";
-							break;
-						}
-						result = tagMatch[1].trim();
-
-					} else if (part.startsWith("heading:")) {
-						const headingText = part.slice(8);
-						const headingRe = new RegExp(
-							`(^|\\n)(#{1,6})\\s+${headingText.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\s*\\n`,
-						);
-						const hMatch = result.match(headingRe);
-						if (!hMatch) {
-							errors.push(`Heading \"${headingText}\" not found in ${filePath}`);
-							result = "";
-							break;
-						}
-						const level = hMatch[2].length;
-						const startIdx = (hMatch.index ?? 0) + hMatch[0].length;
-						const nextHeading = result.slice(startIdx).search(
-							new RegExp(`\\n#{1,${level}}\\s`),
-						);
-						result = nextHeading === -1
-							? result.slice(startIdx).trim()
-							: result.slice(startIdx, startIdx + nextHeading).trim();
-
-					} else if (part.startsWith("lines:")) {
-						const rangeMatch = part.match(/^lines:(\d+)-(\d+)$/);
-						if (!rangeMatch) {
-							errors.push(`Invalid lines selector: ${part}`);
-							result = "";
-							break;
-						}
-						const start = parseInt(rangeMatch[1], 10) - 1;
-						const end = parseInt(rangeMatch[2], 10);
-						result = result.split("\n").slice(start, end).join("\n");
-
-					} else {
-						errors.push(`Unknown selector: ${part}`);
-						result = "";
-						break;
+					let transformed = block.text;
+					for (const match of includes) {
+						const replacement = resolveGsdInclude(match, ctx.cwd, pkgHarness, errors);
+						if (replacement === null) continue;
+						transformed = transformed.replace(match[0], replacement);
 					}
+					block.text = transformed;
 				}
-				if (result === "") continue; // error already logged
 			}
-
-			transformed = transformed.replace(fullMatch, result);
 		}
 
 		if (errors.length > 0) {
-			ctx.ui.notify("\u274c GSD include failed:\n" + errors.map((e) => "  \u2022 " + e).join("\n"),
-				"error",
-			);
-			return { action: "handled" };
+			ctx.ui.notify("\u274c GSD include failed:\n" + errors.map((e) => "  \u2022 " + e).join("\n"), "error");
+			return { messages: [] }; // block LLM call
 		}
 
-		return { action: "transform", text: transformed };
+		return { messages };
 	});
 
 	// ── session_start: GSD update check ──────────────────────────────────────
