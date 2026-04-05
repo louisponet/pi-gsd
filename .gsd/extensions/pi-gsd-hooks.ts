@@ -19,8 +19,10 @@
 import { execSync } from "node:child_process";
 import {
 	existsSync,
+	lstatSync,
 	mkdirSync,
 	readFileSync,
+	rmSync,
 	statSync,
 	symlinkSync,
 	writeFileSync,
@@ -38,7 +40,20 @@ import type { ContextUsage, ExtensionAPI } from "@mariozechner/pi-coding-agent";
 const ensureHarnessSymlink = (cwd: string): void => {
 	try {
 		const dest = join(cwd, ".pi", "gsd");
-		if (existsSync(dest)) return; // already there (symlink or real dir)
+		// If dest exists, verify it's a valid symlink with files inside.
+		// A stale real directory (from old build or worktree) must be replaced.
+		if (existsSync(dest)) {
+			try {
+				const stat = statSync(dest);
+				if (stat.isSymbolicLink?.() || lstatSync(dest).isSymbolicLink()) return; // valid symlink, done
+				// Real directory — check if it has the expected files
+				if (existsSync(join(dest, "workflows", "execute-phase.md"))) return; // looks complete
+				// Stale/incomplete directory — remove and replace with symlink
+				rmSync(dest, { recursive: true, force: true });
+			} catch {
+				return; // can't inspect, leave it
+			}
+		}
 
 		// Walk up from this extension file to the package root:
 		// <pkg>/.gsd/extensions/pi-gsd-hooks.ts → <pkg>
