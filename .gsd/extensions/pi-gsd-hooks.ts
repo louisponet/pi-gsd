@@ -87,8 +87,11 @@ export default function (pi: ExtensionAPI) {
 		if (event.source === "extension") return { action: "continue" };
 
 		const text = event.text;
+		ctx.ui.notify(`[GSD:DBG] text.len=${text?.length} first200=${JSON.stringify((text ?? "").slice(0, 200))}`, "info");
+
 		const includePattern = /<gsd-include\s+path="([^"]+)"(?:\s+select="([^"]*)")?\s*\/>/g;
 		const includes = [...text.matchAll(includePattern)];
+		ctx.ui.notify(`[GSD:DBG] includes=${includes.length}`, "info");
 		if (includes.length === 0) return { action: "continue" };
 
 		// Package harness fallback path
