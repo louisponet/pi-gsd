@@ -81,6 +81,53 @@ const syncReferenceToCore = (cwd: string, ref: string[]): void => {
 };
 
 export default function (pi: ExtensionAPI) {
+	// ── before_agent_start: inject @file contents into the prompt ────────────
+	// Replaces @.pi/gsd/... references with actual file contents so the LLM
+	// gets the full context in the first message. No tool calls, no token
+	// waste, provider-agnostic.
+	pi.on("before_agent_start", async (event, ctx) => {
+		const prompt = event.prompt;
+		if (!prompt) return undefined;
+
+		// Match @.pi/gsd/... and @.planning/... file references
+		const fileRefPattern = /@(\.pi\/gsd\/[^\s]+|\.planning\/[^\s]+)/g;
+		const refs = [...prompt.matchAll(fileRefPattern)];
+		if (refs.length === 0) return undefined;
+
+		const injected: string[] = [];
+		const failed: string[] = [];
+		for (const match of refs) {
+			const relPath = match[1];
+			const absPath = join(ctx.cwd, relPath);
+			try {
+				if (existsSync(absPath)) {
+					const content = readFileSync(absPath, "utf8");
+					injected.push(`<!-- @${relPath} -->\n${content}\n<!-- /@${relPath} -->`);
+				} else {
+					failed.push(relPath);
+				}
+			} catch {
+				failed.push(relPath);
+			}
+		}
+
+		if (failed.length > 0) {
+			ctx.ui.notify(
+				`❌ GSD context injection failed — missing files:\n${failed.map((f) => `  • ${f}`).join("\n")}\n\nCheck that .pi/gsd/ symlink exists and points to the harness.`,
+				"error",
+			);
+			return { abort: true };
+		}
+
+		return {
+			message: {
+				customType: "pi-gsd-context",
+				content: injected.join("\n\n"),
+				display: false,
+			},
+		};
+	});
+
 	// ── session_start: GSD update check ──────────────────────────────────────
 	pi.on("session_start", async (_event, ctx) => {
 		// Ensure harness files are reachable via .pi/gsd/ symlink
