@@ -1,7 +1,7 @@
 ---
 description: Run all remaining phases autonomously - discuss→plan→execute per phase
 ---
-@.pi/gsd/workflows/autonomous.md
-@.pi/gsd/references/ui-brand-core.md
+<gsd-include path=".pi/gsd/workflows/autonomous.md" />
+<gsd-include path=".pi/gsd/references/ui-brand.md" select="tag:core" />
 
 $ARGUMENTS

@@ -1,7 +1,7 @@
 ---
 description: Retroactive 6-pillar visual audit of implemented frontend code
 ---
-@.pi/gsd/workflows/ui-review.md
-@.pi/gsd/references/ui-brand.md
+<gsd-include path=".pi/gsd/workflows/ui-review.md" />
+<gsd-include path=".pi/gsd/references/ui-brand.md" />
 
 $ARGUMENTS

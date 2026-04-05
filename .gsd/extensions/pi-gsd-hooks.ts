@@ -76,102 +76,145 @@ const ensureHarnessSymlink = (cwd: string): void => {
 	}
 };
 
-const syncReferenceToCore = (cwd: string, ref: string[]): void => {
-	try {
-		const refsDir = join(cwd, ".pi", "gsd", "references");
-		const refName = ref.join("-") + ".md";
-		const coreName = [...ref, "core"].join("-") + ".md";
-		const src = join(refsDir, refName);
-		const dst = join(refsDir, coreName);
-		if (!existsSync(src)) return;
-		const srcMtime = statSync(src).mtimeMs;
-		const dstMtime = existsSync(dst) ? statSync(dst).mtimeMs : 0;
-		if (srcMtime <= dstMtime) return; // already in sync
-		const content = readFileSync(src, "utf8");
-		const match = content.match(/<core>([\s\S]*?)<\/core>/i);
-		writeFileSync(dst, match ? match[1].trim() : content, "utf8");
-	} catch {
-		/* silent — never block session startup or tool execution */
-	}
-};
 
 export default function (pi: ExtensionAPI) {
-	// ── input: inject @file contents before the LLM sees the message ──────────
-	// Replaces @.pi/gsd/... and @.planning/... references with actual file
-	// contents programmatically. Zero tool calls, provider-agnostic.
-	// Missing files → red error + action:"handled" skips the LLM entirely.
+	// ── input: <gsd-include> injection ───────────────────────────────────
+	// Replaces <gsd-include path="..." /> tags with actual file contents.
+	// Supports selectors: tag:NAME, heading:TEXT, lines:N-M
+	// Valid chains: tag|heading, tag|lines, heading|lines, heading|tag
+	// On ANY failure: red error + abort (action:"handled"). No partial injection.
 	pi.on("input", async (event, ctx) => {
-		ctx.ui.notify(`[GSD:input] FIRED. source=${event.source} text.len=${event.text?.length ?? "undef"} text.start=${JSON.stringify((event.text ?? "").slice(0, 120))}`, "info");
-
-		if (event.source === "extension") {
-			ctx.ui.notify("[GSD:input] SKIP: source=extension", "info");
-			return { action: "continue" };
-		}
+		if (event.source === "extension") return { action: "continue" };
 
 		const text = event.text;
-		const fileRefPattern = /@(\.pi\/gsd\/[^\s]+|\.planning\/[^\s]+)/g;
-		const refs = [...text.matchAll(fileRefPattern)];
-		ctx.ui.notify(`[GSD:input] refs found: ${refs.length}. Matches: ${refs.map(m => m[0]).join(", ") || "NONE"}`, "info");
+		const includePattern = /<gsd-include\s+path="([^"]+)"(?:\s+select="([^"]*)")?\s*\/>/g;
+		const includes = [...text.matchAll(includePattern)];
+		if (includes.length === 0) return { action: "continue" };
 
-		if (refs.length === 0) return { action: "continue" };
-
+		// Package harness fallback path
 		const extFile = typeof __filename !== "undefined" ? __filename : "";
-		ctx.ui.notify(`[GSD:input] __filename=${extFile || "UNDEFINED"}`, "info");
-		const pkgHarness = extFile ? join(dirname(extFile), "..", "harnesses", "pi", "get-shit-done") : "";
-		ctx.ui.notify(`[GSD:input] pkgHarness=${pkgHarness || "EMPTY"} exists=${pkgHarness ? existsSync(pkgHarness) : false}`, "info");
-		ctx.ui.notify(`[GSD:input] cwd=${ctx.cwd}`, "info");
+		const pkgHarness = extFile
+			? join(dirname(extFile), "..", "harnesses", "pi", "get-shit-done")
+			: "";
 
-		const failed: string[] = [];
+		const errors: string[] = [];
 		let transformed = text;
 
-		for (const match of refs) {
-			const relPath = match[1];
-			const subPath = relPath.replace(/^\.pi\/gsd\//, "");
+		for (const match of includes) {
+			const fullMatch = match[0];
+			const filePath = match[1];
+			const selectExpr = match[2] ?? "";
 
+			// ── Resolve file path ───────────────────────────────────────
+			const subPath = filePath.replace(/^\.pi\/gsd\//, "");
 			const candidates = [
-				join(ctx.cwd, relPath),
-				...(relPath.startsWith(".pi/gsd/") ? [join(pkgHarness, subPath)] : []),
+				join(ctx.cwd, filePath),
+				...(filePath.startsWith(".pi/gsd/") && pkgHarness
+					? [join(pkgHarness, subPath)]
+					: []),
 			];
-			ctx.ui.notify(`[GSD:input] ref=${relPath} candidates=${JSON.stringify(candidates)} exists=${candidates.map(c => existsSync(c))}`, "info");
 
-			let fileContent: string | null = null;
-			for (const candidate of candidates) {
+			let raw: string | null = null;
+			for (const c of candidates) {
 				try {
-					if (existsSync(candidate)) {
-						fileContent = readFileSync(candidate, "utf8");
-						ctx.ui.notify(`[GSD:input] FOUND ${candidate} (${fileContent.length} bytes)`, "info");
+					if (existsSync(c)) { raw = readFileSync(c, "utf8"); break; }
+				} catch { /* try next */ }
+			}
+			if (raw === null) {
+				errors.push(`File not found: ${filePath}`);
+				continue;
+			}
+
+			// ── Apply selector ─────────────────────────────────────────
+			let result = raw;
+			if (selectExpr) {
+				const parts = selectExpr.split("|");
+				if (parts.length > 2) {
+					errors.push(`Invalid selector (max 2 segments): ${selectExpr}`);
+					continue;
+				}
+				// lines: must be standalone — reject any chain involving lines
+				if (parts.length > 1 && parts.some((p) => p.trim().startsWith("lines:"))) {
+					errors.push(`lines: cannot be chained — use it alone: ${selectExpr}`);
+					continue;
+				}
+
+				for (let i = 0; i < parts.length; i++) {
+					const part = parts[i].trim();
+					const prev = i > 0 ? parts[i - 1].trim().split(":")[0] : null;
+
+					if (part.startsWith("tag:")) {
+						const tagName = part.slice(4);
+						const tagRe = new RegExp(
+							`<${tagName}>([\\s\\S]*?)</${tagName}>`,
+							"i",
+						);
+						const tagMatch = result.match(tagRe);
+						if (!tagMatch) {
+							errors.push(`Tag <${tagName}> not found in ${filePath}`);
+							result = "";
+							break;
+						}
+						result = tagMatch[1].trim();
+
+					} else if (part.startsWith("heading:")) {
+						const headingText = part.slice(8);
+						const headingRe = new RegExp(
+							`(^|\\n)(#{1,6})\\s+${headingText.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\s*\\n`,
+						);
+						const hMatch = result.match(headingRe);
+						if (!hMatch) {
+							errors.push(`Heading \"${headingText}\" not found in ${filePath}`);
+							result = "";
+							break;
+						}
+						const level = hMatch[2].length;
+						const startIdx = (hMatch.index ?? 0) + hMatch[0].length;
+						const nextHeading = result.slice(startIdx).search(
+							new RegExp(`\\n#{1,${level}}\\s`),
+						);
+						result = nextHeading === -1
+							? result.slice(startIdx).trim()
+							: result.slice(startIdx, startIdx + nextHeading).trim();
+
+					} else if (part.startsWith("lines:")) {
+						const rangeMatch = part.match(/^lines:(\d+)-(\d+)$/);
+						if (!rangeMatch) {
+							errors.push(`Invalid lines selector: ${part}`);
+							result = "";
+							break;
+						}
+						const start = parseInt(rangeMatch[1], 10) - 1;
+						const end = parseInt(rangeMatch[2], 10);
+						result = result.split("\n").slice(start, end).join("\n");
+
+					} else {
+						errors.push(`Unknown selector: ${part}`);
+						result = "";
 						break;
 					}
-				} catch (e) {
-					ctx.ui.notify(`[GSD:input] ERROR reading ${candidate}: ${e}`, "error");
 				}
+				if (result === "") continue; // error already logged
 			}
 
-			if (fileContent === null) {
-				ctx.ui.notify(`[GSD:input] FAILED: ${relPath} — no candidate found`, "error");
-				failed.push(relPath);
-			} else {
-				transformed = transformed.replace(match[0], fileContent);
-			}
+			transformed = transformed.replace(fullMatch, result);
 		}
 
-		if (failed.length > 0) {
-			ctx.ui.notify(
-				`❌ GSD context injection failed — missing files:\n${failed.map((f) => `  • ${f}`).join("\n")}\n\nRun /gsd-setup-pi to reinstall the harness.`,
+		if (errors.length > 0) {
+			ctx.ui.notify("\u274c GSD include failed:\n" + errors.map((e) => "  \u2022 " + e).join("\n"),
 				"error",
 			);
-			return { action: "handled" }; // skip LLM entirely
+			return { action: "handled" };
 		}
 
 		return { action: "transform", text: transformed };
 	});
+
 	// ── session_start: GSD update check ──────────────────────────────────────
 	pi.on("session_start", async (_event, ctx) => {
 		// Ensure harness files are reachable via .pi/gsd/ symlink
 		ensureHarnessSymlink(ctx.cwd);
 
-		// Sync derived core files from tagged reference sources
-		syncReferenceToCore(ctx.cwd, ["ui", "brand"]);
 
 		try {
 			const cacheDir = join(homedir(), ".pi", "cache");
@@ -677,9 +720,6 @@ export default function (pi: ExtensionAPI) {
 	let lastLevel: "warning" | "critical" | null = null;
 
 	pi.on("tool_result", async (_event, ctx) => {
-		// Keep derived core files in sync after any tool write (e.g. gsd-new-project
-		// creating ui-brand.md mid-session — no reboot needed)
-		syncReferenceToCore(ctx.cwd, ["ui", "brand"]);
 
 		try {
 			const usage: ContextUsage | undefined = ctx.getContextUsage();

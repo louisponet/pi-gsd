@@ -1,6 +1,6 @@
 ---
 description: Generate tests for a completed phase based on UAT criteria and implementation
 ---
-@.pi/gsd/workflows/add-tests.md
+<gsd-include path=".pi/gsd/workflows/add-tests.md" />
 
 $ARGUMENTS

@@ -1,6 +1,6 @@
 ---
 description: Analyze codebase with parallel mapper agents to produce .planning/codebase/ documents
 ---
-@.pi/gsd/workflows/map-codebase.md
+<gsd-include path=".pi/gsd/workflows/map-codebase.md" />
 
 $ARGUMENTS

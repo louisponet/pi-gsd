@@ -1,6 +1,6 @@
 ---
 description: Create phases to close all gaps identified by milestone audit
 ---
-@.pi/gsd/workflows/plan-milestone-gaps.md
+<gsd-include path=".pi/gsd/workflows/plan-milestone-gaps.md" />
 
 $ARGUMENTS

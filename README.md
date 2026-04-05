@@ -139,9 +139,7 @@ Switch profile: `/gsd-set-profile <profile>`
 |       Instant commands (no LLM cost) |     ❌     |   ✔️    | `/gsd-progress`, `/gsd-stats`, `/gsd-health`, `/gsd-help`, `/gsd-next` - zero LLM, editor pivot           |
 |             `/gsd-next` auto-advance |     ❌     |   ✔️    | Deterministic phase routing, pre-fills editor with the correct next command                               |
 |       Prompt-dispatch for all skills |     ❌     |   ✔️    | 54 pi prompt templates - clean autocomplete, arg hints, direct workflow dispatch                          |
-|        `ui-brand` context modularity |     ❌     |   ✔️    | `<core>` tag splits ui-brand.md — planning gets 103 lines, UI commands get full 166                       |
-|        `syncReferenceToCore` utility |     ❌     |   ✔️    | Auto-derives `-core.md` from any `<core>`-tagged reference; syncs on session start + after tool writes    |
-|  Programmatic `@file` injection      |     ❌     |   ✔️    | Extension intercepts `@.pi/gsd/...` refs, injects file contents before LLM sees them — zero tool calls   |
+| `<gsd-include>` context injection    |     ❌     |   ✔️    | `<gsd-include path select>` replaces file refs before LLM sees them — selectors: tag, heading, lines |
 |   Auto harness symlink + self-repair |     ❌     |   ✔️    | `.pi/gsd/` → package harness; detects stale dirs, replaces with symlink; fallback to package root        |
 |        `/gsd-plan-milestone` command |     ❌     |   ✔️    | Plan all unplanned phases - one mode question, scope pre-check per phase, context-safe checkpoint         |
 |     `/gsd-execute-milestone` command |     ❌     |   ✔️    | Execute all phases + scope guardian + auto gap/debt retry loop (insert-phase) + audit→complete→cleanup    |

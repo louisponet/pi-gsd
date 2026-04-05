@@ -1,6 +1,6 @@
 ---
 description: Execute a trivial task inline - no subagents, no planning overhead
 ---
-@.pi/gsd/workflows/fast.md
+<gsd-include path=".pi/gsd/workflows/fast.md" />
 
 $ARGUMENTS

@@ -1,6 +1,6 @@
 ---
 description: Interactive command center for managing multiple phases from one terminal
 ---
-@.pi/gsd/workflows/manager.md
+<gsd-include path=".pi/gsd/workflows/manager.md" />
 
 $ARGUMENTS

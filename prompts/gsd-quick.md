@@ -1,6 +1,6 @@
 ---
 description: Execute a quick task with GSD guarantees (atomic commits, state tracking) but skip optional agents
 ---
-@.pi/gsd/workflows/quick.md
+<gsd-include path=".pi/gsd/workflows/quick.md" />
 
 $ARGUMENTS

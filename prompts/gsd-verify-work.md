@@ -1,7 +1,7 @@
 ---
 description: Validate built features through conversational UAT
 ---
-@.pi/gsd/workflows/verify-work.md
-@.pi/gsd/templates/UAT.md
+<gsd-include path=".pi/gsd/workflows/verify-work.md" />
+<gsd-include path=".pi/gsd/templates/UAT.md" />
 
 $ARGUMENTS

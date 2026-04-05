@@ -1,10 +1,10 @@
 ---
 description: Execute all planned phases + full lifecycle (audit→complete→cleanup), scope guardian, UAT gates, worktree isolation
 ---
-@.pi/gsd/workflows/execute-milestone.md
-@.pi/gsd/references/ui-brand.md
-@.planning/REQUIREMENTS.md
-@.planning/ROADMAP.md
-@.planning/STATE.md
+<gsd-include path=".pi/gsd/workflows/execute-milestone.md" />
+<gsd-include path=".pi/gsd/references/ui-brand.md" />
+<gsd-include path=".planning/REQUIREMENTS.md" />
+<gsd-include path=".planning/ROADMAP.md" />
+<gsd-include path=".planning/STATE.md" />
 
 $ARGUMENTS
