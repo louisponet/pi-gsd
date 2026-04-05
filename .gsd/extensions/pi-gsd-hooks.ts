@@ -87,7 +87,7 @@ export default function (pi: ExtensionAPI) {
 		if (event.source === "extension") return { action: "continue" };
 
 		const text = event.text;
-		ctx.ui.notify(`[GSD:DBG] text.len=${text?.length} first200=${JSON.stringify((text ?? "").slice(0, 200))}`, "info");
+		try { ctx.ui.notify("[GSD:DBG] len=" + String(text?.length) + " text=" + String(text).slice(0, 300), "info"); } catch { ctx.ui.notify("[GSD:DBG] text log failed", "error"); }
 
 		const includePattern = /<gsd-include\s+path="([^"]+)"(?:\s+select="([^"]*)")?\s*\/>/g;
 		const includes = [...text.matchAll(includePattern)];
