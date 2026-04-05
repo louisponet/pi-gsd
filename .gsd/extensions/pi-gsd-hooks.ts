@@ -81,53 +81,67 @@ const syncReferenceToCore = (cwd: string, ref: string[]): void => {
 };
 
 export default function (pi: ExtensionAPI) {
-	// ── before_agent_start: inject @file contents into the prompt ────────────
-	// Replaces @.pi/gsd/... references with actual file contents so the LLM
-	// gets the full context in the first message. No tool calls, no token
-	// waste, provider-agnostic.
-	pi.on("before_agent_start", async (event, ctx) => {
-		const prompt = event.prompt;
-		if (!prompt) return undefined;
+	// ── input: inject @file contents before the LLM sees the message ──────────
+	// Replaces @.pi/gsd/... and @.planning/... references with actual file
+	// contents programmatically. Zero tool calls, provider-agnostic.
+	// Missing files → red error + action:"handled" skips the LLM entirely.
+	pi.on("input", async (event, ctx) => {
+		if (event.source === "extension") return { action: "continue" };
 
-		// Match @.pi/gsd/... and @.planning/... file references
+		const text = event.text;
 		const fileRefPattern = /@(\.pi\/gsd\/[^\s]+|\.planning\/[^\s]+)/g;
-		const refs = [...prompt.matchAll(fileRefPattern)];
-		if (refs.length === 0) return undefined;
+		const refs = [...text.matchAll(fileRefPattern)];
+		if (refs.length === 0) return { action: "continue" };
 
-		const injected: string[] = [];
+		// Fallback lookup: package harness root via this extension file's location
+		// <pkg>/.gsd/extensions/pi-gsd-hooks.ts → <pkg>/.gsd/harnesses/pi/get-shit-done
+		const pkgHarness = join(dirname(__filename), "..", "harnesses", "pi", "get-shit-done");
+
 		const failed: string[] = [];
+		let transformed = text;
+
 		for (const match of refs) {
 			const relPath = match[1];
-			const absPath = join(ctx.cwd, relPath);
-			try {
-				if (existsSync(absPath)) {
-					const content = readFileSync(absPath, "utf8");
-					injected.push(`<!-- @${relPath} -->\n${content}\n<!-- /@${relPath} -->`);
-				} else {
-					failed.push(relPath);
-				}
-			} catch {
+			const subPath = relPath.replace(/^\.pi\/gsd\//, "");
+
+			// Lookup order:
+			// 1. Project symlink:  <cwd>/.pi/gsd/<subPath>
+			// 2. Package harness:  <pkg>/.gsd/harnesses/pi/get-shit-done/<subPath>
+			const candidates = [
+				join(ctx.cwd, relPath),
+				...(relPath.startsWith(".pi/gsd/") ? [join(pkgHarness, subPath)] : []),
+			];
+
+			let fileContent: string | null = null;
+			for (const candidate of candidates) {
+				try {
+					if (existsSync(candidate)) {
+						fileContent = readFileSync(candidate, "utf8");
+						break;
+					}
+				} catch { /* try next */ }
+			}
+
+			if (fileContent === null) {
 				failed.push(relPath);
+			} else {
+				transformed = transformed.replace(
+					match[0],
+					`<!-- @${relPath} -->\n${fileContent}\n<!-- /@${relPath} -->`,
+				);
 			}
 		}
 
 		if (failed.length > 0) {
 			ctx.ui.notify(
-				`❌ GSD context injection failed — missing files:\n${failed.map((f) => `  • ${f}`).join("\n")}\n\nCheck that .pi/gsd/ symlink exists and points to the harness.`,
+				`❌ GSD context injection failed — missing files:\n${failed.map((f) => `  • ${f}`).join("\n")}\n\nRun /gsd-setup-pi to reinstall the harness.`,
 				"error",
 			);
-			return { abort: true };
+			return { action: "handled" }; // skip LLM entirely
 		}
 
-		return {
-			message: {
-				customType: "pi-gsd-context",
-				content: injected.join("\n\n"),
-				display: false,
-			},
-		};
+		return { action: "transform", text: transformed };
 	});
-
 	// ── session_start: GSD update check ──────────────────────────────────────
 	pi.on("session_start", async (_event, ctx) => {
 		// Ensure harness files are reachable via .pi/gsd/ symlink
