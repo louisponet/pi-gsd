@@ -1,3 +1,22 @@
+<gsd-version v="1.12.4" />
+
+<gsd-arguments>
+  <positional name="PHASE" />
+  <flag name="auto" boolean />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools" result="PHASE_DATA">init discuss-phase ${PHASE}</shell>
+  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
+</gsd-execute>
+
+## Initialization Context (pre-injected by WXP)
+
+**Project State:**
+<gsd-paste name="STATE_JSON" />
+
+---
+
 <purpose>
 Extract implementation decisions that downstream agents need. Analyze the phase to identify gray areas, let the user choose what to discuss, then deep-dive each selected area until satisfied.
 

@@ -1,3 +1,22 @@
+<gsd-version v="1.12.4" />
+
+<gsd-arguments>
+  <flag name="auto" boolean />
+  <flag name="skip-research" boolean />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
+  <shell command="pi-gsd-tools" result="ROADMAP">roadmap analyze --raw</shell>
+</gsd-execute>
+
+## Initialization Context (pre-injected by WXP)
+
+**Project State:**
+<gsd-paste name="STATE_JSON" />
+
+---
+
 <purpose>
 
 Start a new milestone cycle for an existing project. Loads project context, gathers milestone goals (from MILESTONE-CONTEXT.md or conversation), updates PROJECT.md and STATE.md, optionally runs parallel research, defines scoped requirements with REQ-IDs, spawns the roadmapper to create phased execution plan, and commits all artifacts. Brownfield equivalent of new-project.
