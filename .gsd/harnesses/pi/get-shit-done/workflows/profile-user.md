@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Orchestrate the full developer profiling flow: consent, session analysis (or questionnaire fallback), profile generation, result display, and artifact creation.
 

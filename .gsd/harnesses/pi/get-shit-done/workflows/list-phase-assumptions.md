@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Surface the agent's assumptions about a phase before planning, enabling users to correct misconceptions early.
 

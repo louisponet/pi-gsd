@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <trigger>
 Use this workflow when:
 - Starting a new session on an existing project

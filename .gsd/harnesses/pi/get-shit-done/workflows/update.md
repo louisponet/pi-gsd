@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Check for GSD updates via npm, display changelog for versions between installed and latest, obtain user confirmation, and execute clean installation with cache clearing.
 </purpose>

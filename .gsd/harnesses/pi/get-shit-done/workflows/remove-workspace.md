@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Remove a GSD workspace, cleaning up git worktrees and deleting the workspace directory.
 </purpose>

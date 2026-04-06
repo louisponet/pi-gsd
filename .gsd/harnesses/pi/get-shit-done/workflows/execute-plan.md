@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
 </purpose>

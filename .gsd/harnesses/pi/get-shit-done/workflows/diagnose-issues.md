@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 

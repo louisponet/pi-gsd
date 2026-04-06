@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 # plan-milestone workflow
 
 Plan all unplanned phases in the current milestone in a single orchestrated session.

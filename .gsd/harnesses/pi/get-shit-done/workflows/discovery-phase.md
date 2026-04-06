@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Execute discovery at the appropriate depth level.
 Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.

@@ -180,3 +180,16 @@ export function processWxpTrustedContent(
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+/**
+ * Read the <gsd-version> tag from a workflow file's content.
+ * Returns null if no version tag found.
+ * Used by Phase 5 harness copy-on-first-run to check do-not-update (WFL-05).
+ */
+export function readWorkflowVersionTag(
+  content: string,
+): { version: string; doNotUpdate: boolean } | null {
+  const m = /<gsd-version\s+v="([^"]+)"(\s+do-not-update)?\s*\/>/.exec(content);
+  if (!m) return null;
+  return { version: m[1], doNotUpdate: Boolean(m[2]) };
+}
