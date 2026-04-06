@@ -112,18 +112,55 @@
 
 | Requirement | Phase | Status |
 |---|---|---|
-| WXP-01 through WXP-14 | — | Pending |
-| INC-01 through INC-03 | — | Pending |
-| TST-01 through TST-03 | — | Pending |
-| CLI-01 through CLI-06 | — | Pending |
-| WFL-01 through WFL-05 | — | Pending |
-| TYP-01 through TYP-06 | — | Pending |
-| HRN-01 through HRN-07 | — | Pending |
+| WXP-01 | Phase 1 | Pending |
+| WXP-02 | Phase 1 | Pending |
+| WXP-03 | Phase 1 | Pending |
+| WXP-04 | Phase 1 | Pending |
+| WXP-05 | Phase 1 | Pending |
+| WXP-06 | Phase 1 | Pending |
+| WXP-07 | Phase 1 | Pending |
+| WXP-08 | Phase 1 | Pending |
+| WXP-09 | Phase 1 | Pending |
+| WXP-10 | Phase 1 | Pending |
+| WXP-11 | Phase 1 | Pending |
+| WXP-12 | Phase 1 | Pending |
+| WXP-13 | Phase 1 | Pending |
+| WXP-14 | Phase 1 | Pending |
+| INC-01 | Phase 1 | Pending |
+| INC-02 | Phase 1 | Pending |
+| INC-03 | Phase 1 | Pending |
+| TST-01 | Phase 1 | Pending |
+| TST-02 | Phase 1 | Pending |
+| TST-03 | Phase 1 | Pending |
+| CLI-01 | Phase 2 | Pending |
+| CLI-02 | Phase 2 | Pending |
+| CLI-03 | Phase 2 | Pending |
+| CLI-04 | Phase 2 | Pending |
+| CLI-05 | Phase 2 | Pending |
+| CLI-06 | Phase 2 | Pending |
+| TYP-01 | Phase 3 | Pending |
+| TYP-02 | Phase 3 | Pending |
+| TYP-03 | Phase 3 | Pending |
+| TYP-04 | Phase 3 | Pending |
+| TYP-05 | Phase 3 | Pending |
+| TYP-06 | Phase 3 | Pending |
+| WFL-01 | Phase 4 | Pending |
+| WFL-02 | Phase 4 | Pending |
+| WFL-03 | Phase 4 | Pending |
+| WFL-04 | Phase 4 | Pending |
+| WFL-05 | Phase 4 | Pending |
+| HRN-01 | Phase 5 | Pending |
+| HRN-02 | Phase 5 | Pending |
+| HRN-03 | Phase 5 | Pending |
+| HRN-04 | Phase 5 | Pending |
+| HRN-05 | Phase 5 | Pending |
+| HRN-06 | Phase 5 | Pending |
+| HRN-07 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 44 ⚠️
+- Mapped to phases: 44
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-06*
