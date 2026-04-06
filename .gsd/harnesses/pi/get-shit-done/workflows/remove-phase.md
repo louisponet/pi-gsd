@@ -1,5 +1,68 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="phase" type="number" />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="phase-op" />
+    </args>
+    <outs>
+      <out type="string" name="init" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="init" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="init" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="init-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="init-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="init" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Phase:** <gsd-paste name="phase" />
+
+**Phase Data:**
+<gsd-paste name="init" />
+
 <purpose>
 Remove an unstarted future phase from the project roadmap, delete its directory, renumber all subsequent phases to maintain a clean linear sequence, and commit the change. The git commit serves as the historical record of removal.
 </purpose>

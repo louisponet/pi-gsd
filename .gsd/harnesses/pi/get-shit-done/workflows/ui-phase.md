@@ -1,5 +1,93 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="phase" type="number" />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="plan-phase" />
+    </args>
+    <outs>
+      <out type="string" name="init" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="init" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="init" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="init-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="init-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="init" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="resolve-model" />
+      <arg string="gsd-ui-researcher" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="ui-researcher-model" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="agent-skills" />
+      <arg string="gsd-ui-researcher" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="agent-skills-ui-researcher" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="agent-skills" />
+      <arg string="gsd-ui-checker" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="agent-skills-ui-checker" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Phase:** <gsd-paste name="phase" />
+
+**Init Data:**
+<gsd-paste name="init" />
+
+**UI Researcher Model:** <gsd-paste name="ui-researcher-model" />
+
 <purpose>
 Generate a UI design contract (UI-SPEC.md) for frontend phases. Orchestrates gsd-ui-researcher and gsd-ui-checker with a revision loop. Inserts between discuss-phase and plan-phase in the lifecycle.
 

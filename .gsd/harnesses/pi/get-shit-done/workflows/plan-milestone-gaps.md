@@ -1,5 +1,42 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="roadmap" />
+      <arg string="analyze" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="roadmap" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Roadmap:**
+<gsd-paste name="roadmap" />
+
+**State:**
+<gsd-paste name="state" />
+
 <purpose>
 Create all phases necessary to close gaps identified by `/gsd-audit-milestone`. Reads MILESTONE-AUDIT.md, groups gaps into logical phases, creates phase entries in ROADMAP.md, and offers to plan each phase. One command creates all fix phases - no manual `/gsd-add-phase` per gap.
 </purpose>

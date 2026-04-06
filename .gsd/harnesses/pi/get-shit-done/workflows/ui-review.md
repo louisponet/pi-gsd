@@ -1,5 +1,82 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="phase" type="number" />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="phase-op" />
+    </args>
+    <outs>
+      <out type="string" name="init" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="init" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="init" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="init-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="init-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="init" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="resolve-model" />
+      <arg string="gsd-ui-auditor" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="ui-auditor-model" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="agent-skills" />
+      <arg string="gsd-ui-reviewer" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="agent-skills-ui-reviewer" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Phase:** <gsd-paste name="phase" />
+
+**Phase Data:**
+<gsd-paste name="init" />
+
+**UI Auditor Model:** <gsd-paste name="ui-auditor-model" />
+
 <purpose>
 Retroactive 6-pillar visual audit of implemented frontend code. Standalone command that works on any project - GSD-managed or not. Produces scored UI-REVIEW.md with actionable findings.
 </purpose>

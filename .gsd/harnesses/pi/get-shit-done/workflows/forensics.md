@@ -1,5 +1,43 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="validate" />
+      <arg string="health" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="health" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**State:**
+<gsd-paste name="state" />
+
+**Health:**
+<gsd-paste name="health" />
+
 # Forensics Workflow
 
 Post-mortem investigation for failed or stuck GSD workflows. Analyzes git history,

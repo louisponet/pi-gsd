@@ -1,5 +1,69 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="todos" />
+      <arg string="0" />
+    </args>
+    <outs>
+      <out type="string" name="todos-data" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="todos-data" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="todos-data" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="todos-data-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="todos-data-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="todos-data" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Todos:**
+<gsd-paste name="todos-data" />
+
+**State:**
+<gsd-paste name="state" />
+
 <purpose>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
 </purpose>

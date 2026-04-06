@@ -1,5 +1,68 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="resume" />
+    </args>
+    <outs>
+      <out type="string" name="resume-data" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="resume-data" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="resume-data" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="resume-data-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="resume-data-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="resume-data" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Resume Context (pre-injected)
+
+**Resume Data:**
+<gsd-paste name="resume-data" />
+
+**State:**
+<gsd-paste name="state" />
+
 <trigger>
 Use this workflow when:
 - Starting a new session on an existing project

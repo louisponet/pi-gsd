@@ -1,5 +1,53 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="list-workspaces" />
+    </args>
+    <outs>
+      <out type="string" name="workspaces-data" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="workspaces-data" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="workspaces-data" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="workspaces-data-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="workspaces-data-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="workspaces-data" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+</gsd-execute>
+
+## Workspaces (pre-injected)
+
+<gsd-paste name="workspaces-data" />
+
 <purpose>
 List all GSD workspaces found in ~/gsd-workspaces/ with their status.
 </purpose>

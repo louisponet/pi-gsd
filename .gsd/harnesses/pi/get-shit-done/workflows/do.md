@@ -1,5 +1,32 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="request" type="string" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="load" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Request:** <gsd-paste name="request" />
+
+**State:**
+<gsd-paste name="state" />
+
 <purpose>
 Analyze freeform text from the user and route to the most appropriate GSD command. This is a dispatcher - it never does the work itself. Match user intent to the best command, confirm the routing, and hand off.
 </purpose>

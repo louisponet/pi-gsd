@@ -1,5 +1,28 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="repair" type="flag" flag="--repair" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="validate" />
+      <arg string="health" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="health" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Health Report (pre-injected)
+
+<gsd-paste name="health" />
+
 <purpose>
 Validate `.planning/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans. Optionally repairs auto-fixable issues.
 </purpose>

@@ -1,5 +1,27 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="stats" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="stats" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Stats (pre-injected)
+
+<gsd-paste name="stats" />
+
 <purpose>
 Display comprehensive project statistics including phases, plans, requirements, git metrics, and timeline.
 </purpose>

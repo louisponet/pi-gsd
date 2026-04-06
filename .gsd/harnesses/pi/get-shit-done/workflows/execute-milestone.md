@@ -1,5 +1,58 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="from" type="number" optional />
+  <arg name="uat-threshold" type="number" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="roadmap" />
+      <arg string="analyze" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="roadmap" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="progress" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="progress" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Execution Context (pre-injected)
+
+**Roadmap:**
+<gsd-paste name="roadmap" />
+
+**State:**
+<gsd-paste name="state" />
+
+**Progress:**
+<gsd-paste name="progress" />
+
 # execute-milestone workflow
 
 Execute all planned phases in the current milestone with scope guardian, UAT gates, and configurable recovery.

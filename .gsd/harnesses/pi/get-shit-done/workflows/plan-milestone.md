@@ -1,5 +1,43 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="interactive" type="flag" flag="--interactive" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="roadmap" />
+      <arg string="analyze" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="roadmap" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Roadmap:**
+<gsd-paste name="roadmap" />
+
+**State:**
+<gsd-paste name="state" />
+
 # plan-milestone workflow
 
 Plan all unplanned phases in the current milestone in a single orchestrated session.

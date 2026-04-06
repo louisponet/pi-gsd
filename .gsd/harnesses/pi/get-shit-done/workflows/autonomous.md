@@ -1,5 +1,84 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="from" type="number" optional />
+  <arg name="to" type="number" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="roadmap" />
+      <arg string="analyze" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="roadmap" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="milestone-op" />
+    </args>
+    <outs>
+      <out type="string" name="milestone-data" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="milestone-data" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="milestone-data" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="milestone-data-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="milestone-data-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="milestone-data" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Roadmap:**
+<gsd-paste name="roadmap" />
+
+**State:**
+<gsd-paste name="state" />
+
+**Milestone Data:**
+<gsd-paste name="milestone-data" />
+
 <purpose>
 
 Drive all remaining milestone phases autonomously. For each incomplete phase: discuss → plan → execute using Skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.

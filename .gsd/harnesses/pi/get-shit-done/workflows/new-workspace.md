@@ -1,5 +1,57 @@
 <gsd-version v="1.12.4" />
 
+<gsd-arguments>
+  <settings><keep-extra-args /></settings>
+  <arg name="name" type="string" optional />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="pi-gsd-tools" />
+      <arg string="init" />
+      <arg string="new-workspace" />
+    </args>
+    <outs>
+      <out type="string" name="workspace-data" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="workspace-data" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="workspace-data" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="workspace-data-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="workspace-data-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="workspace-data" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+</gsd-execute>
+
+## Context (pre-injected)
+
+**Workspace name:** <gsd-paste name="name" />
+
+**Workspace Data:**
+<gsd-paste name="workspace-data" />
+
 <purpose>
 Create an isolated workspace directory with git repo copies (worktrees or clones) and an independent `.planning/` directory. Supports multi-repo orchestration and single-repo feature branch isolation.
 </purpose>
