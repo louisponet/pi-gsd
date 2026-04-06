@@ -1,4 +1,4 @@
 ---
-description: Research phase implementation. Args: phase (number)
+description: "Research phase implementation. Args: phase (number)"
 ---
 $ARGUMENTS

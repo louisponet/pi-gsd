@@ -1,4 +1,4 @@
 ---
-description: Systematic debugging session. No required args.
+description: "Systematic debugging session. No required args."
 ---
 $ARGUMENTS
