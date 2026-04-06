@@ -259,45 +259,51 @@ Injects a variable's value into the text.
 
 WXP tags can appear conditionally (a `<gsd-include>` inside an `<if>` block), and included files may themselves contain `<gsd-execute>` blocks. The engine handles this with a resolution loop:
 
-```
 loop:
-  1. Scan text for unprocessed <gsd-include> tags (not marked done="true")
-  2. For each: resolve file, apply selector, inject content
-     Mark the original tag: <gsd-include ... done="true" />
-  3. Scan for <gsd-arguments> blocks → parse, populate variables
-     Mark: <gsd-arguments done="true">
-  4. Scan for <gsd-execute> blocks (not done) → execute top-to-bottom
-     Mark each: <gsd-execute done="true">
-  5. Scan for <gsd-paste> → replace with variable values
-     Mark: <gsd-paste ... done="true" />
-  6. If any NEW unprocessed tags were introduced (from included files
-     or conditional branches): goto loop
-  7. Final gate: scan for any WXP tag NOT marked done="true".
-     If found → error: "Unresolved WXP tag: <tag...>"
-  8. Strip ALL WXP tags (including done markers) from final text.
-```
+1. Scan text for unprocessed <gsd-include> tags (not marked done) that are not inside any non-done block (could mean inside a <gsd-execute> or <if> block).
+    - For each: resolve file, apply selector, inject content
+    - Mark the original tag: <gsd-include ... done />
+2. Scan for <gsd-arguments> blocks → parse, populate variables
+    - Mark: <gsd-arguments done>
+3. Scan for <gsd-execute> blocks (not done) → execute top-to-bottom
+    - Any <then>, or <else> blocks inside done blocks but not marked done are treated as <gsd-execute> blocks and processed as such, and marked done after execution.
+        - This allows conditional execution of blocks based on variables set in previous <gsd-execute> blocks.
+    - Mark each: <gsd-execute done>
+        - <if> blocks inside are marked done too to prevent double-processing
+            - the if branch that is **false** is marked done and false (<then done false>)
+            - the branch that is **true** is left to be processed in the next loop iteration (since it may contain <gsd-include> or more instructions, more <if> blocks, etc.)
+4. Scan for <gsd-paste> → replace with variable values
+    - If variable is missing → error: "Undefined variable: <name>"
+    - Mark: <gsd-paste ... done />
+5. If any NEW unprocessed tags were introduced (from included files
+    - or conditional branches): goto loop
+6. Final gate: scan for any WXP tag NOT marked done.
+    - If found → error: "Unresolved WXP tag: <tag...>"
+7. Strip ALL WXP tags (including done markers) from final text.
 
 This handles:
-- Conditional includes: `<if>` evaluated in step 4, reveals a `<gsd-include>` → picked up in next loop iteration
+- Conditional includes: `<if>` evaluated in step 3, true branch stays unmarked → step 1 picks up any `<gsd-include>` inside it once the `<then>` itself is marked done in a later iteration
 - Nested includes: included file has its own `<gsd-execute>` → processed in next iteration
-- The `done="true"` marker prevents double-processing
+- The `done` marker prevents double-processing
+- `<then>` / `<else>` equivalence with `<gsd-execute>`: marking `<if>` as `done` only prevents re-checking the condition; the true branch's children flow through the loop like any other execute block
 
 ### 3.6 `<gsd-include>` Self-Closing vs Children Syntax
 
 `<gsd-include>` supports two forms:
 
-**Self-closing (existing):**
+**Self-closing (existing, for prompt templates, primarily):**
 ```xml
 <gsd-include path=".pi/gsd/workflows/execute-phase.md" />
 <gsd-include path=".pi/gsd/workflows/execute-phase.md" include-arguments />
 ```
 
-**With children (new, for arg remapping):**
+**With children (new, for composable workflows):**
 ```xml
 <gsd-include path=".pi/gsd/workflows/execute-phase.md">
   <gsd-arguments>
     <arg name="my-local-phase" as="phase" />
     <arg name="my-flag" as="auto-chain-active" />
+    <arg name="milestone" />
   </gsd-arguments>
 </gsd-include>
 ```
@@ -335,16 +341,28 @@ Partial execution is never delivered to the LLM. All or nothing.
 
 ### 4.1 XSD 1.1
 
-Canonical schema definition at `src/wxp/schema/wxp.xsd`. Defines:
+Canonical schema definition at `src/schemas/wxp.xsd`. Defines:
 - All tag names and nesting rules
 - Attribute types and required/optional
 - Content models for each element
 
 Published alongside the package for external tooling / IDE support.
 
+### 4.1b pi-gsd-settings json schema
+
+`pi-gsd-settings.json` schema at `src/schemas/pi-gsd-settings.schema.json`.
+Defines:
+- `trustedPaths`: array of `{ position: "project" | "pkg" | "absolute", path: string }`
+- `untrustedPaths`: array of `{ position: "project" | "pkg" | "absolute", path: string }` (overrides both default trusted paths and user trusted paths)
+- `shellAllowlist`: array of `strings | { name: string, args: string[] }` (executable names)
+- `shellBanlist`: array of `strings | { name: string, args: string[] }` (executable names, overrides both default allowlist and user allowlist)
+- `shellTimeoutMs`: number (milliseconds)
+
+Published alongside the package for external tooling / IDE support.
+
 ### 4.2 Zod (Runtime)
 
-TypeScript Zod schemas at `src/wxp/schema.ts`. Validate the parsed XML AST before execution:
+TypeScript Zod schemas at `src/schemas/wxp.zod.ts`. Validate the parsed XML AST before execution:
 - Argument type correctness
 - Selector chain validity
 - Shell command allowlist enforcement
@@ -360,9 +378,9 @@ All types are inferred from Zod schemas via `z.infer<>`. Zero `any`.
 ### 5.1 Trusted File Locations
 
 WXP tags are only processed in files loaded from:
-1. **Package harness:** `<pkg>/.gsd/harnesses/pi/get-shit-done/`
-2. **Project harness:** `<project>/.pi/gsd/` (copied from package, user-customisable)
-3. **Override config:** `<project>/.pi/gsd/pi-gsd-settings.json` `trustedPaths` array
+1. **Package harness:** `{ position: "pkg", path: ".gsd/harnesses/pi/get-shit-done/" }`
+2. **Project harness:** `{ position: "project", path: ".pi/gsd/" }` (copied from package, user-customisable)
+3. **Override config:** `<project>/.pi/gsd/pi-gsd-settings.json`.`trustedPaths` array
 
 Files from `.planning/` are NEVER processed for WXP tags. The LLM can write to `.planning/` - if it could embed `<gsd-execute>` blocks there, it could execute arbitrary code via the engine.
 
@@ -381,6 +399,30 @@ find
 ```
 
 Any other executable → abort with error. No exceptions. Configurable via `pi-gsd-settings.json` `shellAllowlist` array (can only ADD, never remove the defaults).
+
+Default settings example:
+```jsonc
+{
+    "trustedPaths": [
+        { "position": "pkg", "path": ".gsd/harnesses/pi/get-shit-done/" },
+        { "position": "project", "path": ".pi/gsd/" }
+    ],
+    "untrustedPaths": [
+        { "position": "project", "path": ".planning/" }, // always overrides trustedPaths, this is useless atm, but you could ban a subfolder of a trustedPaths entry
+    ],
+    "shellAllowlist": [
+        "pi-gsd-tools",
+        "git",
+        "node",
+        "cat",
+        "ls",
+        "echo",
+        "find"
+    ],
+    "shellBanlist": [],
+    "shellTimeoutMs": 30000
+}
+```
 
 ### 5.3 No Piped Input
 
@@ -523,6 +565,7 @@ src/
     - Edge cases: nested includes, conditional includes, variable collisions, partial failure crash dumps
 
 ### Phase 2: oclif migration (breaking: CLI interface)
+
 1. Add oclif dependency
 2. Migrate commands one-by-one from cli.ts switch/case to oclif classes
 3. Typed flags and args
@@ -530,6 +573,8 @@ src/
 5. Verify all workflow `<shell command="pi-gsd-tools">` calls still work
 
 ### Phase 3: Workflow conversion
+
+0. `cp <name>.md <name>.md.bak` all workflows before engaging
 1. Convert `execute-phase.md` as the pilot (highest-value workflow)
 2. Convert remaining high-traffic workflows: `plan-phase.md`, `discuss-phase.md`, `new-project.md`
 3. Convert remaining workflows incrementally
