@@ -1,5 +1,6 @@
 ---
-description: Create an isolated workspace with repo copies and independent .planning/
+description: Create isolated workspace. Args: name (string)
+arguments: "Usage: /gsd-new-workspace <name>"
 ---
 <gsd-include path=".pi/gsd/workflows/new-workspace.md" />
 

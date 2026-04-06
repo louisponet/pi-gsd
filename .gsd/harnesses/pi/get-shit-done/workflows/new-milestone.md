@@ -1,19 +1,40 @@
 <gsd-version v="1.12.4" />
 
 <gsd-arguments>
-  <flag name="auto" boolean />
-  <flag name="skip-research" boolean />
+  <settings>
+    <keep-extra-args />
+  </settings>
+  <arg name="auto" type="flag" flag="--auto" optional />
+  <arg name="skip-research" type="flag" flag="--skip-research" optional />
 </gsd-arguments>
 
 <gsd-execute>
-  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
-  <shell command="pi-gsd-tools" result="ROADMAP">roadmap analyze --raw</shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="roadmap" />
+      <arg string="analyze" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="roadmap" />
+    </outs>
+  </shell>
 </gsd-execute>
-
 ## Initialization Context (pre-injected by WXP)
 
 **Project State:**
-<gsd-paste name="STATE_JSON" />
+<gsd-paste name="state" />
+
 
 ---
 

@@ -1,5 +1,6 @@
 ---
-description: Configure GSD workflow toggles and model profile
+description: Configure workflow toggles. No required args.
+arguments: "Usage: /gsd-settings"
 ---
 <gsd-include path=".pi/gsd/workflows/settings.md" />
 

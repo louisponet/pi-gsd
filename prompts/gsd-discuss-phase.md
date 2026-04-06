@@ -1,5 +1,6 @@
 ---
-description: Gather phase context through adaptive questioning before planning. Use --auto to skip interactive questions (the agent picks recommended defaults).
+description: Gather phase context. Args: phase (number) | Flags: --auto
+arguments: "Usage: /gsd-discuss-phase <phase>"
 ---
 <gsd-include path=".pi/gsd/workflows/discuss-phase.md" />
 <gsd-include path=".pi/gsd/workflows/discuss-phase-assumptions.md" />

@@ -1,5 +1,6 @@
 ---
-description: Plan all unplanned phases in the current milestone — one mode question, scope pre-check per phase, context-safe checkpointing
+description: Plan all unplanned phases. Flags: --interactive
+arguments: "Usage: /gsd-plan-milestone"
 ---
 <gsd-include path=".pi/gsd/workflows/plan-milestone.md" />
 <gsd-include path=".pi/gsd/references/ui-brand.md" select="tag:core" />

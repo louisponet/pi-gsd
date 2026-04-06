@@ -1,5 +1,6 @@
 ---
-description: Capture a forward-looking idea with trigger conditions - surfaces automatically at the right milestone
+description: Capture forward-looking idea with trigger. Args: idea (string, greedy)
+arguments: "Usage: /gsd-plant-seed <idea>"
 ---
 <gsd-include path=".pi/gsd/workflows/plant-seed.md" />
 

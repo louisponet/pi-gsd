@@ -1,6 +1,5 @@
 ---
-description: Add an idea to the backlog parking lot (999.x numbering)
+description: Park idea in backlog (999.x). Args: idea (string, greedy)
+arguments: "Usage: /gsd-add-backlog <idea>"
 ---
-
-
 $ARGUMENTS

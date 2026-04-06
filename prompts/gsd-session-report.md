@@ -1,5 +1,6 @@
 ---
-description: Generate a session report with token usage estimates, work summary, and outcomes
+description: Generate session report. No required args.
+arguments: "Usage: /gsd-session-report"
 ---
 <gsd-include path=".pi/gsd/workflows/session-report.md" />
 

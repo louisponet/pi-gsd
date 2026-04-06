@@ -1,5 +1,6 @@
 ---
-description: Start a new milestone cycle - update PROJECT.md and route to requirements
+description: Start new milestone cycle. Flags: --auto, --skip-research
+arguments: "Usage: /gsd-new-milestone"
 ---
 <gsd-include path=".pi/gsd/workflows/new-milestone.md" />
 <gsd-include path=".pi/gsd/references/questioning.md" />

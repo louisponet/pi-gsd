@@ -1,6 +1,5 @@
 ---
-description: Systematic debugging with persistent state across context resets
+description: Systematic debugging session. No required args.
+arguments: "Usage: /gsd-debug"
 ---
-
-
 $ARGUMENTS

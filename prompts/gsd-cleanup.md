@@ -1,5 +1,6 @@
 ---
-description: Archive accumulated phase directories from completed milestones
+description: Archive completed phase directories. No required args.
+arguments: "Usage: /gsd-cleanup"
 ---
 <gsd-include path=".pi/gsd/workflows/cleanup.md" />
 

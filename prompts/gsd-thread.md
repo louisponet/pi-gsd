@@ -1,6 +1,5 @@
 ---
-description: Manage persistent context threads for cross-session work
+description: Manage context threads. Subcommands: list, new, switch
+arguments: "Usage: /gsd-thread [list|new <name>|switch <name>]"
 ---
-
-
 $ARGUMENTS

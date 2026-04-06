@@ -1,26 +1,56 @@
 <gsd-version v="1.12.4" />
 
 <gsd-arguments>
-  <positional name="PHASE" />
-  <flag name="auto" boolean />
-  <flag name="skip-research" boolean />
+  <settings>
+    <keep-extra-args />
+  </settings>
+  <arg name="auto-chain-active" type="flag" flag="--auto" optional />
+  <arg name="skip-research" type="flag" flag="--skip-research" optional />
+  <arg name="phase" type="number" />
 </gsd-arguments>
 
 <gsd-execute>
-  <shell command="pi-gsd-tools" result="PHASE_DATA">init plan-phase ${PHASE}</shell>
-  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
-  <shell command="pi-gsd-tools" result="ROADMAP_PHASE">roadmap get-phase ${PHASE}</shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="init" />
+      <arg string="plan-phase" />
+      <arg name="phase" wrap='"' />
+    </args>
+    <outs>
+      <out type="string" name="phase-data" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="roadmap" />
+      <arg string="get-phase" />
+      <arg name="phase" wrap='"' />
+    </args>
+    <outs>
+      <out type="string" name="roadmap-phase" />
+    </outs>
+  </shell>
 </gsd-execute>
-
 ## Planning Context (pre-injected by WXP)
 
-**Phase:** <gsd-paste name="PHASE" />
+**Phase:** <gsd-paste name="phase" />
 
 **Project State:**
-<gsd-paste name="STATE_JSON" />
+<gsd-paste name="state" />
 
 **Phase Roadmap:**
-<gsd-paste name="ROADMAP_PHASE" />
+<gsd-paste name="roadmap-phase" />
+
 
 ---
 

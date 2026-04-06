@@ -1,5 +1,6 @@
 ---
-description: Audit milestone completion against original intent before archiving
+description: Audit milestone before archiving. No required args.
+arguments: "Usage: /gsd-audit-milestone"
 ---
 <gsd-include path=".pi/gsd/workflows/audit-milestone.md" />
 

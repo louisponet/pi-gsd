@@ -1,5 +1,6 @@
 ---
-description: Execute all planned phases + full lifecycle (audit→complete→cleanup), scope guardian, UAT gates, worktree isolation
+description: Execute all phases with lifecycle. Flags: --from N, --uat-threshold N (default 80)
+arguments: "Usage: /gsd-execute-milestone"
 ---
 <gsd-include path=".pi/gsd/workflows/execute-milestone.md" />
 <gsd-include path=".pi/gsd/references/ui-brand.md" />

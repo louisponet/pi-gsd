@@ -1,6 +1,5 @@
 ---
-description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
+description: Research phase implementation. Args: phase (number)
+arguments: "Usage: /gsd-research-phase <phase>"
 ---
-
-
 $ARGUMENTS

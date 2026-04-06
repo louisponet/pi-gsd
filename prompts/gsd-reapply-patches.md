@@ -1,6 +1,5 @@
 ---
-description: Reapply local modifications after a GSD update
+description: Reapply local mods after GSD update. No required args.
+arguments: "Usage: /gsd-reapply-patches"
 ---
-
-
 $ARGUMENTS

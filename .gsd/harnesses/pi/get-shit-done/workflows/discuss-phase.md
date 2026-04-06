@@ -1,19 +1,42 @@
 <gsd-version v="1.12.4" />
 
 <gsd-arguments>
-  <positional name="PHASE" />
-  <flag name="auto" boolean />
+  <settings>
+    <keep-extra-args />
+  </settings>
+  <arg name="auto-chain-active" type="flag" flag="--auto" optional />
+  <arg name="phase" type="number" />
 </gsd-arguments>
 
 <gsd-execute>
-  <shell command="pi-gsd-tools" result="PHASE_DATA">init discuss-phase ${PHASE}</shell>
-  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="init" />
+      <arg string="discuss-phase" />
+      <arg name="phase" wrap='"' />
+    </args>
+    <outs>
+      <out type="string" name="phase-data" />
+    </outs>
+  </shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="state" />
+      <arg string="json" />
+      <arg string="--raw" />
+    </args>
+    <outs>
+      <out type="string" name="state" />
+    </outs>
+  </shell>
 </gsd-execute>
-
 ## Initialization Context (pre-injected by WXP)
 
+**Phase:** <gsd-paste name="phase" />
+
 **Project State:**
-<gsd-paste name="STATE_JSON" />
+<gsd-paste name="state" />
+
 
 ---
 

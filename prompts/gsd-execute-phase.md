@@ -1,5 +1,6 @@
 ---
-description: Execute all plans in a phase with wave-based parallelization
+description: Execute all plans in a phase. Args: phase (number) | Flags: --auto (skip transition), --wave N (single wave), --interactive
+arguments: "Usage: /gsd-execute-phase <phase>"
 ---
 <gsd-include path=".pi/gsd/workflows/execute-phase.md" />
 <gsd-include path=".pi/gsd/references/ui-brand.md" />

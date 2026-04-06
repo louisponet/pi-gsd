@@ -1,5 +1,6 @@
 ---
-description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
+description: Insert decimal phase after existing phase. Args: after-phase (number), description (string, greedy)
+arguments: "Usage: /gsd-insert-phase <after-phase> <description>"
 ---
 <gsd-include path=".pi/gsd/workflows/insert-phase.md" />
 
