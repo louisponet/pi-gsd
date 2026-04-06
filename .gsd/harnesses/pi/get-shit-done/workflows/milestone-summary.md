@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 # Milestone Summary Workflow
 
 Generate a comprehensive, human-friendly project summary from completed milestone artifacts.

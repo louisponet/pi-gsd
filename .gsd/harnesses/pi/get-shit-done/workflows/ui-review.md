@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Retroactive 6-pillar visual audit of implemented frontend code. Standalone command that works on any project - GSD-managed or not. Produces scored UI-REVIEW.md with actionable findings.
 </purpose>

@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Display comprehensive project statistics including phases, plans, requirements, git metrics, and timeline.
 </purpose>

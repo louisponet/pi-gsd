@@ -1,3 +1,29 @@
+<gsd-version v="1.12.4" />
+
+<gsd-arguments>
+  <positional name="PHASE" />
+  <flag name="auto" boolean />
+  <flag name="skip-research" boolean />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools" result="PHASE_DATA">init plan-phase ${PHASE}</shell>
+  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
+  <shell command="pi-gsd-tools" result="ROADMAP_PHASE">roadmap get-phase ${PHASE}</shell>
+</gsd-execute>
+
+## Planning Context (pre-injected by WXP)
+
+**Phase:** <gsd-paste name="PHASE" />
+
+**Project State:**
+<gsd-paste name="STATE_JSON" />
+
+**Phase Roadmap:**
+<gsd-paste name="ROADMAP_PHASE" />
+
+---
+
 <purpose>
 Create executable phase prompts (PLAN.md files) for a roadmap phase with integrated research and verification. Default flow: Research (if needed) -> Plan -> Verify -> Done. Orchestrates gsd-phase-researcher, gsd-planner, and gsd-plan-checker agents with a revision loop (max 3 iterations).
 </purpose>
@@ -21,13 +47,7 @@ Valid GSD subagent types (use exact names - do not fall back to 'general-purpose
 
 Load all context in one call (paths only to minimize orchestrator context):
 
-```bash
-INIT=$(pi-gsd-tools init plan-phase "$PHASE")
-if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_RESEARCHER=$(pi-gsd-tools agent-skills gsd-researcher 2>/dev/null)
-AGENT_SKILLS_PLANNER=$(pi-gsd-tools agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(pi-gsd-tools agent-skills gsd-checker 2>/dev/null)
-```
+<!-- Init data pre-injected above via WXP -->
 
 Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `nyquist_validation_enabled`, `commit_docs`, `text_mode`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_reviews`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`, `phase_req_ids`.
 

@@ -131,11 +131,10 @@ export function stripFrontmatter(content: string): string {
 	return result;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStateFrontmatter(
 	bodyContent: string,
 	cwd?: string,
-): Record<string, unknown> {
+): import("./frontmatter.js").FrontmatterObject {
 	const currentPhase = stateExtractField(bodyContent, "Current Phase");
 	const currentPhaseName = stateExtractField(bodyContent, "Current Phase Name");
 	const currentPlan = stateExtractField(bodyContent, "Current Plan");
@@ -240,7 +239,7 @@ function buildStateFrontmatter(
 		normalizedStatus = "executing";
 	}
 
-	const fm: Record<string, unknown> = { gsd_state_version: "1.0" };
+	const fm: import("./frontmatter.js").FrontmatterObject = { gsd_state_version: "1.0" };
 	if (milestone) fm.milestone = milestone;
 	if (milestoneName) fm.milestone_name = milestoneName;
 	if (currentPhase) fm.current_phase = currentPhase;

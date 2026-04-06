@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Extract implementation decisions that downstream agents need - using codebase-first analysis
 and assumption surfacing instead of interview-style questioning.

@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 # execute-milestone workflow
 
 Execute all planned phases in the current milestone with scope guardian, UAT gates, and configurable recovery.

@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Research how to implement a phase. Spawns gsd-phase-researcher with phase context.
 

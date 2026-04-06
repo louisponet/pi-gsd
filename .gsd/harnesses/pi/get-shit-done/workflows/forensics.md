@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 # Forensics Workflow
 
 Post-mortem investigation for failed or stuck GSD workflows. Analyzes git history,

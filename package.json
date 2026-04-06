@@ -13,7 +13,11 @@
 		"typecheck": "tsc --noEmit",
 		"check": "tsc --noEmit && npm run build",
 		"postinstall": "node scripts/postinstall.js",
-		"prepublishOnly": "npm run build"
+		"prepublishOnly": "npm run build",
+		"test": "vitest run",
+		"test:unit": "vitest run src/wxp/__tests__ --ignore src/wxp/__tests__/integration.test.ts",
+		"test:integration": "vitest run src/wxp/__tests__/integration.test.ts",
+		"lint": "eslint src/ --ext .ts"
 	},
 	"files": [
 		"dist",
@@ -65,15 +69,19 @@
 		]
 	},
 	"dependencies": {
+		"@oclif/core": "^4.10.5",
 		"@toon-format/toon": "^2.1.0",
-		"commander": "^13.0.0",
 		"jsonpath-plus": "^10.4.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"@mariozechner/pi-coding-agent": "^0.65.0",
 		"@types/node": "^22.0.0",
+		"@typescript-eslint/eslint-plugin": "^8.58.0",
+		"@typescript-eslint/parser": "^8.58.0",
+		"eslint": "^10.2.0",
 		"tsup": "^8.0.0",
-		"typescript": "^5.0.0"
+		"typescript": "^5.0.0",
+		"vitest": "^4.1.2"
 	}
 }

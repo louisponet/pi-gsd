@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
 </purpose>

@@ -1,3 +1,22 @@
+<gsd-version v="1.12.4" />
+
+<gsd-arguments>
+  <flag name="auto" boolean />
+  <flag name="skip-research" boolean />
+</gsd-arguments>
+
+<gsd-execute>
+  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
+  <shell command="pi-gsd-tools" result="CONFIG">config-get workflow --raw</shell>
+</gsd-execute>
+
+## Initialization Context (pre-injected by WXP)
+
+**Project State:**
+<gsd-paste name="STATE_JSON" />
+
+---
+
 <purpose>
 Initialize a new project through unified flow: questioning, research (optional), requirements, roadmap. This is the most leveraged moment in any project - deep questioning here means better plans, better execution, better outcomes. One workflow takes you from idea to ready-for-planning.
 </purpose>

@@ -10,8 +10,8 @@ import { JSONPath } from "jsonpath-plus";
 
 export type OutputFormat = "json" | "toon";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyValue = any;
+// AnyValue replaced with unknown + type guards (TYP-03)
+type AnyValue = unknown;
 
 /**
  * Format `value` as a string ready for stdout.

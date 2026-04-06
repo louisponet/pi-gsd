@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <internal_workflow>
 
 **This is an INTERNAL workflow - NOT a user-facing command.**

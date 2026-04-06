@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 Zero-friction idea capture. One Write call, one confirmation line. No questions, no prompts.
 Runs inline - no Task, no AskUserQuestion, no Bash.

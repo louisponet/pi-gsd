@@ -1,3 +1,5 @@
+<gsd-version v="1.12.4" />
+
 <purpose>
 List all GSD workspaces found in ~/gsd-workspaces/ with their status.
 </purpose>
