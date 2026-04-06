@@ -155,7 +155,7 @@ export default function (pi: ExtensionAPI) {
             }
         }
         if (raw === null) {
-            // Missing file: remove tag silently (not fatal)
+            errors.push("File not found: " + filePath);
             
             return null;
         }
@@ -231,7 +231,7 @@ export default function (pi: ExtensionAPI) {
         // Package harness fallback path
         const extFile = typeof __filename !== "undefined" ? __filename : "";
         const pkgHarness = extFile
-            ? join(dirname(extFile), "..", "harnesses", "pi", "get-shit-done")
+            ? join(dirname(extFile), "..", ".gsd", "harnesses", "pi", "get-shit-done")
             : "";
 
         const errors: string[] = [];
