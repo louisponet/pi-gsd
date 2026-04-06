@@ -296,7 +296,7 @@ export default function (pi: ExtensionAPI) {
         // ── WXP post-processing: run after <gsd-include> resolution (WXP-14) ──
         // Load global + project settings (HRN-06, HRN-07)
         const extFile2 = typeof __filename !== "undefined" ? __filename : "";
-        const pkgRoot2 = join(dirname(extFile2), "..", "..");
+        const pkgRoot2 = join(dirname(extFile2), "..");
 
         type SettingsFile = {
             shellAllowlist?: string[];
@@ -375,7 +375,7 @@ export default function (pi: ExtensionAPI) {
         // Copy-on-first-run harness distribution (HRN-01, HRN-03)
         try {
             const extFile = typeof __filename !== "undefined" ? __filename : "";
-            const pkgRoot = join(dirname(extFile), "..", "..");
+            const pkgRoot = join(dirname(extFile), "..");
             const pkgHarness = join(pkgRoot, ".gsd", "harnesses", "pi", "get-shit-done");
             const projectHarness = join(ctx.cwd, ".pi", "gsd");
             if (existsSync(pkgHarness)) {
