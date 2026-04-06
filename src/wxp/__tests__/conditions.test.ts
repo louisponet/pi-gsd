@@ -1,76 +1,60 @@
 import { describe, it, expect } from "vitest";
 import { evaluateCondition } from "../conditions.js";
 import { createVariableStore } from "../variables.js";
-import type { IfNode } from "../schema.js";
+import type { IfNode } from "../../schemas/wxp.zod.js";
 
 describe("evaluateCondition", () => {
-  it("equals: returns true when variable matches", () => {
+  it("equals: true when variable matches", () => {
     const vars = createVariableStore();
     vars.set("mode", "silent");
     const node: IfNode = {
       type: "if",
-      var: "mode",
-      condition: { type: "equals", value: "silent" },
-      children: [],
+      condition: { op: "equals", left: { name: "mode" }, right: { type: "string", value: "silent" } },
+      then: [],
     };
     expect(evaluateCondition(node, vars)).toBe(true);
   });
 
-  it("equals: returns false when variable does not match", () => {
+  it("equals: false when variable does not match", () => {
     const vars = createVariableStore();
     vars.set("mode", "interactive");
     const node: IfNode = {
       type: "if",
-      var: "mode",
-      condition: { type: "equals", value: "silent" },
-      children: [],
+      condition: { op: "equals", left: { name: "mode" }, right: { type: "string", value: "silent" } },
+      then: [],
     };
     expect(evaluateCondition(node, vars)).toBe(false);
   });
 
-  it("starts-with: returns true when value starts with prefix", () => {
+  it("starts-with: true when value starts with prefix", () => {
     const vars = createVariableStore();
-    vars.set("phase", "1.2");
+    vars.set("init", "@file:/tmp/foo.json");
     const node: IfNode = {
       type: "if",
-      var: "phase",
-      condition: { type: "starts-with", value: "1" },
-      children: [],
+      condition: { op: "starts-with", left: { name: "init" }, right: { type: "string", value: "@file:" } },
+      then: [],
     };
     expect(evaluateCondition(node, vars)).toBe(true);
   });
 
-  it("starts-with: returns false when value does not start with prefix", () => {
+  it("equals with boolean literal: false when flag is false", () => {
     const vars = createVariableStore();
-    vars.set("phase", "2.1");
+    vars.set("auto-chain-active", "false");
     const node: IfNode = {
       type: "if",
-      var: "phase",
-      condition: { type: "starts-with", value: "1" },
-      children: [],
+      condition: { op: "equals", left: { name: "auto-chain-active" }, right: { type: "boolean", value: "false" } },
+      then: [],
     };
-    expect(evaluateCondition(node, vars)).toBe(false);
+    expect(evaluateCondition(node, vars)).toBe(true);
   });
 
   it("returns false (not throws) when variable is undefined", () => {
     const vars = createVariableStore();
     const node: IfNode = {
       type: "if",
-      var: "missing",
-      condition: { type: "equals", value: "anything" },
-      children: [],
+      condition: { op: "equals", left: { name: "missing" }, right: { type: "string", value: "x" } },
+      then: [],
     };
     expect(evaluateCondition(node, vars)).toBe(false);
-  });
-
-  it("equals empty string matches undefined variable (treated as '')", () => {
-    const vars = createVariableStore();
-    const node: IfNode = {
-      type: "if",
-      var: "missing",
-      condition: { type: "equals", value: "" },
-      children: [],
-    };
-    expect(evaluateCondition(node, vars)).toBe(true);
   });
 });

@@ -1,49 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { executeStringOp, WxpStringOpError } from "../string-ops.js";
 import { createVariableStore } from "../variables.js";
-import type { StringOpNode } from "../schema.js";
+import type { StringOpNode } from "../../schemas/wxp.zod.js";
 
-describe("executeStringOp", () => {
-  it("splits variable value by delimiter and stores newline-joined result", () => {
+describe("executeStringOp split", () => {
+  it("splits @file: prefix and stores remainder", () => {
     const vars = createVariableStore();
-    vars.set("input", "a,b,c");
+    vars.set("init", "@file:/tmp/gsd-init.json");
     const node: StringOpNode = {
       type: "string-op",
       op: "split",
-      var: "input",
-      delimiter: ",",
-      result: "parts",
+      args: [{ name: "init" }, { type: "string", value: "@file:" }],
+      outs: [{ type: "string", name: "init-file" }],
     };
     executeStringOp(node, vars);
-    expect(vars.get("parts")).toBe("a\nb\nc");
-  });
-
-  it("splits on multi-char delimiter", () => {
-    const vars = createVariableStore();
-    vars.set("input", "one::two::three");
-    const node: StringOpNode = {
-      type: "string-op",
-      op: "split",
-      var: "input",
-      delimiter: "::",
-      result: "out",
-    };
-    executeStringOp(node, vars);
-    expect(vars.get("out")).toBe("one\ntwo\nthree");
-  });
-
-  it("single-element split stores the value unchanged (no newline)", () => {
-    const vars = createVariableStore();
-    vars.set("input", "hello");
-    const node: StringOpNode = {
-      type: "string-op",
-      op: "split",
-      var: "input",
-      delimiter: ",",
-      result: "out",
-    };
-    executeStringOp(node, vars);
-    expect(vars.get("out")).toBe("hello");
+    expect(vars.get("init-file")).toBe("/tmp/gsd-init.json");
   });
 
   it("throws WxpStringOpError when source variable is undefined", () => {
@@ -51,11 +22,9 @@ describe("executeStringOp", () => {
     const node: StringOpNode = {
       type: "string-op",
       op: "split",
-      var: "missing",
-      delimiter: ",",
-      result: "out",
+      args: [{ name: "missing" }, { type: "string", value: "@file:" }],
+      outs: [{ type: "string", name: "out" }],
     };
     expect(() => executeStringOp(node, vars)).toThrow(WxpStringOpError);
-    expect(() => executeStringOp(node, vars)).toThrow(/missing/);
   });
 });

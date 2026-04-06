@@ -1,17 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
-import { parseWxpDocument } from "./parser.js";
+import { extractWxpTags, spliceContent, extractCodeFenceRegions, inDeadZone } from "./parser.js";
+import { buildOperation } from "./ast.js";
 import { createVariableStore } from "./variables.js";
 import { parseArguments } from "./arguments.js";
 import { executeBlock } from "./executor.js";
-import { applyPaste } from "./paste.js";
-import { checkTrustedPath } from "./security.js";
-import type { WxpSecurityConfig, WxpOperation } from "./schema.js";
+import { applyPaste, WxpPasteError } from "./paste.js";
+import { checkTrustedPath, checkAllowlist } from "./security.js";
+import type { WxpSecurityConfig, WxpOperation } from "../schemas/wxp.zod.js";
 
 export { WxpExecutionError } from "./executor.js";
 export { WxpShellError } from "./shell.js";
 export { WxpPasteError } from "./paste.js";
 export { WxpStringOpError } from "./string-ops.js";
+export { WxpArgumentsError } from "./arguments.js";
 
 const MAX_ITERATIONS = 50;
 
@@ -40,20 +42,27 @@ export class WxpProcessingError extends Error {
 /**
  * Main WXP entry point.
  *
- * Processes raw markdown content from a trusted harness file.
- * Resolution loop order (WXP-08): include → arguments → execute → paste → repeat.
- * 50-iteration safety cap.
+ * Resolution loop (PRD §3.5):
+ * Each iteration:
+ *   1. Process <gsd-include> tags (not done) → inject content, mark done
+ *   2. Process <gsd-arguments> block (not done) → parse $ARGUMENTS into vars, mark done
+ *   3. Process <gsd-execute> blocks (not done) → execute children, mark done
+ *      - <if> branches: false branch marked done+false; true branch children left for next iter
+ *   4. Apply <gsd-paste> replacements
+ * Repeat until no new unprocessed tags, or 50-iteration cap.
  *
- * Any failure throws WxpProcessingError — no partial output, no LLM fallback (WXP-09).
+ * Any failure → WxpProcessingError (no partial output, no LLM fallback).
  */
 export function processWxp(
   content: string,
   filePath: string,
   config: WxpSecurityConfig,
+  projectRoot: string,
+  pkgRoot: string,
   rawArguments = "",
 ): string {
-  // WXP-10: verify file is in a trusted path
-  const pathCheck = checkTrustedPath(filePath, config);
+  // Security: verify file is from a trusted path
+  const pathCheck = checkTrustedPath(filePath, config, projectRoot, pkgRoot);
   if (!pathCheck.ok) {
     const err = new Error(pathCheck.reason);
     throw new WxpProcessingError(filePath, err, {}, [], []);
@@ -64,95 +73,99 @@ export function processWxp(
   let current = content;
 
   for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-    const doc = parseWxpDocument(current, filePath);
-    const activeOps = doc.operations.filter((op) => op.type !== "version");
+    const tagsBefore = extractWxpTags(current);
+    const activeTags = tagsBefore.filter(
+      (t) => t.node.tag !== "gsd-version" && !t.node.attrs["done"],
+    );
 
-    if (activeOps.length === 0) break;
+    if (activeTags.length === 0) break;
 
-    const pendingBefore = activeOps.map((op) => op.type);
+    const pendingBefore = activeTags.map((t) => t.node.tag);
 
     try {
-      // ── 1. Process includes ─────────────────────────────────────────────
-      for (const op of doc.operations) {
-        if (op.type !== "include") continue;
+      // ── 1. Process <gsd-include> ─────────────────────────────────────────
+      let didWork = false;
+      for (const tag of extractWxpTags(current)) {
+        if (tag.node.tag !== "gsd-include" || tag.node.attrs["done"]) continue;
+        if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
 
-        const includePath = path.resolve(path.dirname(filePath), op.path);
-        const includeCheck = checkTrustedPath(includePath, config);
-        if (!includeCheck.ok) throw new Error(`Include rejected: ${includeCheck.reason}`);
+        const incPath = tag.node.attrs["path"];
+        if (!incPath) continue;
 
-        const includeContent = fs.readFileSync(includePath, "utf8");
-        const appendArgs = op.includeArguments ? `\n${rawArguments}` : "";
-        const stem = path.basename(includePath, path.extname(includePath));
+        const absPath = path.resolve(path.dirname(filePath), incPath);
+        const pathCheck2 = checkTrustedPath(absPath, config, projectRoot, pkgRoot);
+        if (!pathCheck2.ok) throw new Error(`Include rejected: ${pathCheck2.reason}`);
 
-        // INC-02: map caller variables into included file's namespace
-        for (const mapping of op.argMappings) {
-          const callerValue = vars.get(mapping.name);
-          if (callerValue !== undefined) vars.set(mapping.as, callerValue, stem);
+        const included = fs.readFileSync(absPath, "utf8");
+        const stem = path.basename(absPath, path.extname(absPath));
+
+        // INC-02: arg mappings
+        for (const mapping of tag.node.children
+          .flatMap((c) => (c.tag === "gsd-arguments" ? c.children : []))
+          .filter((c) => c.tag === "arg" && c.attrs["name"] && c.attrs["as"])) {
+          const val = vars.get(mapping.attrs["name"]);
+          if (val !== undefined) vars.set(mapping.attrs["as"], val, stem);
         }
 
-        // Replace the tag in content — handle both self-closing and with-children forms
-        const selfCloseRe = new RegExp(
-          `<gsd-include\\s[^>]*path="${escapeRegex(op.path)}"[^>]*\\/>`,
-          "m",
-        );
-        const withChildRe = new RegExp(
-          `<gsd-include\\s[^>]*path="${escapeRegex(op.path)}"[^>]*>[\\s\\S]*?<\\/gsd-include>`,
-          "m",
-        );
-        if (selfCloseRe.test(current)) {
-          current = current.replace(selfCloseRe, includeContent + appendArgs);
-        } else {
-          current = current.replace(withChildRe, includeContent + appendArgs);
+        const appendArgs = tag.node.attrs["include-arguments"] !== undefined
+          ? `\n${rawArguments}`
+          : "";
+
+        // Replace the tag span with included content, mark done
+        current = spliceContent(current, tag.start, tag.end, included + appendArgs);
+        completedOps.push("gsd-include");
+        didWork = true;
+        break; // Re-scan after each include (content changed)
+      }
+      if (didWork) continue;
+
+      // ── 2. Process <gsd-arguments> ───────────────────────────────────────
+      for (const tag of extractWxpTags(current)) {
+        if (tag.node.tag !== "gsd-arguments" || tag.node.attrs["done"]) continue;
+        if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
+
+        const op = buildOperation(tag.node)[0];
+        if (op?.type === "arguments") {
+          parseArguments(op, rawArguments, vars);
+          completedOps.push("gsd-arguments");
         }
+        // Mark done by removing the tag from content
+        current = spliceContent(current, tag.start, tag.end, "");
+        didWork = true;
+        break;
+      }
+      if (didWork) continue;
 
-        completedOps.push("include");
+      // ── 3. Process <gsd-execute> blocks ──────────────────────────────────
+      for (const tag of extractWxpTags(current)) {
+        if (tag.node.tag !== "gsd-execute" || tag.node.attrs["done"]) continue;
+        if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
+
+        const ops = tag.node.children.flatMap(buildOperation);
+        const block = { type: "execute" as const, children: ops };
+        executeBlock(block, vars, config);
+        completedOps.push("gsd-execute");
+        // Remove the execute block from content
+        current = spliceContent(current, tag.start, tag.end, "");
+        didWork = true;
+        break;
+      }
+      if (didWork) continue;
+
+      // ── 4. Apply <gsd-paste> replacements ────────────────────────────────
+      const afterPaste = applyPaste(current, vars);
+      if (afterPaste !== current) {
+        current = afterPaste;
+        completedOps.push("gsd-paste");
+        continue;
       }
 
-      // ── 2. Process arguments ────────────────────────────────────────────
-      for (const op of doc.operations) {
-        if (op.type !== "arguments") continue;
-        parseArguments(op, rawArguments, vars);
-        completedOps.push("arguments");
-        current = current.replace(/<gsd-arguments>[\s\S]*?<\/gsd-arguments>/m, "");
-      }
-
-      // ── 3. Process execute blocks ───────────────────────────────────────
-      for (const op of doc.operations) {
-        if (op.type !== "execute") continue;
-        executeBlock(op, vars, config);
-        completedOps.push("execute");
-        current = current.replace(/<gsd-execute>[\s\S]*?<\/gsd-execute>/m, "");
-      }
-
-      // ── 4. Apply paste replacements ─────────────────────────────────────
-      current = applyPaste(current, vars);
+      // No progress made
+      break;
     } catch (err) {
       if (err instanceof WxpProcessingError) throw err;
       const e = err instanceof Error ? err : new Error(String(err));
       throw new WxpProcessingError(filePath, e, vars.snapshot(), pendingBefore, completedOps);
-    }
-
-    // Count remaining active ops after this iteration
-    const docAfter = parseWxpDocument(current, filePath);
-    const pendingAfter = docAfter.operations.filter(
-      (op: WxpOperation) => op.type !== "version",
-    ).length;
-
-    if (pendingAfter === 0) break;
-
-    if (pendingAfter >= pendingBefore.length) {
-      const stuckErr = new Error(
-        `Resolution loop made no progress at iteration ${iteration + 1}. ` +
-          `Still pending: [${pendingBefore.join(", ")}]. ` +
-          `Increase file complexity analysis or check for unsupported tag nesting.`,
-      );
-      throw new WxpProcessingError(
-        filePath,
-        stuckErr,
-        vars.snapshot(),
-        pendingBefore,
-        completedOps,
-      );
     }
   }
 
@@ -160,31 +173,30 @@ export function processWxp(
 }
 
 /**
- * Process WXP tags in already-trusted content (path check skipped).
- * Use only when the caller has already validated the content source.
+ * Process WXP tags in pre-validated content (path check already done by caller).
  */
 export function processWxpTrustedContent(
   content: string,
   virtualFilePath: string,
   config: WxpSecurityConfig,
+  projectRoot: string,
+  pkgRoot: string,
   rawArguments = "",
 ): string {
-  // Build config with virtualFilePath's directory as trusted (bypass path check)
+  // Build a config that trusts the virtual path's directory
   const trustedConfig: WxpSecurityConfig = {
     ...config,
-    trustedPaths: [...config.trustedPaths, path.dirname(path.resolve(virtualFilePath))],
+    trustedPaths: [
+      ...config.trustedPaths,
+      { position: "absolute", path: path.dirname(path.resolve(virtualFilePath)) },
+    ],
   };
-  return processWxp(content, virtualFilePath, trustedConfig, rawArguments);
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return processWxp(content, virtualFilePath, trustedConfig, projectRoot, pkgRoot, rawArguments);
 }
 
 /**
- * Read the <gsd-version> tag from a workflow file's content.
- * Returns null if no version tag found.
- * Used by Phase 5 harness copy-on-first-run to check do-not-update (WFL-05).
+ * Read the <gsd-version> tag from workflow file content.
+ * Used by harness copy-on-first-run to check do-not-update (WFL-05).
  */
 export function readWorkflowVersionTag(
   content: string,
@@ -193,3 +205,5 @@ export function readWorkflowVersionTag(
   if (!m) return null;
   return { version: m[1], doNotUpdate: Boolean(m[2]) };
 }
+
+void checkAllowlist; // exported via security.ts, referenced here for completeness

@@ -3,28 +3,45 @@
 # Settings
 PI_MAIN_PACKAGE="@mariozechner/pi-coding-agent"
 PACKAGES=(
+    # Basic useful protection, imho
     "npm:@aliou/pi-guardrails"
-    "npm:pi-lens"
+    # Had to removeit because it can slow down startup exponentially woth big codebases, and the benefits are not worth it
+    # "npm:pi-lens"
+    # Very useful for preliminary scheeming and brainstorming. Also for keeping the LLM grounded over time
     "npm:@apmantza/greedysearch-pi"
+    # Same as greedysearch-pi
     "npm:pi-web-access"
+    # Very VERY cool porting of [LiteParse](https://www.llamaindex.ai/blog/liteparse-local-document-parsing-for-ai-agents)
     "npm:pi-docparser"
     # oh-pi needs to insstall globally running `oh-pi` command, so we must insert in the list two different type of packages: simple, and complex (custom sequences of commands)
+    # Suggest avoiding this bundle, is heavy and has issues as it is...
     # "npm:@ifi/oh-pi"
     # (
     #     "pi:npm:@ifi/oh-pi"
     #     "sh:oh-pi"
     # )
+    # Debatable
     "npm:@ifi/oh-pi-agents"
-    "npm:@ifi/oh-pi-ant-colony"
+    # Cool but unusable for now because they made debatable design choices that cause more problems than benefits:
+    # "npm:@ifi/oh-pi-ant-colony"
+    # Useful but conflicts with npm:powerline-footer
     # "npm:@ifi/oh-pi-extensions"
+    # Debatable
     "npm:@ifi/oh-pi-prompts"
+    # Debatable
     "npm:@ifi/oh-pi-skills"
+    # Debatable
     "npm:@ifi/oh-pi-themes"
+    # Debatable
     "npm:@ifi/pi-extension-subagents"
+    # Debatable
     "npm:@ifi/pi-plan"
+    # Debatable
     "npm:@ifi/pi-spec"
     
+    # Debatable
     "npm:pi-markdown-preview"
+
     # "npm:@guwidoe/pi-prompt-suggester"
     # REMOVED: pi-prompt-suggester has two serious drawbacks that outweigh the benefit of inline suggestions:
     #   1. SLOW STARTUP - on every session start it runs an agentic codebase seeder (up to 16 Claude API
@@ -33,16 +50,28 @@ PACKAGES=(
     #   2. SILENT AUTO-SUBMIT - the suggester pre-fills the input with its predicted next user message
     #      (e.g. 'detect_project'). If you hit Enter before noticing, it submits without your consent
     #      and there is no way to interrupt it once the session has started.
+
+    # Debatable and weird to use: it creates an effimerous web server with a form to answer the interview and submit them... I'm still unsure if to keep this or not
     "npm:pi-interview"
+    # Debatable, I want to have it ready if I need it, but ymmv
     "npm:pi-mermaid"
-    "npm:pi-mcp-adapter"
+    # Debatable, but some people need it, ymmv (I don't like MCP in itself, [since even its creatores recused it](https://www.anthropic.com/engineering/code-execution-with-mcp))
+    # "npm:pi-mcp-adapter"
+    # Very debatable, worth a try but ymmv
     "npm:@manojlds/ralphi"
+    # Eyecandy
     "npm:pi-powerline-footer"
+    # Parallelization/squads tool... depends on your workflow
     # "npm:pi-messenger"
+    # Useful
     "npm:pi-ask-user"
+    # Useful to snoop what the tool calls are all about
     "npm:pi-tool-display"
+    # In theory very powerful, still have to find a way to have my GSD workflow trigger it by itself when needed
     "npm:pi-annotate"
+    # Eyecandy
     "npm:pi-animations"
+    # For local-first LLM, if you need it, but I don't need it for now and it adds a dependency to ollama that I don't want
     # "npm:@0xkobold/pi-ollama"
 )
 

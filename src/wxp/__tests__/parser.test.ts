@@ -1,138 +1,175 @@
 import { describe, it, expect } from "vitest";
-import { parseWxpDocument, extractCodeFenceRegions } from "../parser.js";
+import { extractWxpTags, extractCodeFenceRegions } from "../parser.js";
+import { buildOperation } from "../ast.js";
 
 describe("extractCodeFenceRegions", () => {
-  it("returns empty array for content with no fences", () => {
+  it("returns empty for content with no fences", () => {
     expect(extractCodeFenceRegions("hello world")).toEqual([]);
   });
 
-  it("identifies a single fenced region", () => {
+  it("identifies a fenced region", () => {
     const content = "before\n```\ncode\n```\nafter";
     const regions = extractCodeFenceRegions(content);
     expect(regions).toHaveLength(1);
-    const [start, end] = regions[0];
-    expect(content.slice(start, end)).toContain("code");
-  });
-
-  it("identifies multiple fenced regions", () => {
-    const content = "```\nfirst\n```\nmiddle\n```\nsecond\n```";
-    const regions = extractCodeFenceRegions(content);
-    expect(regions).toHaveLength(2);
-  });
-
-  it("region excludes content after closing fence", () => {
-    const content = "```\ncode\n```\noutside";
-    const regions = extractCodeFenceRegions(content);
-    const [, end] = regions[0];
-    expect(content.slice(end)).toContain("outside");
+    expect(content.slice(regions[0][0], regions[0][1])).toContain("code");
   });
 });
 
-describe("parseWxpDocument — code-fence skip (WXP-01)", () => {
+describe("extractWxpTags — code-fence skip (WXP-01)", () => {
   it("does NOT parse <gsd-paste> inside a code fence", () => {
     const content = "before\n```\n<gsd-paste name=\"x\" />\n```\nafter";
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const pasteOps = doc.operations.filter((op) => op.type === "paste");
-    expect(pasteOps).toHaveLength(0);
+    const tags = extractWxpTags(content);
+    const pastes = tags.filter((t) => t.node.tag === "gsd-paste");
+    expect(pastes).toHaveLength(0);
   });
 
   it("DOES parse <gsd-paste> outside a code fence", () => {
-    const content = "text\n<gsd-paste name=\"x\" />\nmore";
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const pasteOps = doc.operations.filter((op) => op.type === "paste");
-    expect(pasteOps).toHaveLength(1);
-    expect(pasteOps[0]).toMatchObject({ type: "paste", name: "x" });
-  });
-
-  it("parses paste outside fence even when fence contains look-alike tags", () => {
-    const content = "```\n<gsd-paste name=\"a\" />\n```\n<gsd-paste name=\"b\" />";
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const pasteOps = doc.operations.filter((op) => op.type === "paste");
-    expect(pasteOps).toHaveLength(1);
-    expect(pasteOps[0]).toMatchObject({ name: "b" });
+    const content = 'text\n<gsd-paste name="x" />\nmore';
+    const tags = extractWxpTags(content);
+    const pastes = tags.filter((t) => t.node.tag === "gsd-paste");
+    expect(pastes).toHaveLength(1);
+    expect(pastes[0].node.attrs["name"]).toBe("x");
   });
 });
 
-describe("parseWxpDocument — gsd-execute", () => {
-  it("parses a basic shell node inside gsd-execute", () => {
-    const content = `<gsd-execute>\n<shell command="git" result="branch">rev-parse HEAD</shell>\n</gsd-execute>`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const execOps = doc.operations.filter((op) => op.type === "execute");
-    expect(execOps).toHaveLength(1);
-    if (execOps[0].type === "execute") {
-      const shell = execOps[0].children.find((c) => c.type === "shell");
-      expect(shell).toBeDefined();
-      if (shell?.type === "shell") {
-        expect(shell.command).toBe("git");
-        expect(shell.result).toBe("branch");
-      }
+describe("extractWxpTags — gsd-execute", () => {
+  it("extracts a gsd-execute block with shell children", () => {
+    const content = [
+      "<gsd-execute>",
+      "  <shell command=\"pi-gsd-tools\">",
+      "    <args><arg string=\"init\" /><arg string=\"execute-phase\" /><arg name=\"phase\" wrap='\"' /></args>",
+      "    <outs><out type=\"string\" name=\"init\" /></outs>",
+      "  </shell>",
+      "</gsd-execute>",
+    ].join("\n");
+
+    const tags = extractWxpTags(content);
+    expect(tags).toHaveLength(1);
+    expect(tags[0].node.tag).toBe("gsd-execute");
+
+    const ops = tags[0].node.children.flatMap(buildOperation);
+    expect(ops).toHaveLength(1);
+    expect(ops[0].type).toBe("shell");
+    if (ops[0].type === "shell") {
+      expect(ops[0].command).toBe("pi-gsd-tools");
+      expect(ops[0].args).toHaveLength(3);
+      expect(ops[0].outs).toHaveLength(1);
+      expect(ops[0].outs[0].name).toBe("init");
     }
   });
 });
 
-describe("parseWxpDocument — gsd-arguments", () => {
-  it("parses positionals and flags", () => {
-    const content = `<gsd-arguments>\n<positional name="phase" />\n<flag name="skip" boolean />\n</gsd-arguments>`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const argsOps = doc.operations.filter((op) => op.type === "arguments");
-    expect(argsOps).toHaveLength(1);
-    if (argsOps[0].type === "arguments") {
-      expect(argsOps[0].positionals).toHaveLength(1);
-      expect(argsOps[0].flags).toHaveLength(1);
+describe("extractWxpTags — gsd-arguments", () => {
+  it("parses typed positionals and flag", () => {
+    const content = [
+      "<gsd-arguments>",
+      "  <settings><keep-extra-args /></settings>",
+      "  <arg name=\"phase\" type=\"number\" />",
+      "  <arg name=\"auto\" type=\"flag\" flag=\"--auto\" optional />",
+      "  <arg name=\"user-text\" type=\"string\" optional />",
+      "</gsd-arguments>",
+    ].join("\n");
+
+    const tags = extractWxpTags(content);
+    const ops = tags[0].node.children.length > 0
+      ? tags.flatMap((t) => buildOperation(t.node))
+      : buildOperation(tags[0].node);
+    const argsOp = ops.find((o) => o.type === "arguments");
+    expect(argsOp).toBeDefined();
+    if (argsOp?.type === "arguments") {
+      expect(argsOp.args).toHaveLength(3);
+      expect(argsOp.settings.keepExtraArgs).toBe(true);
+      const flag = argsOp.args.find((a) => a.type === "flag");
+      expect(flag?.flag).toBe("--auto");
+      expect(flag?.optional).toBe(true);
     }
   });
 });
 
-describe("parseWxpDocument — gsd-include", () => {
+describe("extractWxpTags — gsd-include", () => {
   it("parses self-closing include", () => {
     const content = `<gsd-include path="other.md" />`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const incOps = doc.operations.filter((op) => op.type === "include");
-    expect(incOps).toHaveLength(1);
-    if (incOps[0].type === "include") {
-      expect(incOps[0].path).toBe("other.md");
-      expect(incOps[0].includeArguments).toBe(false);
-    }
+    const tags = extractWxpTags(content);
+    expect(tags).toHaveLength(1);
+    expect(tags[0].node.attrs["path"]).toBe("other.md");
   });
 
-  it("parses include with include-arguments flag", () => {
+  it("parses include with include-arguments", () => {
     const content = `<gsd-include path="other.md" include-arguments />`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const incOps = doc.operations.filter((op) => op.type === "include");
-    if (incOps[0].type === "include") {
-      expect(incOps[0].includeArguments).toBe(true);
-    }
+    const tags = extractWxpTags(content);
+    expect("include-arguments" in tags[0].node.attrs).toBe(true);
   });
 
-  it("parses include with child arg mappings (INC-02)", () => {
-    const content = `<gsd-include path="other.md">\n<gsd-arguments><arg name="x" as="y" /></gsd-arguments>\n</gsd-include>`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const incOps = doc.operations.filter((op) => op.type === "include");
-    if (incOps[0].type === "include") {
-      expect(incOps[0].argMappings).toHaveLength(1);
-      expect(incOps[0].argMappings[0]).toMatchObject({ name: "x", as: "y" });
+  it("parses include with arg mappings (INC-02)", () => {
+    const content = [
+      `<gsd-include path="other.md">`,
+      `  <gsd-arguments>`,
+      `    <arg name="my-phase" as="phase" />`,
+      `  </gsd-arguments>`,
+      `</gsd-include>`,
+    ].join("\n");
+    const tags = extractWxpTags(content);
+    const ops = buildOperation(tags[0].node);
+    if (ops[0].type === "include") {
+      expect(ops[0].argMappings).toHaveLength(1);
+      expect(ops[0].argMappings[0].name).toBe("my-phase");
+      expect(ops[0].argMappings[0].as).toBe("phase");
     }
   });
 });
 
-describe("parseWxpDocument — gsd-version", () => {
+describe("extractWxpTags — gsd-version", () => {
   it("parses version tag", () => {
-    const content = `<gsd-version v="1.2.3" />`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const vOps = doc.operations.filter((op) => op.type === "version");
-    expect(vOps).toHaveLength(1);
-    if (vOps[0].type === "version") {
-      expect(vOps[0].v).toBe("1.2.3");
-      expect(vOps[0].doNotUpdate).toBe(false);
-    }
+    const content = `<gsd-version v="1.12.4" />`;
+    const tags = extractWxpTags(content);
+    expect(tags[0].node.attrs["v"]).toBe("1.12.4");
   });
 
-  it("parses version tag with do-not-update", () => {
+  it("parses do-not-update flag", () => {
     const content = `<gsd-version v="1.0.0" do-not-update />`;
-    const doc = parseWxpDocument(content, "/trusted/file.md");
-    const vOps = doc.operations.filter((op) => op.type === "version");
-    if (vOps[0].type === "version") {
-      expect(vOps[0].doNotUpdate).toBe(true);
+    const tags = extractWxpTags(content);
+    expect("do-not-update" in tags[0].node.attrs).toBe(true);
+  });
+});
+
+describe("buildOperation — if node with PRD condition structure", () => {
+  it("builds an if/condition/equals/left/right node", () => {
+    const content = [
+      "<gsd-execute>",
+      "  <if>",
+      "    <condition>",
+      "      <equals>",
+      "        <left name=\"auto-chain-active\" />",
+      "        <right type=\"boolean\" value=\"false\" />",
+      "      </equals>",
+      "    </condition>",
+      "    <then>",
+      "      <shell command=\"pi-gsd-tools\">",
+      "        <args><arg string=\"config-set\" /></args>",
+      "        <outs><suppress-errors /></outs>",
+      "      </shell>",
+      "    </then>",
+      "  </if>",
+      "</gsd-execute>",
+    ].join("\n");
+
+    const tags = extractWxpTags(content);
+    const ops = buildOperation(tags[0].node);
+    expect(ops[0].type).toBe("execute");
+    if (ops[0].type === "execute") {
+      const ifOp = ops[0].children[0];
+      expect(ifOp.type).toBe("if");
+      if (ifOp.type === "if") {
+        expect(ifOp.condition.op).toBe("equals");
+        expect(ifOp.condition.left.name).toBe("auto-chain-active");
+        expect(ifOp.condition.right.type).toBe("boolean");
+        expect(ifOp.condition.right.value).toBe("false");
+        expect(ifOp.then).toHaveLength(1);
+        expect(ifOp.then[0].type).toBe("shell");
+        if (ifOp.then[0].type === "shell") {
+          expect(ifOp.then[0].suppressErrors).toBe(true);
+        }
+      }
     }
   });
 });

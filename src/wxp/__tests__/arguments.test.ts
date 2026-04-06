@@ -1,106 +1,80 @@
 import { describe, it, expect } from "vitest";
-import { parseArguments } from "../arguments.js";
+import { parseArguments, WxpArgumentsError } from "../arguments.js";
 import { createVariableStore } from "../variables.js";
-import type { ArgumentsNode } from "../schema.js";
+import type { ArgumentsNode } from "../../schemas/wxp.zod.js";
 
-describe("parseArguments — two-pass algorithm (WXP-02)", () => {
-  it("parses a single positional", () => {
+describe("parseArguments — two-pass (PRD §3.2)", () => {
+  it("extracts flag and assigns positional", () => {
     const vars = createVariableStore();
     const node: ArgumentsNode = {
       type: "arguments",
-      positionals: [{ name: "phase", greedy: false }],
-      flags: [],
-    };
-    parseArguments(node, "3", vars);
-    expect(vars.get("phase")).toBe("3");
-  });
-
-  it("parses flags before positionals (flags can appear anywhere)", () => {
-    const vars = createVariableStore();
-    const node: ArgumentsNode = {
-      type: "arguments",
-      positionals: [{ name: "phase", greedy: false }],
-      flags: [{ name: "skip-research", boolean: true }],
-    };
-    parseArguments(node, "1 --skip-research", vars);
-    expect(vars.get("phase")).toBe("1");
-    expect(vars.get("skip-research")).toBe("true");
-  });
-
-  it("greedy last positional consumes all remaining tokens", () => {
-    const vars = createVariableStore();
-    const node: ArgumentsNode = {
-      type: "arguments",
-      positionals: [
-        { name: "phase", greedy: false },
-        { name: "rest", greedy: true },
+      settings: { keepExtraArgs: false, strictArgs: false, delimiters: [] },
+      args: [
+        { name: "phase", type: "number" },
+        { name: "auto-chain-active", type: "flag", flag: "--auto", optional: true },
       ],
-      flags: [{ name: "skip-research", boolean: true }],
     };
-    parseArguments(node, "1 --skip-research foo bar", vars);
+    parseArguments(node, "1 --auto", vars);
     expect(vars.get("phase")).toBe("1");
-    expect(vars.get("rest")).toBe("foo bar");
-    expect(vars.get("skip-research")).toBe("true");
+    expect(vars.get("auto-chain-active")).toBe("true");
   });
 
-  it("flag with value consumes the next token", () => {
+  it("absent flag defaults to false", () => {
     const vars = createVariableStore();
     const node: ArgumentsNode = {
       type: "arguments",
-      positionals: [{ name: "phase", greedy: false }],
-      flags: [{ name: "profile", boolean: false }],
-    };
-    parseArguments(node, "2 --profile quality", vars);
-    expect(vars.get("phase")).toBe("2");
-    expect(vars.get("profile")).toBe("quality");
-  });
-
-  it("absent boolean flag defaults to 'false'", () => {
-    const vars = createVariableStore();
-    const node: ArgumentsNode = {
-      type: "arguments",
-      positionals: [],
-      flags: [{ name: "dry-run", boolean: true }],
+      settings: { keepExtraArgs: false, strictArgs: false, delimiters: [] },
+      args: [{ name: "dry-run", type: "flag", flag: "--dry-run", optional: true }],
     };
     parseArguments(node, "", vars);
     expect(vars.get("dry-run")).toBe("false");
   });
 
-  it("absent string flag defaults to empty string", () => {
+  it("greedy last string consumes all remaining tokens", () => {
     const vars = createVariableStore();
     const node: ArgumentsNode = {
       type: "arguments",
-      positionals: [],
-      flags: [{ name: "output", boolean: false }],
-    };
-    parseArguments(node, "", vars);
-    expect(vars.get("output")).toBe("");
-  });
-
-  it("missing positional defaults to empty string", () => {
-    const vars = createVariableStore();
-    const node: ArgumentsNode = {
-      type: "arguments",
-      positionals: [{ name: "phase", greedy: false }],
-      flags: [],
-    };
-    parseArguments(node, "", vars);
-    expect(vars.get("phase")).toBe("");
-  });
-
-  it("flag in middle of positionals is correctly consumed", () => {
-    const vars = createVariableStore();
-    const node: ArgumentsNode = {
-      type: "arguments",
-      positionals: [
-        { name: "a", greedy: false },
-        { name: "b", greedy: false },
+      settings: { keepExtraArgs: false, strictArgs: false, delimiters: [] },
+      args: [
+        { name: "phase", type: "number" },
+        { name: "auto", type: "flag", flag: "--auto", optional: true },
+        { name: "user-text", type: "string", optional: true },
       ],
-      flags: [{ name: "verbose", boolean: true }],
     };
-    parseArguments(node, "first --verbose second", vars);
-    expect(vars.get("a")).toBe("first");
-    expect(vars.get("b")).toBe("second");
-    expect(vars.get("verbose")).toBe("true");
+    parseArguments(node, "1 --auto fix the login bug", vars);
+    expect(vars.get("phase")).toBe("1");
+    expect(vars.get("auto")).toBe("true");
+    expect(vars.get("user-text")).toBe("fix the login bug");
+  });
+
+  it("throws on missing required positional", () => {
+    const vars = createVariableStore();
+    const node: ArgumentsNode = {
+      type: "arguments",
+      settings: { keepExtraArgs: false, strictArgs: false, delimiters: [] },
+      args: [{ name: "phase", type: "number" }],
+    };
+    expect(() => parseArguments(node, "", vars)).toThrow(WxpArgumentsError);
+  });
+
+  it("number type: throws on NaN", () => {
+    const vars = createVariableStore();
+    const node: ArgumentsNode = {
+      type: "arguments",
+      settings: { keepExtraArgs: false, strictArgs: false, delimiters: [] },
+      args: [{ name: "phase", type: "number" }],
+    };
+    expect(() => parseArguments(node, "notanumber", vars)).toThrow(WxpArgumentsError);
+  });
+
+  it("keep-extra-args stores extra in _extra", () => {
+    const vars = createVariableStore();
+    const node: ArgumentsNode = {
+      type: "arguments",
+      settings: { keepExtraArgs: true, strictArgs: false, delimiters: [] },
+      args: [{ name: "phase", type: "number" }],
+    };
+    parseArguments(node, "1 extra stuff", vars);
+    expect(vars.get("_extra")).toBe("extra stuff");
   });
 });

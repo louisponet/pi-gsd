@@ -1,60 +1,92 @@
-import type { ArgumentsNode } from "./schema.js";
+import type { ArgumentsNode, Arg } from "../schemas/wxp.zod.js";
 import type { VariableStore } from "./variables.js";
 
-/**
- * Two-pass $ARGUMENTS parser (WXP-02).
- *
- * Pass 1: Extract all --flag and --flag value pairs (flags can appear anywhere).
- *         Remove consumed tokens from the list.
- * Pass 2: Assign remaining tokens to positionals left-to-right.
- *         The last positional defined with greedy=true consumes all remaining tokens joined by space.
- *
- * All parsed values are stored in vars under each argument's name.
- */
+export class WxpArgumentsError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "WxpArgumentsError";
+  }
+}
+
 export function parseArguments(
   node: ArgumentsNode,
   rawArguments: string,
   vars: VariableStore,
 ): void {
-  const tokens = rawArguments.trim().split(/\s+/).filter(Boolean);
+  let tokens: string[];
+  if (node.settings.delimiters.length > 0) {
+    const delim = node.settings.delimiters[0].value;
+    const unescaped = delim === "\\n" ? "\n" : delim;
+    tokens = rawArguments.split(unescaped).map((t) => t.trim()).filter(Boolean);
+  } else {
+    tokens = rawArguments.trim().split(/\s+/).filter(Boolean);
+  }
+
   const consumed = new Set<number>();
 
   // ── Pass 1: flags ─────────────────────────────────────────────────────────
-  for (const flagDef of node.flags) {
-    const flagToken = `--${flagDef.name}`;
-    const flagIndex = tokens.indexOf(flagToken);
-
-    if (flagIndex === -1) {
-      // Flag not present: store default
-      vars.set(flagDef.name, flagDef.boolean ? "false" : "", undefined);
-      continue;
-    }
-
-    consumed.add(flagIndex);
-
-    if (flagDef.boolean) {
-      vars.set(flagDef.name, "true", undefined);
+  for (const argDef of node.args.filter((a: Arg) => a.type === "flag")) {
+    const flagToken = argDef.flag ?? `--${argDef.name}`;
+    const idx = tokens.indexOf(flagToken);
+    if (idx === -1) {
+      vars.set(argDef.name!, "false", undefined);
     } else {
-      const valueIndex = flagIndex + 1;
-      if (valueIndex < tokens.length && !tokens[valueIndex].startsWith("--")) {
-        vars.set(flagDef.name, tokens[valueIndex], undefined);
-        consumed.add(valueIndex);
-      } else {
-        vars.set(flagDef.name, "", undefined);
-      }
+      vars.set(argDef.name!, "true", undefined);
+      consumed.add(idx);
     }
   }
 
-  // ── Pass 2: positionals ───────────────────────────────────────────────────
+  // ── Pass 2: positionals ────────────────────────────────────────────────────
+  const positionals = node.args.filter((a: Arg) => a.type !== "flag");
   const remaining = tokens.filter((_, i) => !consumed.has(i));
+  let tokenIdx = 0;
 
-  node.positionals.forEach((pos, idx) => {
-    const isLast = idx === node.positionals.length - 1;
-    if (isLast && pos.greedy) {
-      // Greedy-last: consume all remaining tokens
-      vars.set(pos.name, remaining.slice(idx).join(" "), undefined);
-    } else {
-      vars.set(pos.name, remaining[idx] ?? "", undefined);
+  for (let i = 0; i < positionals.length; i++) {
+    const argDef = positionals[i];
+    const isLast = i === positionals.length - 1;
+
+    if (tokenIdx >= remaining.length) {
+      if (!argDef.optional) {
+        throw new WxpArgumentsError(
+          `Missing required argument '${argDef.name}' (type: ${argDef.type})`,
+        );
+      }
+      vars.set(argDef.name!, "", undefined);
+      continue;
     }
-  });
+
+    if (argDef.type === "string" && isLast) {
+      vars.set(argDef.name!, remaining.slice(tokenIdx).join(" "), undefined);
+      tokenIdx = remaining.length;
+    } else if (argDef.type === "number") {
+      const raw = remaining[tokenIdx++];
+      const num = Number(raw);
+      if (isNaN(num)) {
+        throw new WxpArgumentsError(
+          `Argument '${argDef.name}' expected a number, got '${raw}'`,
+        );
+      }
+      vars.set(argDef.name!, String(num), undefined);
+    } else if (argDef.type === "boolean") {
+      const raw = remaining[tokenIdx++].toLowerCase();
+      if (raw !== "true" && raw !== "false") {
+        throw new WxpArgumentsError(
+          `Argument '${argDef.name}' expected true/false, got '${raw}'`,
+        );
+      }
+      vars.set(argDef.name!, raw, undefined);
+    } else {
+      vars.set(argDef.name!, remaining[tokenIdx++] ?? "", undefined);
+    }
+  }
+
+  const extra = remaining.slice(tokenIdx).join(" ");
+  if (extra) {
+    if (node.settings.strictArgs) {
+      throw new WxpArgumentsError(`Unexpected extra arguments: '${extra}'.`);
+    }
+    if (node.settings.keepExtraArgs) {
+      vars.set("_extra", extra, undefined);
+    }
+  }
 }

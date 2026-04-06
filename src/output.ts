@@ -32,14 +32,14 @@ export function formatOutput(
         data = result;
     }
 
-    if (format === "toon") {
-        // @toon-format/toon may not ship types; import dynamically to avoid hard failure
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { encode } = require("@toon-format/toon") as {
-            encode: (v: AnyValue) => string;
-        };
-        return encode(data);
+    if (format === "json") {
+        return JSON.stringify(data, null, 2);
     }
 
-    return JSON.stringify(data, null, 2);
+    // @toon-format/toon may not ship types; import dynamically to avoid hard failure
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { encode } = require("@toon-format/toon") as {
+        encode: (v: AnyValue) => string;
+    };
+    return encode(data);
 }

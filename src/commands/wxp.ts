@@ -11,11 +11,9 @@ export class WxpProcessCommand extends Command {
   };
   static override flags = {
     input: Flags.string({ description: "Input content string (alternative to file)" }),
-    "trusted-path": Flags.string({
-      description: "Additional trusted path",
-      multiple: true,
-    }),
-    arguments: Flags.string({ description: "Raw arguments string for $ARGUMENTS", default: "" }),
+    arguments: Flags.string({ description: "Raw $ARGUMENTS string", default: "" }),
+    "project-root": Flags.string({ description: "Project root directory", default: process.cwd() }),
+    "pkg-root": Flags.string({ description: "Package root directory", default: process.cwd() }),
   };
 
   async run() {
@@ -26,7 +24,7 @@ export class WxpProcessCommand extends Command {
 
     if (flags.input !== undefined) {
       content = flags.input;
-      filePath = path.join(process.cwd(), ".pi", "gsd", "workflows", "_inline.md");
+      filePath = path.join(flags["project-root"], ".pi", "gsd", "workflows", "_inline.md");
     } else if (args.file) {
       const fs = await import("node:fs");
       filePath = path.resolve(args.file);
@@ -36,19 +34,26 @@ export class WxpProcessCommand extends Command {
       return;
     }
 
-    const trustedPaths = [
-      path.join(process.cwd(), ".pi", "gsd"),
-      ...(flags["trusted-path"] ?? []),
-    ];
-
     const config = {
-      trustedPaths,
+      trustedPaths: [
+        { position: "project" as const, path: ".pi/gsd" },
+        { position: "pkg" as const, path: ".gsd/harnesses/pi/get-shit-done" },
+      ],
+      untrustedPaths: [],
       shellAllowlist: [...DEFAULT_SHELL_ALLOWLIST],
+      shellBanlist: [],
       shellTimeoutMs: 30_000,
     };
 
     try {
-      const result = processWxp(content, filePath, config, flags.arguments);
+      const result = processWxp(
+        content,
+        filePath,
+        config,
+        flags["project-root"],
+        flags["pkg-root"],
+        flags.arguments,
+      );
       process.stdout.write(result);
     } catch (err) {
       if (err instanceof WxpProcessingError) {

@@ -1,27 +1,96 @@
 <gsd-version v="1.12.4" />
 
 <gsd-arguments>
-  <positional name="PHASE" />
-  <flag name="auto" boolean />
-  <flag name="no-transition" boolean />
-  <flag name="ws" />
+  <settings>
+    <keep-extra-args />
+    <delimiters>
+      <delimiter type="string" value="\n" />
+    </delimiters>
+  </settings>
+  <arg name="auto-chain-active" type="flag" flag="--auto" optional />
+  <arg name="phase" type="number" />
+  <arg name="user-text" type="string" optional />
 </gsd-arguments>
 
 <gsd-execute>
-  <shell command="pi-gsd-tools" result="PHASE_DATA">init execute-phase ${PHASE}</shell>
-  <shell command="pi-gsd-tools" result="STATE_JSON">state json --raw</shell>
-  <shell command="pi-gsd-tools" result="ROADMAP_PHASE">roadmap get-phase ${PHASE}</shell>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="init" />
+      <arg string="execute-phase" />
+      <arg name="phase" wrap='"' />
+    </args>
+    <outs>
+      <out type="string" name="init" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <starts-with>
+        <left name="init" />
+        <right type="string" value="@file:" />
+      </starts-with>
+    </condition>
+    <then>
+      <string-op op="split">
+        <args>
+          <arg name="init" />
+          <arg type="string" value="@file:" />
+        </args>
+        <outs>
+          <out type="string" name="init-file" />
+        </outs>
+      </string-op>
+      <shell command="cat">
+        <args>
+          <arg name="init-file" wrap='"' />
+        </args>
+        <outs>
+          <out type="string" name="init" />
+        </outs>
+      </shell>
+    </then>
+  </if>
+  <shell command="pi-gsd-tools">
+    <args>
+      <arg string="agent-skills" />
+      <arg string="gsd-executor" />
+    </args>
+    <outs>
+      <suppress-errors />
+      <out type="string" name="agent-skills" />
+    </outs>
+  </shell>
+  <if>
+    <condition>
+      <equals>
+        <left name="auto-chain-active" />
+        <right type="boolean" value="false" />
+      </equals>
+    </condition>
+    <then>
+      <shell command="pi-gsd-tools">
+        <args>
+          <arg string="config-set" />
+          <arg string="workflow._auto_chain_active" />
+          <arg name="auto-chain-active" />
+        </args>
+        <outs>
+          <suppress-errors />
+        </outs>
+      </shell>
+    </then>
+  </if>
 </gsd-execute>
 
-## Execution Context (pre-injected by WXP)
+## Execution Context (pre-injected)
 
-**Phase:** <gsd-paste name="PHASE" />
+**Phase:** <gsd-paste name="phase" />
 
-**Project State:**
-<gsd-paste name="STATE_JSON" />
+**Phase Init Data:**
+<gsd-paste name="init" />
 
-**Phase Roadmap:**
-<gsd-paste name="ROADMAP_PHASE" />
+**Agent Skills:**
+<gsd-paste name="agent-skills" />
 
 ---
 
@@ -74,21 +143,13 @@ Always use the exact name from this list - do not fall back to 'general-purpose'
 
 <process>
 
-<step name="parse_args" priority="first">
-Parse `$ARGUMENTS` before loading any context:
-
-- First positional token → `PHASE_ARG`
-- Optional `--wave N` → `WAVE_FILTER`
-- Optional `--gaps-only` keeps its current meaning
-
-If `--wave` is absent, preserve the current behavior of executing all incomplete waves in the phase.
-</step>
 
 <step name="initialize" priority="first">
-Context is pre-injected above via WXP. Parse `PHASE_DATA` for: `executor_model`, `verifier_model`,
-`commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`,
-`phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`,
-`incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`.
+Load all context in one call:
+
+<!-- Init data pre-injected above via WXP: `init`, `agent-skills` variables available -->
+
+Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`.
 
 **If `phase_found` is false:** Error - phase directory not found.
 **If `plan_count` is 0:** Error - no plans found in phase.
@@ -105,12 +166,7 @@ internally and skip the `execute_waves` step in favor of `check_interactive_mode
 inline path for each plan.
 
 **REQUIRED - Sync chain flag with intent.** If user invoked manually (no `--auto`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This prevents stale `_auto_chain_active: true` from causing unwanted auto-advance. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference). You MUST execute this bash block before any config reads:
-```bash
-# REQUIRED: prevents stale auto-chain from previous --auto runs
-if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-  pi-gsd-tools config-set workflow._auto_chain_active false 2>/dev/null
-fi
-```
+<!-- auto-chain-active sync handled above via WXP -->
 </step>
 
 <step name="check_interactive_mode">

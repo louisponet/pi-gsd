@@ -31,7 +31,7 @@ import { dirname, join, relative } from "node:path";
 import type { ContextUsage, ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { processWxpTrustedContent, WxpProcessingError, readWorkflowVersionTag } from "../../src/wxp/index.js";
 import { DEFAULT_SHELL_ALLOWLIST } from "../../src/wxp/security.js";
-import type { WxpSecurityConfig } from "../../src/wxp/schema.js";
+import type { WxpSecurityConfig } from "../../src/schemas/wxp.zod.js";
 
 /**
  * Ensures .pi/gsd/ in the project is a symlink to the harness files
@@ -243,17 +243,26 @@ function resolveGsdInclude(
 
 		// ── WXP post-processing: run after <gsd-include> resolution (WXP-14) ──
 		// Load global + project settings (HRN-06, HRN-07)
-		const loadSettings = (settingsPath: string): Partial<WxpSecurityConfig> => {
+		const extFile2 = typeof __filename !== "undefined" ? __filename : "";
+		const pkgRoot2 = join(dirname(extFile2), "..", "..");
+
+		type SettingsFile = {
+			shellAllowlist?: string[];
+			shellBanlist?: string[];
+			trustedPaths?: Array<{ position: "project" | "pkg" | "absolute"; path: string }>;
+			untrustedPaths?: Array<{ position: "project" | "pkg" | "absolute"; path: string }>;
+			shellTimeoutMs?: number;
+		};
+		const loadSettings = (settingsPath: string): SettingsFile => {
 			try {
 				if (existsSync(settingsPath)) {
-					return JSON.parse(readFileSync(settingsPath, "utf8")) as Partial<WxpSecurityConfig>;
+					return JSON.parse(readFileSync(settingsPath, "utf8")) as SettingsFile;
 				}
 			} catch { /* ignore */ }
 			return {};
 		};
 		const globalSettings = loadSettings(join(homedir(), ".gsd", "pi-gsd-settings.json"));
 		const projectSettings = loadSettings(join(ctx.cwd, ".pi", "gsd", "pi-gsd-settings.json"));
-		// Merge: project overrides global; both can extend the default allowlist
 		const mergedAllowlist = [
 			...DEFAULT_SHELL_ALLOWLIST,
 			...(globalSettings.shellAllowlist ?? []),
@@ -263,10 +272,18 @@ function resolveGsdInclude(
 			trustedPaths: [
 				...(globalSettings.trustedPaths ?? []),
 				...(projectSettings.trustedPaths ?? []),
-				pkgHarness,
-				join(ctx.cwd, ".pi", "gsd"),
-			].filter(existsSync),
+				{ position: "pkg", path: ".gsd/harnesses/pi/get-shit-done" },
+				{ position: "project", path: ".pi/gsd" },
+			],
+			untrustedPaths: [
+				...(globalSettings.untrustedPaths ?? []),
+				...(projectSettings.untrustedPaths ?? []),
+			],
 			shellAllowlist: [...new Set(mergedAllowlist)],
+			shellBanlist: [
+				...(globalSettings.shellBanlist ?? []),
+				...(projectSettings.shellBanlist ?? []),
+			],
 			shellTimeoutMs: projectSettings.shellTimeoutMs ?? globalSettings.shellTimeoutMs ?? 30_000,
 		};
 
@@ -275,15 +292,14 @@ function resolveGsdInclude(
 				if (msg.role !== "user") continue;
 				if (typeof msg.content === "string") {
 					if (!msg.content.includes("<gsd-")) continue;
-					// Use a virtual trusted path so the path-check passes
 					const virtualPath = join(ctx.cwd, ".pi", "gsd", "workflows", "_message.md");
-					msg.content = processWxpTrustedContent(msg.content, virtualPath, wxpSecurity);
+					msg.content = processWxpTrustedContent(msg.content, virtualPath, wxpSecurity, ctx.cwd, pkgRoot2);
 				} else if (Array.isArray(msg.content)) {
 					for (const block of msg.content) {
 						if (block.type !== "text" || !block.text) continue;
 						if (!block.text.includes("<gsd-")) continue;
 						const virtualPath = join(ctx.cwd, ".pi", "gsd", "workflows", "_message.md");
-						block.text = processWxpTrustedContent(block.text, virtualPath, wxpSecurity);
+						block.text = processWxpTrustedContent(block.text, virtualPath, wxpSecurity, ctx.cwd, pkgRoot2);
 					}
 				}
 			}

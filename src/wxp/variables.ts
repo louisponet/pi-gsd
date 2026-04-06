@@ -1,4 +1,4 @@
-import type { WxpVariable } from "./schema.js";
+import type { WxpVariable } from "../schemas/wxp.zod.js";
 
 export interface VariableStore {
   set(name: string, value: string, owner?: string): void;
@@ -14,41 +14,31 @@ export function createVariableStore(): VariableStore {
   return {
     set(name, value, owner) {
       const existing = store.get(name);
-
-      if (existing !== undefined && existing.owner && owner && existing.owner !== owner) {
-        // Collision: rename existing entry to owner-prefixed key, add new as prefixed too
-        const existingPrefixed = `${existing.owner}:${name}`;
-        const newPrefixed = `${owner}:${name}`;
-
+      if (existing?.owner && owner && existing.owner !== owner) {
+        // Collision: prefix both entries with their owner stem
         store.delete(name);
-        store.set(existingPrefixed, {
-          name: existingPrefixed,
+        store.set(`${existing.owner}:${name}`, {
+          name: `${existing.owner}:${name}`,
           value: existing.value,
           owner: existing.owner,
         });
-        store.set(newPrefixed, { name: newPrefixed, value, owner });
+        store.set(`${owner}:${name}`, { name: `${owner}:${name}`, value, owner });
       } else {
         store.set(name, { name, value, owner });
       }
     },
-
     get(name) {
       return store.get(name)?.value;
     },
-
     has(name) {
       return store.has(name);
     },
-
     entries() {
       return store.entries();
     },
-
     snapshot() {
       const out: Record<string, string> = {};
-      for (const [k, v] of store) {
-        out[k] = v.value;
-      }
+      for (const [k, v] of store) out[k] = v.value;
       return out;
     },
   };

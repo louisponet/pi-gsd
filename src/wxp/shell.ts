@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { checkAllowlist } from "./security.js";
-import type { ShellNode, WxpSecurityConfig } from "./schema.js";
+import type { ShellNode, WxpSecurityConfig, Arg } from "../schemas/wxp.zod.js";
 import type { VariableStore } from "./variables.js";
 
 export class WxpShellError extends Error {
@@ -15,12 +15,24 @@ export class WxpShellError extends Error {
   }
 }
 
-/**
- * Execute a <shell> node using execFileSync (not execSync — no shell injection possible).
- * Validates the command against the allowlist before spawning any process.
- * Stores trimmed stdout in vars under node.result.
- * Throws WxpShellError on allowlist violation, non-zero exit, or timeout.
- */
+/** Resolve a single <arg> in a shell <args> context. */
+function resolveArg(arg: Arg, vars: VariableStore): string {
+  if (arg.string !== undefined) {
+    // <arg string="literal" />
+    return arg.string;
+  }
+  if (arg.name !== undefined) {
+    // <arg name="varname" wrap='"' />
+    const raw = vars.get(arg.name) ?? "";
+    return arg.wrap ? `${arg.wrap}${raw}${arg.wrap}` : raw;
+  }
+  if (arg.type !== undefined && arg.value !== undefined) {
+    // <arg type="string" value="..." />
+    return arg.value;
+  }
+  return "";
+}
+
 export function executeShell(
   node: ShellNode,
   vars: VariableStore,
@@ -31,10 +43,8 @@ export function executeShell(
     throw new WxpShellError(node, "", vars.snapshot(), check.reason);
   }
 
-  // Interpolate ${varname} references in args
-  const resolvedArgs = node.args.map((arg) =>
-    arg.replace(/\$\{([^}]+)\}/g, (_, varName: string) => vars.get(varName) ?? ""),
-  );
+  const resolvedArgs = node.args.map((arg) => resolveArg(arg, vars));
+  const outVars = node.outs.filter((o) => o.name !== undefined) as Array<{ type?: string; name: string }>;
 
   let stdout = "";
   try {
@@ -44,15 +54,19 @@ export function executeShell(
       windowsHide: true,
     }).trim();
   } catch (err) {
-    const e = err as { stderr?: string; stdout?: string; message?: string };
+    if (node.suppressErrors) {
+      for (const out of outVars) vars.set(out.name, "", undefined);
+      return;
+    }
+    const e = err as { stderr?: string; message?: string };
     const stderr = (e.stderr ?? e.message ?? String(err)).trim();
     throw new WxpShellError(
-      node,
-      stderr,
-      vars.snapshot(),
-      `Shell command '${node.command} ${resolvedArgs.join(" ")}' failed: ${stderr}`,
+      node, stderr, vars.snapshot(),
+      `Shell '${node.command} ${resolvedArgs.join(" ")}' failed: ${stderr}`,
     );
   }
 
-  vars.set(node.result, stdout, undefined);
+  if (outVars.length > 0) {
+    vars.set(outVars[0].name, stdout, undefined);
+  }
 }

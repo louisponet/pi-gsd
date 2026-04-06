@@ -1,7 +1,7 @@
 import { evaluateCondition } from "./conditions.js";
 import { executeShell, WxpShellError } from "./shell.js";
 import { executeStringOp } from "./string-ops.js";
-import type { ExecuteBlock, WxpSecurityConfig, WxpOperation } from "./schema.js";
+import type { ExecuteBlock, WxpSecurityConfig, WxpOperation } from "../schemas/wxp.zod.js";
 import type { VariableStore } from "./variables.js";
 
 export class WxpExecutionError extends Error {
@@ -24,13 +24,14 @@ function executeOperation(
     case "shell":
       executeShell(op, vars, config);
       break;
-    case "if":
-      if (evaluateCondition(op, vars)) {
-        for (const child of op.children) {
-          executeOperation(child, vars, config);
-        }
+    case "if": {
+      const branch = evaluateCondition(op, vars);
+      const children = branch ? op.then : (op.else ?? []);
+      for (const child of children) {
+        executeOperation(child, vars, config);
       }
       break;
+    }
     case "string-op":
       executeStringOp(op, vars);
       break;
@@ -38,7 +39,7 @@ function executeOperation(
       executeBlock(op, vars, config);
       break;
     default:
-      // paste, arguments, include, version handled by index.ts resolution loop
+      // paste, arguments, include, version — handled by resolution loop in index.ts
       break;
   }
 }
