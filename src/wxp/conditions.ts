@@ -1,56 +1,46 @@
-import type {
-  IfNode,
-  ConditionExpr,
-  BinaryCondExpr,
-  AndCondExpr,
-  OrCondExpr,
-  Operand,
-} from "../schemas/wxp.zod.js";
+import type { XmlNode } from "../schemas/wxp.zod.js";
 import type { VariableStore } from "./variables.js";
 
-// ─── Operand resolution ───────────────────────────────────────────────────────
+const BINARY_OPS = new Set([
+  "equals", "not-equals", "starts-with", "contains",
+  "less-than", "greater-than", "less-than-or-equal", "greater-than-or-equal",
+]);
 
-function resolveOperand(op: Operand, vars: VariableStore): string {
-  // Variable reference (name= or name.prop=)
-  if (op.name !== undefined) return vars.resolve(op.name) ?? "";
-  // Typed literal (type= value=)
-  if (op.value !== undefined) return op.value;
+export const CONDITION_OPS = new Set([...BINARY_OPS, "and", "or"]);
+
+function resolveOperand(node: XmlNode, vars: VariableStore): string {
+  if (node.attrs["name"]) return vars.resolve(node.attrs["name"]) ?? "";
+  if (node.attrs["value"] !== undefined) return node.attrs["value"];
   return "";
 }
 
-/** Coerce an operand value to a number for numeric comparisons. */
-function resolveNumber(op: Operand, vars: VariableStore): number {
-  return Number(resolveOperand(op, vars));
+function isNumeric(node: XmlNode): boolean {
+  return node.attrs["type"] === "number";
 }
 
-/** Returns true if either operand has type="number", signalling numeric comparison. */
-function isNumericComparison(expr: BinaryCondExpr): boolean {
-  return expr.left.type === "number" || expr.right.type === "number";
-}
+function evalBinary(node: XmlNode, vars: VariableStore): boolean {
+  const leftNode  = node.children.find((c) => c.tag === "left");
+  const rightNode = node.children.find((c) => c.tag === "right");
+  if (!leftNode || !rightNode) return false;
 
-// ─── Binary condition evaluation ─────────────────────────────────────────────
-
-function evaluateBinary(expr: BinaryCondExpr, vars: VariableStore): boolean {
-  const numeric = isNumericComparison(expr);
-
+  const numeric = isNumeric(leftNode) || isNumeric(rightNode);
   if (numeric) {
-    const l = resolveNumber(expr.left, vars);
-    const r = resolveNumber(expr.right, vars);
-    switch (expr.op) {
+    const l = Number(resolveOperand(leftNode, vars));
+    const r = Number(resolveOperand(rightNode, vars));
+    switch (node.tag) {
       case "equals":                return l === r;
       case "not-equals":            return l !== r;
       case "less-than":             return l < r;
       case "greater-than":          return l > r;
       case "less-than-or-equal":    return l <= r;
       case "greater-than-or-equal": return l >= r;
-      case "starts-with":           return String(l).startsWith(String(r));
-      case "contains":              return String(l).includes(String(r));
+      default:                      return false;
     }
   }
 
-  const l = resolveOperand(expr.left, vars);
-  const r = resolveOperand(expr.right, vars);
-  switch (expr.op) {
+  const l = resolveOperand(leftNode, vars);
+  const r = resolveOperand(rightNode, vars);
+  switch (node.tag) {
     case "equals":                return l === r;
     case "not-equals":            return l !== r;
     case "starts-with":           return l.startsWith(r);
@@ -59,23 +49,30 @@ function evaluateBinary(expr: BinaryCondExpr, vars: VariableStore): boolean {
     case "greater-than":          return Number(l) > Number(r);
     case "less-than-or-equal":    return Number(l) <= Number(r);
     case "greater-than-or-equal": return Number(l) >= Number(r);
+    default:                      return false;
   }
 }
 
-// ─── Recursive condition evaluation ──────────────────────────────────────────
-
-export function evaluateConditionExpr(expr: ConditionExpr, vars: VariableStore): boolean {
-  switch (expr.op) {
-    case "and":
-      return (expr as AndCondExpr).children.every((c) => evaluateConditionExpr(c, vars));
-    case "or":
-      return (expr as OrCondExpr).children.some((c) => evaluateConditionExpr(c, vars));
-    default:
-      return evaluateBinary(expr as BinaryCondExpr, vars);
+export function evaluateCondExprNode(node: XmlNode, vars: VariableStore): boolean {
+  if (node.tag === "and") {
+    return node.children.filter((c) => CONDITION_OPS.has(c.tag)).every((c) => evaluateCondExprNode(c, vars));
   }
+  if (node.tag === "or") {
+    return node.children.filter((c) => CONDITION_OPS.has(c.tag)).some((c) => evaluateCondExprNode(c, vars));
+  }
+  return evalBinary(node, vars);
 }
 
-/** Convenience: evaluate an <if> node's condition. */
-export function evaluateCondition(node: IfNode, vars: VariableStore): boolean {
-  return evaluateConditionExpr(node.condition, vars);
+/** Evaluate the condition of an <if> node. */
+export function evaluateCondition(ifNode: XmlNode, vars: VariableStore): boolean {
+  const condContainer = ifNode.children.find((c) => c.tag === "condition");
+  if (!condContainer) return false;
+  const exprNode = condContainer.children.find((c) => CONDITION_OPS.has(c.tag));
+  return exprNode ? evaluateCondExprNode(exprNode, vars) : false;
+}
+
+/** Evaluate a <where> node's condition. */
+export function evaluateWhere(whereNode: XmlNode, vars: VariableStore): boolean {
+  const exprNode = whereNode.children.find((c) => CONDITION_OPS.has(c.tag));
+  return exprNode ? evaluateCondExprNode(exprNode, vars) : true;
 }

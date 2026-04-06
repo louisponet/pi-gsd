@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { extractWxpTags, spliceContent, extractCodeFenceRegions, inDeadZone } from "./parser.js";
-import { buildOperation } from "./ast.js";
 import { createVariableStore } from "./variables.js";
 import { parseArguments } from "./arguments.js";
 import { executeBlock } from "./executor.js";
@@ -9,7 +8,6 @@ import { applyPaste, WxpPasteError } from "./paste.js";
 import { checkTrustedPath } from "./security.js";
 import type {
   WxpSecurityConfig,
-  WxpOperation,
   WxpExecContext,
   DisplayLevel,
   DisplayCallback,
@@ -47,17 +45,6 @@ export class WxpProcessingError extends Error {
   }
 }
 
-/**
- * Main WXP entry point.
- *
- * Resolution loop (PRD §3.5) — max 50 iterations:
- *   1. <gsd-include> tags → inline file content
- *   2. <gsd-arguments> blocks → parse rawArguments into vars
- *   3. <gsd-execute> blocks → run shells, conditions, loops, string-ops, display
- *   4. <gsd-paste> tags → replace with variable values
- *
- * Any failure → WxpProcessingError (no partial output, no LLM fallback).
- */
 export function processWxp(
   content: string,
   filePath: string,
@@ -71,13 +58,9 @@ export function processWxp(
   if (!pathCheck.ok) {
     throw new WxpProcessingError(filePath, new Error(pathCheck.reason), {}, [], []);
   }
-
-  return runResolutionLoop(content, filePath, config, projectRoot, pkgRoot, rawArguments, onDisplay);
+  return runLoop(content, filePath, config, projectRoot, pkgRoot, rawArguments, onDisplay);
 }
 
-/**
- * Process WXP tags in already-validated content (path check already done by caller).
- */
 export function processWxpTrustedContent(
   content: string,
   virtualFilePath: string,
@@ -87,21 +70,17 @@ export function processWxpTrustedContent(
   rawArguments = "",
   onDisplay: DisplayCallback = NOOP_DISPLAY,
 ): string {
-  const trustedConfig: WxpSecurityConfig = {
+  const trusted: WxpSecurityConfig = {
     ...config,
     trustedPaths: [
       ...config.trustedPaths,
       { position: "absolute", path: path.dirname(path.resolve(virtualFilePath)) },
     ],
   };
-  return runResolutionLoop(
-    content, virtualFilePath, trustedConfig, projectRoot, pkgRoot, rawArguments, onDisplay,
-  );
+  return runLoop(content, virtualFilePath, trusted, projectRoot, pkgRoot, rawArguments, onDisplay);
 }
 
-// ─── Internal resolution loop ─────────────────────────────────────────────────
-
-function runResolutionLoop(
+function runLoop(
   content: string,
   filePath: string,
   config: WxpSecurityConfig,
@@ -111,22 +90,22 @@ function runResolutionLoop(
   onDisplay: DisplayCallback,
 ): string {
   const vars = createVariableStore();
-  const completedOps: string[] = [];
+  const done: string[] = [];
   let current = content;
 
   const ctx: WxpExecContext = { config, projectRoot, pkgRoot, onDisplay };
 
-  for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-    const tags = extractWxpTags(current);
-    const activeTags = tags.filter((t) => t.node.tag !== "gsd-version");
-    if (activeTags.length === 0) break;
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
+    const tags   = extractWxpTags(current);
+    const active = tags.filter((t) => t.node.tag !== "gsd-version");
+    if (active.length === 0) break;
 
-    const pendingBefore = activeTags.map((t) => t.node.tag);
+    const pending = active.map((t) => t.node.tag);
 
     try {
-      let didWork = false;
+      let progress = false;
 
-      // ── 1. Process <gsd-include> ───────────────────────────────────────────
+      // 1. <gsd-include>
       for (const tag of extractWxpTags(current)) {
         if (tag.node.tag !== "gsd-include") continue;
         if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
@@ -134,85 +113,75 @@ function runResolutionLoop(
         const incPath = tag.node.attrs["path"];
         if (!incPath) continue;
 
-        const absPath = path.resolve(path.dirname(filePath), incPath);
-        const check = checkTrustedPath(absPath, config, projectRoot, pkgRoot);
+        const abs   = path.resolve(path.dirname(filePath), incPath);
+        const check = checkTrustedPath(abs, config, projectRoot, pkgRoot);
         if (!check.ok) throw new Error(`Include rejected: ${check.reason}`);
 
-        const included = fs.readFileSync(absPath, "utf8");
-        const stem = path.basename(absPath, path.extname(absPath));
+        const included = fs.readFileSync(abs, "utf8");
+        const stem     = path.basename(abs, path.extname(abs));
 
-        // INC-02: arg mappings
-        for (const mapping of tag.node.children
-          .flatMap((c) => (c.tag === "gsd-arguments" ? c.children : []))
-          .filter((c) => c.tag === "arg" && c.attrs["name"] && c.attrs["as"])) {
-          const val = vars.get(mapping.attrs["name"]);
-          if (val !== undefined) vars.set(mapping.attrs["as"], val, stem);
+        // INC-02: arg mappings from <gsd-arguments> child
+        for (const child of tag.node.children) {
+          if (child.tag !== "gsd-arguments") continue;
+          for (const arg of child.children.filter((c) => c.tag === "arg")) {
+            const from = arg.attrs["name"];
+            const to   = arg.attrs["as"];
+            if (from && to) {
+              const val = vars.get(from);
+              if (val !== undefined) vars.set(to, val, stem);
+            }
+          }
         }
 
-        const appendArgs = tag.node.attrs["include-arguments"] !== undefined
-          ? `\n${rawArguments}`
-          : "";
-
+        const appendArgs = "include-arguments" in tag.node.attrs ? `\n${rawArguments}` : "";
         current = spliceContent(current, tag.start, tag.end, included + appendArgs);
-        completedOps.push("gsd-include");
-        didWork = true;
+        done.push("gsd-include");
+        progress = true;
         break;
       }
-      if (didWork) continue;
+      if (progress) continue;
 
-      // ── 2. Process <gsd-arguments> ────────────────────────────────────────
+      // 2. <gsd-arguments>
       for (const tag of extractWxpTags(current)) {
         if (tag.node.tag !== "gsd-arguments") continue;
         if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
 
-        const op = buildOperation(tag.node)[0];
-        if (op?.type === "arguments") {
-          parseArguments(op, rawArguments, vars);
-          completedOps.push("gsd-arguments");
-        }
+        parseArguments(tag.node, rawArguments, vars);
         current = spliceContent(current, tag.start, tag.end, "");
-        didWork = true;
+        done.push("gsd-arguments");
+        progress = true;
         break;
       }
-      if (didWork) continue;
+      if (progress) continue;
 
-      // ── 3. Process <gsd-execute> blocks ───────────────────────────────────
+      // 3. <gsd-execute>
       for (const tag of extractWxpTags(current)) {
         if (tag.node.tag !== "gsd-execute") continue;
         if (inDeadZone(tag.start, extractCodeFenceRegions(current))) continue;
 
-        const ops = tag.node.children.flatMap(buildOperation);
-        executeBlock({ type: "execute", children: ops }, vars, ctx);
-        completedOps.push("gsd-execute");
+        executeBlock(tag.node, vars, ctx);
         current = spliceContent(current, tag.start, tag.end, "");
-        didWork = true;
+        done.push("gsd-execute");
+        progress = true;
         break;
       }
-      if (didWork) continue;
+      if (progress) continue;
 
-      // ── 4. Apply <gsd-paste> ──────────────────────────────────────────────
-      const afterPaste = applyPaste(current, vars);
-      if (afterPaste !== current) {
-        current = afterPaste;
-        completedOps.push("gsd-paste");
-        continue;
-      }
+      // 4. <gsd-paste>
+      const after = applyPaste(current, vars);
+      if (after !== current) { current = after; done.push("gsd-paste"); continue; }
 
-      break; // No progress
+      break; // no progress
     } catch (err) {
       if (err instanceof WxpProcessingError) throw err;
       const e = err instanceof Error ? err : new Error(String(err));
-      throw new WxpProcessingError(filePath, e, vars.snapshot(), pendingBefore, completedOps);
+      throw new WxpProcessingError(filePath, e, vars.snapshot(), pending, done);
     }
   }
 
   return current;
 }
 
-/**
- * Read the <gsd-version> tag from workflow file content.
- * Used by harness copy-on-first-run for do-not-update detection.
- */
 export function readWorkflowVersionTag(
   content: string,
 ): { version: string; doNotUpdate: boolean } | null {

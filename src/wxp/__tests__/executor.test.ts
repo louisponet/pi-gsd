@@ -7,9 +7,10 @@ vi.mock("node:child_process", () => ({
 
 import { executeBlock, WxpExecutionError } from "../executor.js";
 import { createVariableStore } from "../variables.js";
-import type { ExecuteBlock, WxpExecContext } from "../../schemas/wxp.zod.js";
+import type { WxpExecContext } from "../../schemas/wxp.zod.js";
+import { x } from "./helpers.js";
 
-const cfg: WxpExecContext = {
+const makeCtx = (): WxpExecContext => ({
   config: {
     trustedPaths: [],
     untrustedPaths: [],
@@ -20,89 +21,75 @@ const cfg: WxpExecContext = {
   projectRoot: "/project",
   pkgRoot: "/pkg",
   onDisplay: () => {},
-};
+});
+
+// Build a <gsd-execute> container
+function exec(...children: ReturnType<typeof x>[]) {
+  return x("gsd-execute", {}, children);
+}
 
 describe("executeBlock", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("executes a shell child and stores result", () => {
     const vars = createVariableStore();
-    const block: ExecuteBlock = {
-      type: "execute",
-      children: [{
-        type: "shell",
-        command: "git",
-        args: [{ string: "status" }],
-        outs: [{ type: "string", name: "out" }],
-        suppressErrors: false,
-      }],
-    };
-    executeBlock(block, vars, cfg);
+    executeBlock(exec(
+      x("shell", { command: "git" }, [
+        x("args", {}, [x("arg", { string: "status" })]),
+        x("outs", {}, [x("out", { type: "string", name: "out" })]),
+      ]),
+    ), vars, makeCtx());
     expect(vars.get("out")).toBe("exec-output");
   });
 
   it("evaluates if/condition/equals and executes then-branch when true", () => {
     const vars = createVariableStore();
     vars.set("auto-chain-active", "false");
-    const block: ExecuteBlock = {
-      type: "execute",
-      children: [{
-        type: "if",
-        condition: {
-          op: "equals",
-          left: { name: "auto-chain-active" },
-          right: { type: "boolean", value: "false" },
-        },
-        then: [{
-          type: "shell",
-          command: "git",
-          args: [],
-          outs: [{ type: "string", name: "branch" }],
-          suppressErrors: false,
-        }],
-      }],
-    };
-    executeBlock(block, vars, cfg);
+    executeBlock(exec(
+      x("if", {}, [
+        x("condition", {}, [
+          x("equals", {}, [
+            x("left", { name: "auto-chain-active" }),
+            x("right", { type: "boolean", value: "false" }),
+          ]),
+        ]),
+        x("then", {}, [
+          x("shell", { command: "git" }, [
+            x("args", {}, []),
+            x("outs", {}, [x("out", { type: "string", name: "branch" })]),
+          ]),
+        ]),
+      ]),
+    ), vars, makeCtx());
     expect(vars.get("branch")).toBe("exec-output");
   });
 
   it("skips then-branch when condition is false", () => {
     const vars = createVariableStore();
     vars.set("auto-chain-active", "true");
-    const block: ExecuteBlock = {
-      type: "execute",
-      children: [{
-        type: "if",
-        condition: {
-          op: "equals",
-          left: { name: "auto-chain-active" },
-          right: { type: "boolean", value: "false" },
-        },
-        then: [{
-          type: "shell",
-          command: "git",
-          args: [],
-          outs: [{ type: "string", name: "branch" }],
-          suppressErrors: false,
-        }],
-      }],
-    };
-    executeBlock(block, vars, cfg);
+    executeBlock(exec(
+      x("if", {}, [
+        x("condition", {}, [
+          x("equals", {}, [
+            x("left", { name: "auto-chain-active" }),
+            x("right", { type: "boolean", value: "false" }),
+          ]),
+        ]),
+        x("then", {}, [
+          x("shell", { command: "git" }, [
+            x("args", {}, []),
+            x("outs", {}, [x("out", { type: "string", name: "branch" })]),
+          ]),
+        ]),
+      ]),
+    ), vars, makeCtx());
     expect(vars.get("branch")).toBeUndefined();
   });
 
   it("wraps errors in WxpExecutionError", () => {
     const vars = createVariableStore();
-    const block: ExecuteBlock = {
-      type: "execute",
-      children: [{
-        type: "shell",
-        command: "bash",
-        args: [],
-        outs: [],
-        suppressErrors: false,
-      }],
-    };
-    expect(() => executeBlock(block, vars, cfg)).toThrow(WxpExecutionError);
+    expect(() => executeBlock(exec(
+      x("shell", { command: "bash" }, [x("args", {}, []), x("outs", {}, [])]),
+    ), vars, makeCtx())).toThrow(WxpExecutionError);
   });
 });

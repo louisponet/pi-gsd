@@ -93,6 +93,29 @@ export const JsonParseNodeSchema = z.object({
 });
 export type JsonParseNode = z.infer<typeof JsonParseNodeSchema>;
 
+// ─── <read-file> ─────────────────────────────────────────────────────────────
+// Reads any accessible file into a named variable.
+// No trusted-path restriction — same surface as <shell command="cat"> already provides.
+
+export const ReadFileNodeSchema = z.object({
+  type: z.literal("read-file"),
+  path: z.string(),
+  out: z.string(),
+});
+export type ReadFileNode = z.infer<typeof ReadFileNodeSchema>;
+
+// ─── <write-file> ────────────────────────────────────────────────────────────
+// Create-only: fails if file already exists (never overwrites existing state).
+// Cannot target trusted harness paths (prevents harness corruption).
+// Creates parent directories as needed.
+
+export const WriteFileNodeSchema = z.object({
+  type: z.literal("write-file"),
+  path: z.string(),
+  src: z.string(),
+});
+export type WriteFileNode = z.infer<typeof WriteFileNodeSchema>;
+
 // ─── <display> ───────────────────────────────────────────────────────────────
 // Emits ctx.ui.notify(). msg supports {varname} and {var.prop} interpolation.
 
@@ -236,6 +259,8 @@ export type WxpOperation =
   | ShellNode
   | StringOpNode
   | JsonParseNode
+  | ReadFileNode
+  | WriteFileNode
   | DisplayNode
   | IfNode
   | ForEachNode
