@@ -73,7 +73,6 @@ function validateKnownConfigKeyPath(keyPath: string): void {
 
 // ─── New project config builder ───────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildNewProjectConfig(
     userChoices: Partial<PlanningConfig>,
 ): Record<string, unknown> {
@@ -208,7 +207,6 @@ export function ensureConfigFile(cwd: string): {
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function setConfigValue(
     cwd: string,
     keyPath: string,
@@ -258,7 +256,6 @@ export function cmdConfigNewProject(
         output({ created: false, reason: "already_exists" }, raw, "exists");
         return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let userChoices: Partial<PlanningConfig> = {};
     if (choicesJson && choicesJson.trim()) {
         try {
@@ -301,7 +298,6 @@ export function cmdConfigSet(
         gsdError(
             `Unknown config key: "${keyPath}". Valid keys: ${[...VALID_CONFIG_KEYS].sort().join(", ")}, agent_skills.<agent-type>`,
         );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let parsedValue: unknown = value;
     if (value === "true") parsedValue = true;
     else if (value === "false") parsedValue = false;
@@ -328,7 +324,6 @@ export function cmdConfigGet(
 ): void {
     if (!keyPath) gsdError("Usage: config-get <key.path>");
     const configPath = path.join(planningRoot(cwd), "config.json");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let config: Record<string, unknown> = {};
     try {
         if (fs.existsSync(configPath))

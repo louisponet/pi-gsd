@@ -13,7 +13,7 @@ import {
     output,
     planningPaths,
 } from "./core.js";
-import { extractFrontmatter } from "./frontmatter.js";
+import { extractFrontmatter, asStr } from "./frontmatter.js";
 import { stateReplaceFieldWithFallback, writeStateMd } from "./state.js";
 
 export function cmdRequirementsMarkComplete(
@@ -141,7 +141,7 @@ export function cmdMilestoneComplete(
                         "utf-8",
                     );
                     const fm = extractFrontmatter(content);
-                    const oneLiner = fm["one-liner"] || extractOneLinerFromBody(content);
+                    const oneLiner = asStr(fm["one-liner"]) ?? extractOneLinerFromBody(content);
                     if (oneLiner) accomplishments.push(oneLiner);
                     const tasksFieldMatch = content.match(/\*\*Tasks:\*\*\s*(\d+)/);
                     if (tasksFieldMatch) {

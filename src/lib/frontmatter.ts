@@ -8,10 +8,35 @@ import { gsdError, normalizeMd, output, safeReadFile } from "./core.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// NOTE: Changing to unknown would cascade to 16 call-sites — tracked in TODO #6
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FrontmatterObject = Record<string, any>;
+// Recursive YAML value type — covers all YAML primitives, arrays, and nested objects (TYP-01)
+export type YamlValue =
+  | string
+  | number
+  | boolean
+  | null
+  | YamlValue[]
+  | { [key: string]: YamlValue };
+
+export type FrontmatterObject = Record<string, YamlValue>;
+
+// ─── YamlValue type guards (TYP-01) ───────────────────────────────────────────────
+
+/** Narrow a YamlValue to string | undefined */
+export function asStr(v: YamlValue | undefined): string | undefined {
+  return typeof v === "string" ? v : undefined;
+}
+
+/** Narrow a YamlValue to YamlValue[] | undefined */
+export function asArr(v: YamlValue | undefined): YamlValue[] | undefined {
+  return Array.isArray(v) ? v : undefined;
+}
+
+/** Narrow a YamlValue to Record<string, YamlValue> | undefined */
+export function asObj(v: YamlValue | undefined): Record<string, YamlValue> | undefined {
+  return v !== null && typeof v === "object" && !Array.isArray(v)
+    ? (v as Record<string, YamlValue>)
+    : undefined;
+}
 
 export type FrontmatterSchema = "plan" | "summary" | "verification";
 
@@ -53,8 +78,7 @@ export function extractFrontmatter(content: string): FrontmatterObject {
     const lines = yaml.split(/\r?\n/);
 
     // Stack to track nested objects: [{obj, key, indent}]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stack: Array<{ obj: FrontmatterObject; key: string | null; indent: number }> = [
+    const stack: Array<{ obj: Record<string, YamlValue>; key: string | null; indent: number }> = [
         { obj: frontmatter, key: null, indent: -1 },
     ];
 
@@ -78,7 +102,11 @@ export function extractFrontmatter(content: string): FrontmatterObject {
             if (value === "" || value === "[") {
                 current.obj[key] = value === "[" ? [] : {};
                 current.key = null;
-                stack.push({ obj: current.obj[key], key: null, indent });
+                const nested = current.obj[key];
+                // nested is either [] or {} — safe to push as obj entry
+                if (nested !== null && typeof nested === "object") {
+                    stack.push({ obj: nested as Record<string, YamlValue>, key: null, indent });
+                }
             } else if (value.startsWith("[") && value.endsWith("]")) {
                 current.obj[key] = value
                     .slice(1, -1)
@@ -106,7 +134,7 @@ export function extractFrontmatter(content: string): FrontmatterObject {
                     for (const k of Object.keys(parent.obj)) {
                         if (parent.obj[k] === current.obj) {
                             parent.obj[k] = [itemValue];
-                            current.obj = parent.obj[k];
+                            current.obj = parent.obj[k] as unknown as Record<string, YamlValue>;
                             break;
                         }
                     }
@@ -242,9 +270,7 @@ export function parseMustHavesBlock(
     const afterBlock = yaml.slice(blockStart);
     const blockLines = afterBlock.split(/\r?\n/).slice(1);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const items: unknown[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let current: FrontmatterObject | string | null = null;
     let listItemIndent = -1;
 
@@ -283,7 +309,8 @@ export function parseMustHavesBlock(
                 if (lastKey && !Array.isArray(current[lastKey])) {
                     current[lastKey] = current[lastKey] ? [current[lastKey]] : [];
                 }
-                if (lastKey) current[lastKey].push(arrVal);
+                const arr = current[lastKey];
+                if (lastKey && Array.isArray(arr)) arr.push(arrVal);
             } else {
                 const kvMatch = trimmed.match(/^(\w+):\s*"?([^"]*)"?\s*$/);
                 if (kvMatch) {
@@ -355,10 +382,11 @@ export function cmdFrontmatterSet(
     }
     const content = fs.readFileSync(fullPath, "utf-8");
     const fm = extractFrontmatter(content);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let parsedValue: unknown;
+    let parsedValue: YamlValue;
     try {
-        parsedValue = JSON.parse(value);
+        const parsed: unknown = JSON.parse(value);
+        // Only accept YAML-compatible parsed values
+        parsedValue = parsed as YamlValue;
     } catch {
         parsedValue = value;
     }
@@ -386,7 +414,6 @@ export function cmdFrontmatterMerge(
     }
     const content = fs.readFileSync(fullPath, "utf-8");
     const fm = extractFrontmatter(content);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let mergeData: FrontmatterObject;
     try {
         mergeData = JSON.parse(data);

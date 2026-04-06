@@ -23,7 +23,7 @@ import {
 	replaceInCurrentMilestone,
 	toPosixPath,
 } from "./core.js";
-import { extractFrontmatter } from "./frontmatter.js";
+import { extractFrontmatter, asStr, asArr } from "./frontmatter.js";
 
 // Shape of a single plan entry built by cmdPhasePlanIndex
 interface PhasePlanEntry {
@@ -304,8 +304,11 @@ export function cmdPhasePlanIndex(
 			autonomous = fm.autonomous === "true" || fm.autonomous === true;
 		if (!autonomous) hasCheckpoints = true;
 		let filesModified: string[] = [];
-		const fmFiles = fm["files_modified"] || fm["files-modified"];
-		if (fmFiles) filesModified = Array.isArray(fmFiles) ? fmFiles : [fmFiles];
+		const fmFiles = fm["files_modified"] ?? fm["files-modified"];
+		if (fmFiles) {
+			const arr = asArr(fmFiles);
+			filesModified = arr ? arr.map((f) => asStr(f) ?? String(f)) : [asStr(fmFiles) ?? String(fmFiles)];
+		}
 		const hasSummary = completedPlanIds.has(planId);
 		if (!hasSummary) incomplete.push(planId);
 		plans.push({
@@ -313,8 +316,8 @@ export function cmdPhasePlanIndex(
 			wave,
 			autonomous,
 			objective:
-				content.match(/<objective>\s*\n?\s*(.+)/)?.[1]?.trim() ||
-				fm.objective ||
+				content.match(/<objective>\s*\n?\s*(.+)/)?.[1]?.trim() ??
+				asStr(fm.objective) ??
 				null,
 			files_modified: filesModified,
 			task_count: taskCount,

@@ -30,7 +30,7 @@ import {
     safeReadFile,
     toPosixPath,
 } from "./core.js";
-import { extractFrontmatter } from "./frontmatter.js";
+import { extractFrontmatter, asStr, asArr, asObj } from "./frontmatter.js";
 import { MODEL_PROFILES } from "./model-profiles.js";
 import { sanitizeForPrompt } from "./security.js";
 
@@ -182,38 +182,42 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
                 try {
                     const content = fs.readFileSync(path.join(dirPath, summary), "utf-8");
                     const fm = extractFrontmatter(content);
-                    const phaseNum = fm.phase || dir.split("-")[0];
+                    const phaseNum = asStr(fm.phase) ?? dir.split("-")[0];
                     if (!digest.phases[phaseNum])
                         digest.phases[phaseNum] = {
-                            name: fm.name || dir.split("-").slice(1).join(" ") || "Unknown",
+                            name: asStr(fm.name) ?? dir.split("-").slice(1).join(" ") ?? "Unknown",
                             provides: new Set(),
                             affects: new Set(),
                             patterns: new Set(),
                         };
-                    if (fm["dependency-graph"]?.provides)
-                        fm["dependency-graph"].provides.forEach((p: string) =>
-                            digest.phases[phaseNum].provides.add(p),
+                    const depGraph = asObj(fm["dependency-graph"]);
+                    if (depGraph?.provides)
+                        asArr(depGraph.provides)?.forEach((p) =>
+                            digest.phases[phaseNum].provides.add(asStr(p) ?? String(p)),
                         );
                     else if (fm.provides)
-                        fm.provides.forEach((p: string) =>
-                            digest.phases[phaseNum].provides.add(p),
+                        asArr(fm.provides)?.forEach((p) =>
+                            digest.phases[phaseNum].provides.add(asStr(p) ?? String(p)),
                         );
-                    if (fm["dependency-graph"]?.affects)
-                        fm["dependency-graph"].affects.forEach((a: string) =>
-                            digest.phases[phaseNum].affects.add(a),
+                    if (depGraph?.affects)
+                        asArr(depGraph.affects)?.forEach((a) =>
+                            digest.phases[phaseNum].affects.add(asStr(a) ?? String(a)),
                         );
                     if (fm["patterns-established"])
-                        fm["patterns-established"].forEach((p: string) =>
-                            digest.phases[phaseNum].patterns.add(p),
+                        asArr(fm["patterns-established"])?.forEach((p) =>
+                            digest.phases[phaseNum].patterns.add(asStr(p) ?? String(p)),
                         );
                     if (fm["key-decisions"])
-                        fm["key-decisions"].forEach((d: string) =>
-                            digest.decisions.push({ phase: phaseNum, decision: d }),
+                        asArr(fm["key-decisions"])?.forEach((d) =>
+                            digest.decisions.push({ phase: phaseNum, decision: asStr(d) ?? String(d) }),
                         );
-                    if (fm["tech-stack"]?.added)
-                        fm["tech-stack"].added.forEach((t: string | { name: string }) =>
-                            digest.tech_stack.add(typeof t === "string" ? t : t.name),
-                        );
+                    const techStack = asObj(fm["tech-stack"]);
+                    if (techStack?.added)
+                        asArr(techStack.added)?.forEach((t) => {
+                            const s = asStr(t);
+                            if (s) digest.tech_stack.add(s);
+                            else { const o = asObj(t); if (o) digest.tech_stack.add(asStr(o.name) ?? ""); }
+                        });
                 } catch {
                     /* ok */
                 }
@@ -445,24 +449,25 @@ export function cmdSummaryExtract(
     }
     const content = fs.readFileSync(fullPath, "utf-8"),
         fm = extractFrontmatter(content);
-    const parseDecisions = (list: string[] | undefined) =>
+    const parseDecisions = (list: import("./frontmatter.js").YamlValue[] | undefined) =>
         (list || []).map((d) => {
-            const idx = d.indexOf(":");
+            const ds = asStr(d) ?? String(d);
+            const idx = ds.indexOf(":");
             return idx > 0
                 ? {
-                    summary: d.substring(0, idx).trim(),
-                    rationale: d.substring(idx + 1).trim(),
+                    summary: ds.substring(0, idx).trim(),
+                    rationale: ds.substring(idx + 1).trim(),
                 }
-                : { summary: d, rationale: null };
+                : { summary: ds, rationale: null };
         });
     const fullResult = {
         path: summaryPath,
-        one_liner: fm["one-liner"] || extractOneLinerFromBody(content) || null,
-        key_files: fm["key-files"] || [],
-        tech_added: fm["tech-stack"]?.added || [],
-        patterns: fm["patterns-established"] || [],
-        decisions: parseDecisions(fm["key-decisions"]),
-        requirements_completed: fm["requirements-completed"] || [],
+        one_liner: asStr(fm["one-liner"]) ?? extractOneLinerFromBody(content) ?? null,
+        key_files: asArr(fm["key-files"]) ?? [],
+        tech_added: asArr(asObj(fm["tech-stack"])?.added) ?? [],
+        patterns: asArr(fm["patterns-established"]) ?? [],
+        decisions: parseDecisions(asArr(fm["key-decisions"])),
+        requirements_completed: asArr(fm["requirements-completed"]) ?? [],
     };
     if (fields && fields.length > 0) {
         const filtered: Record<string, unknown> = { path: summaryPath };
