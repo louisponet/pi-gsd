@@ -155,7 +155,8 @@ export default function (pi: ExtensionAPI) {
             }
         }
         if (raw === null) {
-            errors.push("File not found: " + filePath);
+            // Missing file: remove tag silently (not fatal)
+            
             return null;
         }
 
