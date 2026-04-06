@@ -8,14 +8,14 @@ import { gsdError, normalizeMd, output, safeReadFile } from "./core.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// Recursive YAML value type — covers all YAML primitives, arrays, and nested objects (TYP-01)
+// Recursive YAML value type - covers all YAML primitives, arrays, and nested objects (TYP-01)
 export type YamlValue =
-  | string
-  | number
-  | boolean
-  | null
-  | YamlValue[]
-  | { [key: string]: YamlValue };
+    | string
+    | number
+    | boolean
+    | null
+    | YamlValue[]
+    | { [key: string]: YamlValue };
 
 export type FrontmatterObject = Record<string, YamlValue>;
 
@@ -23,19 +23,19 @@ export type FrontmatterObject = Record<string, YamlValue>;
 
 /** Narrow a YamlValue to string | undefined */
 export function asStr(v: YamlValue | undefined): string | undefined {
-  return typeof v === "string" ? v : undefined;
+    return typeof v === "string" ? v : undefined;
 }
 
 /** Narrow a YamlValue to YamlValue[] | undefined */
 export function asArr(v: YamlValue | undefined): YamlValue[] | undefined {
-  return Array.isArray(v) ? v : undefined;
+    return Array.isArray(v) ? v : undefined;
 }
 
 /** Narrow a YamlValue to Record<string, YamlValue> | undefined */
 export function asObj(v: YamlValue | undefined): Record<string, YamlValue> | undefined {
-  return v !== null && typeof v === "object" && !Array.isArray(v)
-    ? (v as Record<string, YamlValue>)
-    : undefined;
+    return v !== null && typeof v === "object" && !Array.isArray(v)
+        ? (v as Record<string, YamlValue>)
+        : undefined;
 }
 
 export type FrontmatterSchema = "plan" | "summary" | "verification";
@@ -103,7 +103,7 @@ export function extractFrontmatter(content: string): FrontmatterObject {
                 current.obj[key] = value === "[" ? [] : {};
                 current.key = null;
                 const nested = current.obj[key];
-                // nested is either [] or {} — safe to push as obj entry
+                // nested is either [] or {} - safe to push as obj entry
                 if (nested !== null && typeof nested === "object") {
                     stack.push({ obj: nested as Record<string, YamlValue>, key: null, indent });
                 }

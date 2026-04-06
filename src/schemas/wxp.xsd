@@ -4,7 +4,7 @@
            version="1.0">
 
   <!--
-    WXP Canonical Schema — pi-gsd v1.0
+    WXP Canonical Schema - pi-gsd v1.0
     Authoritative definition of all WXP XML elements, attributes, nesting rules,
     and content models. Mirrors src/schemas/wxp.zod.ts exactly.
 
@@ -48,7 +48,7 @@
   </xs:simpleType>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <arg> — universal argument element
+       <arg> - universal argument element
        Used in: <gsd-arguments>, <shell><args>, <string-op><args>,
                 <gsd-include><gsd-arguments>, <left>, <right>
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -62,21 +62,21 @@
           name + type (required), flag (required when type="flag"), optional (boolean attr)
 
         In &lt;shell&gt;&lt;args&gt;:
-          string="literal"              — literal string argument
-          name="varname"                — variable reference
-          name="varname" wrap='"'       — variable wrapped in quotes
-          type="string" value="..."     — typed literal (inline)
+          string="literal"              - literal string argument
+          name="varname"                - variable reference
+          name="varname" wrap='"'       - variable wrapped in quotes
+          type="string" value="..."     - typed literal (inline)
 
         In &lt;string-op&gt;&lt;args&gt;:
-          name="varname"                — variable reference
-          type="string" value="..."     — typed literal (delimiter)
+          name="varname"                - variable reference
+          type="string" value="..."     - typed literal (delimiter)
 
         In &lt;left&gt; / &lt;right&gt; (condition operands):
-          name="varname"                — variable reference
-          type="string|boolean|number" value="..."  — literal operand
+          name="varname"                - variable reference
+          type="string|boolean|number" value="..."  - literal operand
 
         In &lt;gsd-include&gt;&lt;gsd-arguments&gt;:
-          name="callerVar" as="targetVar"  — variable rename mapping
+          name="callerVar" as="targetVar"  - variable rename mapping
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -92,7 +92,7 @@
       <xs:attribute name="value" type="xs:string" use="optional"/>
       <!-- Flag token to match in $ARGUMENTS: <arg name="auto" type="flag" flag="--auto" /> -->
       <xs:attribute name="flag" type="xs:string" use="optional"/>
-      <!-- Marks arg as optional in gsd-arguments (boolean attribute — presence = optional) -->
+      <!-- Marks arg as optional in gsd-arguments (boolean attribute - presence = optional) -->
       <xs:attribute name="optional" type="xs:string" use="optional"/>
       <!-- Variable rename in gsd-include arg mappings: <arg name="x" as="y" /> -->
       <xs:attribute name="as" type="xs:string" use="optional"/>
@@ -100,7 +100,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <out> — output capture element
+       <out> - output capture element
        Used in: <shell><outs>, <string-op><outs>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -118,7 +118,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <suppress-errors> — suppress stderr (equivalent to 2>/dev/null)
+       <suppress-errors> - suppress stderr (equivalent to 2>/dev/null)
        Used in: <shell><outs>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -133,7 +133,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <args> — ordered argument list container
+       <args> - ordered argument list container
        Used in: <shell>, <string-op>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -149,7 +149,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <outs> — output capture container
+       <outs> - output capture container
        Used in: <shell>, <string-op>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -170,7 +170,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <left> / <right> — condition operands
+       <left> / <right> - condition operands
        Used in: <equals>, <starts-with>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -191,7 +191,7 @@
   <xs:element name="right" type="OperandType"/>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <equals> / <starts-with> — condition operators
+       <equals> / <starts-with> - condition operators
        Used in: <condition>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -211,7 +211,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <shell> — execFileSync wrapper (PRD §3.3.1)
+       <shell> - execFileSync wrapper (PRD §3.3.1)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="shell">
@@ -236,7 +236,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <string-op> — string operations (PRD §3.3.3)
+       <string-op> - string operations (PRD §3.3.3)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="string-op">
@@ -256,7 +256,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <then> / <else> — conditional branches inside <if>
+       <then> / <else> - conditional branches inside <if>
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="then">
@@ -272,7 +272,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <display> — deterministic notification (PRD §3.x)
+       <display> - deterministic notification (PRD §3.x)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="display">
@@ -280,7 +280,7 @@
       <xs:documentation>
         Emits a ctx.ui.notify() at WXP processing time.
         msg supports {varname} and {var.prop} dot-notation interpolation.
-        Does NOT inject into document text — UI notification only.
+        Does NOT inject into document text - UI notification only.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -302,7 +302,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <json-parse> — parse JSON variable into scalar or array
+       <json-parse> - parse JSON variable into scalar or array
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="json-parse">
@@ -321,7 +321,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <where> — filter clause inside <for-each>
+       <where> - filter clause inside <for-each>
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="where">
@@ -331,7 +331,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <sort-by> — sort clause inside <for-each>
+       <sort-by> - sort clause inside <for-each>
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="sort-by">
@@ -361,7 +361,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <for-each> — iteration over array variables
+       <for-each> - iteration over array variables
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="for-each">
@@ -388,7 +388,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       Condition expression group — all valid condition operators
+       Condition expression group - all valid condition operators
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:group name="ConditionExprGroup">
@@ -412,14 +412,14 @@
       <xs:documentation>
         &lt;and&gt;: all children must be true.
         &lt;or&gt;: at least one child must be true.
-        Children are condition expressions — supports nesting.
+        Children are condition expressions - supports nesting.
       </xs:documentation>
     </xs:annotation>
     <xs:group ref="ConditionExprGroup" minOccurs="1" maxOccurs="unbounded"/>
   </xs:complexType>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       Updated ExecutableOperations group — includes new elements
+       Updated ExecutableOperations group - includes new elements
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:group name="ExecutableOperations">
@@ -434,7 +434,7 @@
   </xs:group>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <if> — conditional execution (PRD §3.3.2)
+       <if> - conditional execution (PRD §3.3.2)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="if">
@@ -455,7 +455,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <delimiter> — argument delimiter configuration
+       <delimiter> - argument delimiter configuration
        Used in: <gsd-arguments><settings><delimiters>
        ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -473,7 +473,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <settings> — parsing settings inside <gsd-arguments>
+       <settings> - parsing settings inside <gsd-arguments>
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="settings">
@@ -505,7 +505,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <gsd-arguments> — argument declaration block (PRD §3.2)
+       <gsd-arguments> - argument declaration block (PRD §3.2)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="gsd-arguments">
@@ -526,7 +526,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <gsd-execute> — executable block container (PRD §3.3)
+       <gsd-execute> - executable block container (PRD §3.3)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="gsd-execute">
@@ -542,7 +542,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <gsd-paste> — variable injection (PRD §3.4)
+       <gsd-paste> - variable injection (PRD §3.4)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="gsd-paste">
@@ -559,7 +559,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <gsd-include> — file inclusion (PRD §3.1, §3.6)
+       <gsd-include> - file inclusion (PRD §3.1, §3.6)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="gsd-include">
@@ -592,7 +592,7 @@
   </xs:element>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       <gsd-version> — workflow version tag (PRD §6.1, WFL-04, WFL-05)
+       <gsd-version> - workflow version tag (PRD §6.1, WFL-04, WFL-05)
        ═══════════════════════════════════════════════════════════════════════ -->
 
   <xs:element name="gsd-version">

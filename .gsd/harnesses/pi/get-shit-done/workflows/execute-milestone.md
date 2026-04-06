@@ -82,14 +82,14 @@ If no: warn once, proceed on current branch.
 
 ---
 
-## Mode Selection (step 1 — always second)
+## Mode Selection (step 1 - always second)
 
 Ask the user ONE binary question:
 
 > **"How should I behave when I hit a doubt, error, or scope deviation?"**
 >
-> - **Interactive** — Stop and ask me; I'll guide you through it
-> - **Silent** — Try to self-correct; only surface unrecoverable blockers
+> - **Interactive** - Stop and ask me; I'll guide you through it
+> - **Silent** - Try to self-correct; only surface unrecoverable blockers
 
 Store as `MODE` (interactive | silent). Do not ask again.
 
@@ -120,10 +120,10 @@ Read:
 
 Prompt (internal): *"Does executing this phase risk implementing anything not covered by active requirements, or conflict with what previous phases delivered? Rate: low / medium / high. One sentence reason."*
 
-- **low** — continue silently
-- **medium** — log in scope-log, continue
-- **high + interactive** — surface to user, ask: proceed / adjust phase goal / stop
-- **high + silent** — log prominently, continue, include in final report
+- **low** - continue silently
+- **medium** - log in scope-log, continue
+- **high + interactive** - surface to user, ask: proceed / adjust phase goal / stop
+- **high + silent** - log prominently, continue, include in final report
 
 ### B. Execute Phase
 
@@ -136,14 +136,14 @@ Skill(skill="gsd-execute-phase", args="${N}")
 Read new SUMMARY.md files from the phase directory.
 
 Check:
-1. **Undelivered must-haves** — PLAN.md `must_haves` entries absent from SUMMARY
-2. **Scope creep** — files modified that are outside this phase's stated scope
-3. **Requirement drift** — work done that has no matching REQUIREMENTS entry
+1. **Undelivered must-haves** - PLAN.md `must_haves` entries absent from SUMMARY
+2. **Scope creep** - files modified that are outside this phase's stated scope
+3. **Requirement drift** - work done that has no matching REQUIREMENTS entry
 
 Classify result as `SCOPE_STATUS`:
-- **clean** — continue
-- **drift** — log + warn, continue
-- **violation** — trigger recovery (see §F)
+- **clean** - continue
+- **drift** - log + warn, continue
+- **violation** - trigger recovery (see §F)
 
 ### D. Verify
 
@@ -156,12 +156,12 @@ Default threshold: **80%**. Override with `--uat-threshold N`.
 
 ### E. Gate Check
 
-| Condition | Interactive | Silent |
-|-----------|-------------|--------|
-| UAT pass rate < threshold | Ask: fix gaps now or continue? | → Recovery loop |
-| Context remaining < 20% | Warn, ask: stop or continue? | → Write HANDOFF, stop |
-| SCOPE_STATUS = violation | Surface details, ask | → Recovery loop |
-| All gates pass | Continue to checkpoint | Continue to checkpoint |
+| Condition                 | Interactive                    | Silent                 |
+| ------------------------- | ------------------------------ | ---------------------- |
+| UAT pass rate < threshold | Ask: fix gaps now or continue? | → Recovery loop        |
+| Context remaining < 20%   | Warn, ask: stop or continue?   | → Write HANDOFF, stop  |
+| SCOPE_STATUS = violation  | Surface details, ask           | → Recovery loop        |
+| All gates pass            | Continue to checkpoint         | Continue to checkpoint |
 
 ### F. Recovery Loop
 
@@ -177,7 +177,7 @@ When triggered:
    - Silent: write HANDOFF files (see §G), stop
 ```
 
-### G. Hard Stop — HANDOFF Files
+### G. Hard Stop - HANDOFF Files
 
 On unrecoverable stop, write two files matching original GSD pause-work convention:
 
@@ -232,11 +232,11 @@ pi-gsd-tools state update last_activity $(date -u +%Y-%m-%d)
 pi-gsd-tools commit "chore: complete phase ${N}" --files .planning/
 ```
 
-Announce: `✓ Phase ${N} complete — UAT: ${pass_rate}%  Scope: ${scope_status}`
+Announce: `✓ Phase ${N} complete - UAT: ${pass_rate}%  Scope: ${scope_status}`
 
 ---
 
-## After All Phases — Mode Split
+## After All Phases - Mode Split
 
 ### Interactive mode
 
@@ -257,7 +257,7 @@ Stop. The user owns the audit decision.
 
 ---
 
-### Silent mode — Auto Lifecycle
+### Silent mode - Auto Lifecycle
 
 Only in silent mode. Display transition banner:
 ```
@@ -273,19 +273,19 @@ Read config once:
 - `config.workflow.auto_retry_tech_debt_budget` (default: `1`)
 
 Initialise accumulators (persist across the outer loop):
-- `gaps_store = []` — unsatisfied requirements not yet resolved
-- `debt_store = []` — tech debt items not yet resolved
-- `gaps_phases_tried = []` — inserted phases attempted for gap closure
-- `debt_phases_tried = []` — inserted phases attempted for debt resolution
+- `gaps_store = []` - unsatisfied requirements not yet resolved
+- `debt_store = []` - tech debt items not yet resolved
+- `gaps_phases_tried = []` - inserted phases attempted for gap closure
+- `debt_phases_tried = []` - inserted phases attempted for debt resolution
 - `outer_cycles = 0`
 
 ---
 
-#### OUTER LOOP — Full audit cycle
+#### OUTER LOOP - Full audit cycle
 
 `LABEL: outer_loop`
 
-**Step A — Full audit**
+**Step A - Full audit**
 
 ```
 Skill(skill="gsd-audit-milestone")
@@ -294,14 +294,14 @@ Skill(skill="gsd-audit-milestone")
 If no result / malformed → Write HANDOFF (§G), stop.
 
 Extract from audit result:
-- `current_gaps[]` — unsatisfied requirement IDs + affected phase numbers
-- `current_debt[]` — tech debt items + affected phase numbers
+- `current_gaps[]` - unsatisfied requirement IDs + affected phase numbers
+- `current_debt[]` - tech debt items + affected phase numbers
 
 If both empty → AUDIT PASSED. Proceed to Step D (complete).
 
 ---
 
-**Step B — Gap closure loop** (only if `current_gaps` non-empty)
+**Step B - Gap closure loop** (only if `current_gaps` non-empty)
 
 If `auto_retry_audit = false`: add `current_gaps` to `gaps_store`, skip to Step C.
 
@@ -317,7 +317,7 @@ While `current_gaps` non-empty and `auto_retry_audit_budget > 0`:
 4. Execute it:
    Skill(skill="gsd-execute-phase", args="${new_phase}")
 5. Track: append new_phase to gaps_phases_tried
-6. Targeted re-audit — affected phases only:
+6. Targeted re-audit - affected phases only:
    Skill(skill="gsd-audit-milestone", args="--phases ${gap_affected_phases}")
 7. Re-read current_gaps from result
    - Resolved? current_gaps = [], break loop
@@ -331,7 +331,7 @@ After loop:
 
 ---
 
-**Step C — Tech debt loop** (only if `current_debt` non-empty)
+**Step C - Tech debt loop** (only if `current_debt` non-empty)
 
 If `auto_retry_tech_debt = false`: add `current_debt` to `debt_store`, skip to final gate.
 
@@ -347,7 +347,7 @@ While `current_debt` non-empty and `auto_retry_tech_debt_budget > 0`:
 4. Execute it:
    Skill(skill="gsd-execute-phase", args="${new_phase}")
 5. Track: append new_phase to debt_phases_tried
-6. Targeted re-audit — affected phases only:
+6. Targeted re-audit - affected phases only:
    Skill(skill="gsd-audit-milestone", args="--phases ${debt_affected_phases}")
 7. Re-read current_debt from result
    - Resolved? current_debt = [], break loop
@@ -375,7 +375,7 @@ If anything remains in stores:
 
 ---
 
-#### Step D — Complete Milestone
+#### Step D - Complete Milestone
 
 ```
 Skill(skill="gsd-complete-milestone", args="${milestone_version}")
@@ -387,7 +387,7 @@ ls .planning/milestones/v${milestone_version}-ROADMAP.md 2>/dev/null || true
 ```
 If absent → Write HANDOFF, stop. Message: "complete-milestone did not produce archive files."
 
-#### Step E — Cleanup
+#### Step E - Cleanup
 
 ```
 Skill(skill="gsd-cleanup")
@@ -420,7 +420,7 @@ If no: leave the worktree open. Tell the user how to merge manually.
  GSD ► EXECUTE-MILESTONE ▸ COMPLETE 🎉
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
- Milestone: ${milestone_version} — ${milestone_name}
+ Milestone: ${milestone_version} - ${milestone_name}
  Phases:    ${done}/${total} complete
  Avg UAT:   ${avg_uat}%
  Lifecycle: audit ✅ → complete ✅ → cleanup ✅

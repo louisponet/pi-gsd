@@ -10,9 +10,9 @@ Completed Wave 1 of Phase 1: WXP Foundation.
 
 ### Delivered
 
-- `src/wxp/schema.ts` — All Zod schemas for WXP AST nodes (`ShellNodeSchema`, `PasteNodeSchema`, `IfNodeSchema` via `z.lazy`, `StringOpNodeSchema`, `ArgumentsNodeSchema`, `IncludeNodeSchema`, `ExecuteBlockSchema`, `VersionTagSchema`, `WxpOperationSchema`, `WxpDocumentSchema`, `WxpVariableSchema`, `WxpSecurityConfigSchema`). All TypeScript types inferred via `z.infer<>`. Zero `any` (except two required `z.lazy` circular-ref exceptions with eslint comments).
-- `src/wxp/variables.ts` — `VariableStore` interface + `createVariableStore()` factory. Collision detection: same-named vars from different owners get `owner:name` prefix.
-- `src/wxp/security.ts` — `checkTrustedPath()` with hard `.planning/` invariant, `checkAllowlist()` matching bare command name against allowlist, `DEFAULT_SHELL_ALLOWLIST` constant.
+- `src/wxp/schema.ts` - All Zod schemas for WXP AST nodes (`ShellNodeSchema`, `PasteNodeSchema`, `IfNodeSchema` via `z.lazy`, `StringOpNodeSchema`, `ArgumentsNodeSchema`, `IncludeNodeSchema`, `ExecuteBlockSchema`, `VersionTagSchema`, `WxpOperationSchema`, `WxpDocumentSchema`, `WxpVariableSchema`, `WxpSecurityConfigSchema`). All TypeScript types inferred via `z.infer<>`. Zero `any` (except two required `z.lazy` circular-ref exceptions with eslint comments).
+- `src/wxp/variables.ts` - `VariableStore` interface + `createVariableStore()` factory. Collision detection: same-named vars from different owners get `owner:name` prefix.
+- `src/wxp/security.ts` - `checkTrustedPath()` with hard `.planning/` invariant, `checkAllowlist()` matching bare command name against allowlist, `DEFAULT_SHELL_ALLOWLIST` constant.
 
 ### Requirements Covered
 

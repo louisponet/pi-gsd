@@ -64,7 +64,7 @@
 			"./dist/pi-gsd-hooks.js"
 		],
 		"prompts": [
-			"./prompts/*.md"
+			"./prompts"
 		]
 	},
 	"dependencies": {

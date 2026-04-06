@@ -60,7 +60,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 ## 1. Setup
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse JSON for: `workspace_base`, `workspaces`, `workspace_count`.
 

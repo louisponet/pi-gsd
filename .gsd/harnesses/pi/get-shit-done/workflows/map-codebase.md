@@ -69,7 +69,7 @@ Documents are reference material for the agent when planning/executing. Always i
 <step name="init_context" priority="first">
 Load codebase mapping context:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`.
 </step>

@@ -100,7 +100,7 @@ Resolve model for:
 
 @.pi/gsd/references/phase-argument-parsing.md
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 ## Step 4: Spawn Researcher
 

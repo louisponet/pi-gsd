@@ -93,7 +93,7 @@ Exit.
 <step name="init_context">
 Load phase operation context:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Extract: `phase_found`, `phase_dir`, `phase_number`, `commit_docs`, `roadmap_exists`.
 

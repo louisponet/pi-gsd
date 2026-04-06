@@ -26,7 +26,7 @@
       <out type="string" name="timestamp" />
     </outs>
   </shell>
-  <!-- CLEAR _auto_chain_active — chain ends here -->
+  <!-- CLEAR _auto_chain_active - chain ends here -->
   <shell command="pi-gsd-tools">
     <args>
       <arg string="config-set" />

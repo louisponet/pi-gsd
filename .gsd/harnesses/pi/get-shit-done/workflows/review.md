@@ -78,7 +78,7 @@ A plan that survives review from 2-3 independent AI systems is more robust.
 <step name="detect_clis">
 Check which AI CLIs are available on the system:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Read from init: `phase_dir`, `phase_number`, `padded_phase`.
 

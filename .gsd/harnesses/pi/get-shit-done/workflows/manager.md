@@ -97,7 +97,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 Bootstrap via manager init:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse JSON for: `milestone_version`, `milestone_name`, `phase_count`, `completed_count`, `in_progress_count`, `phases`, `recommended_actions`, `all_complete`, `waiting_signal`.
 
@@ -128,7 +128,7 @@ Proceed to dashboard step.
 
 **Every time this step is reached**, re-read state from disk to pick up changes from background agents:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse the full JSON. Build the dashboard display.
 

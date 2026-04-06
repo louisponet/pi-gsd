@@ -40,7 +40,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 <step name="init_context">
 Load todo context:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Extract from init JSON: `commit_docs`, `date`, `timestamp`, `todo_count`, `todos`, `pending_dir`, `todos_dir_exists`.
 

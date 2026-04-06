@@ -37,7 +37,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 <step name="ensure_and_load_config">
 Ensure config exists and load current state:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Creates `.planning/config.json` with defaults if missing and loads current config values.
 </step>

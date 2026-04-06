@@ -1,4 +1,4 @@
-# Roadmap: pi-gsd v1.0 — WXP
+# Roadmap: pi-gsd v1.0 - WXP
 
 **Milestone:** v1.0
 **Requirements:** 44 total
@@ -9,13 +9,13 @@
 
 ## Phase Summary
 
-| Phase | Name | Goal | Requirements | Success Criteria |
-|---|---|---|---|---|
-| 1 | WXP Foundation | Build the preprocessing engine and integrate into pi | WXP-01–14, INC-01–03, TST-01–03 | 5 |
-| 2 | oclif Migration | Replace commander.js with typed oclif commands | CLI-01–06 | 5 |
-| 3 | Type Cleanup | Eliminate every `any` from the codebase | TYP-01–06 | 5 |
-| 4 | Workflow Conversion | Convert all workflow files to use WXP directives | WFL-01–05 | 4 |
-| 5 | Harness Distribution | Replace symlinks with copy-on-first-run | HRN-01–07 | 5 |
+| Phase | Name                 | Goal                                                 | Requirements                    | Success Criteria |
+| ----- | -------------------- | ---------------------------------------------------- | ------------------------------- | ---------------- |
+| 1     | WXP Foundation       | Build the preprocessing engine and integrate into pi | WXP-01–14, INC-01–03, TST-01–03 | 5                |
+| 2     | oclif Migration      | Replace commander.js with typed oclif commands       | CLI-01–06                       | 5                |
+| 3     | Type Cleanup         | Eliminate every `any` from the codebase              | TYP-01–06                       | 5                |
+| 4     | Workflow Conversion  | Convert all workflow files to use WXP directives     | WFL-01–05                       | 4                |
+| 5     | Harness Distribution | Replace symlinks with copy-on-first-run              | HRN-01–07                       | 5                |
 
 ---
 
@@ -26,26 +26,26 @@
 **Requirements:** WXP-01, WXP-02, WXP-03, WXP-04, WXP-05, WXP-06, WXP-07, WXP-08, WXP-09, WXP-10, WXP-11, WXP-12, WXP-13, WXP-14, INC-01, INC-02, INC-03, TST-01, TST-02, TST-03
 
 **Build order (within phase):**
-1. `src/wxp/schema.ts` — Zod schemas (all other modules depend on this)
-2. `src/wxp/variables.ts` — typed variable store
-3. `src/wxp/security.ts` — trusted-path + allowlist enforcement
-4. `src/wxp/parser.ts` — XML token extraction with code-fence skip
-5. `src/wxp/shell.ts` — `<shell>` execFileSync execution
-6. `src/wxp/conditions.ts` — `<if>/<equals>/<starts-with>`
-7. `src/wxp/string-ops.ts` — `<string-op op="split">`
-8. `src/wxp/arguments.ts` — `<gsd-arguments>` two-pass parser
-9. `src/wxp/paste.ts` — `<gsd-paste>` replacement
-10. `src/wxp/executor.ts` — `<gsd-execute>` block runner + resolution loop
-11. `src/wxp/index.ts` — `processWxp()` main entry + error handling
-12. `src/schemas/wxp.xsd` — XSD 1.1 canonical schema
+1. `src/wxp/schema.ts` - Zod schemas (all other modules depend on this)
+2. `src/wxp/variables.ts` - typed variable store
+3. `src/wxp/security.ts` - trusted-path + allowlist enforcement
+4. `src/wxp/parser.ts` - XML token extraction with code-fence skip
+5. `src/wxp/shell.ts` - `<shell>` execFileSync execution
+6. `src/wxp/conditions.ts` - `<if>/<equals>/<starts-with>`
+7. `src/wxp/string-ops.ts` - `<string-op op="split">`
+8. `src/wxp/arguments.ts` - `<gsd-arguments>` two-pass parser
+9. `src/wxp/paste.ts` - `<gsd-paste>` replacement
+10. `src/wxp/executor.ts` - `<gsd-execute>` block runner + resolution loop
+11. `src/wxp/index.ts` - `processWxp()` main entry + error handling
+12. `src/schemas/wxp.xsd` - XSD 1.1 canonical schema
 13. Integration into `.gsd/extensions/gsd-hooks.ts`
-14. `src/wxp/__tests__/` — vitest unit + integration tests
+14. `src/wxp/__tests__/` - vitest unit + integration tests
 
 **`<gsd-include>` extensions (INC-01–03) build alongside parser.ts**
 
 **Success criteria:**
-1. A test workflow file containing `<gsd-execute><shell command="pi-gsd-tools">...</shell></gsd-execute>` and `<gsd-paste name="result" />` is processed by `processWxp()` and the paste tag is replaced with the shell output — confirmed by integration test
-2. A document with WXP tags inside fenced code blocks passes through the preprocessor unchanged — the tags appear verbatim in the output (code-fence skip works correctly)
+1. A test workflow file containing `<gsd-execute><shell command="pi-gsd-tools">...</shell></gsd-execute>` and `<gsd-paste name="result" />` is processed by `processWxp()` and the paste tag is replaced with the shell output - confirmed by integration test
+2. A document with WXP tags inside fenced code blocks passes through the preprocessor unchanged - the tags appear verbatim in the output (code-fence skip works correctly)
 3. Any WXP processing failure (non-allowlisted command, undefined variable, untrusted path) produces zero LLM output and a visible error notification containing the full variable namespace and pending block state
 4. `npm test` passes all vitest unit and integration tests with zero failures
 5. `npm run typecheck` passes at zero errors for `src/wxp/` (all types Zod-inferred, zero `any`)
@@ -109,9 +109,9 @@
 **Depends on:** Phase 1 (WXP engine must be complete), Phase 2 (oclif CLI must be available for `<shell>` calls)
 
 **Build order (within phase):**
-1. Backup and convert `execute-phase.md` (pilot) — validate full WXP pipeline end-to-end
+1. Backup and convert `execute-phase.md` (pilot) - validate full WXP pipeline end-to-end
 2. Commit `.bak` file for pilot
-3. Convert high-traffic workflows: `plan-phase.md`, `discuss-phase.md`, `new-project.md`, `new-milestone.md` — backup each
+3. Convert high-traffic workflows: `plan-phase.md`, `discuss-phase.md`, `new-project.md`, `new-milestone.md` - backup each
 4. Convert all remaining workflows incrementally
 5. Add `<gsd-version v="X.Y.Z" />` tag to all converted files
 6. Add `do-not-update` flag support to version tag parser
@@ -142,7 +142,7 @@
 
 **Success criteria:**
 1. On a fresh project (no `.pi/gsd/` directory), `session_start` populates `.pi/gsd/` with real file copies from the package harness (confirmed by `ls -la .pi/gsd/` showing files, not symlinks)
-2. On a project from v1.12.x with symlinks at `.pi/gsd/`, the next session start replaces all symlinks with real files and displays a notification — confirmed by `ls -la .pi/gsd/` post-session
+2. On a project from v1.12.x with symlinks at `.pi/gsd/`, the next session start replaces all symlinks with real files and displays a notification - confirmed by `ls -la .pi/gsd/` post-session
 3. When the package version is newer than the project harness, the update prompt appears and each option (`y`/`n`/`pick`/`diff`) behaves correctly
 4. `grep -r "ensureHarnessSymlink" .gsd/ src/` returns zero matches
 5. A global `~/.gsd/pi-gsd-settings.json` with a custom `shellAllowlist` entry is respected by the WXP security module; a project-level `pi-gsd-settings.json` override takes precedence
@@ -151,52 +151,52 @@
 
 ## Requirement Coverage
 
-| Requirement | Phase |
-|---|---|
-| WXP-01 | Phase 1 |
-| WXP-02 | Phase 1 |
-| WXP-03 | Phase 1 |
-| WXP-04 | Phase 1 |
-| WXP-05 | Phase 1 |
-| WXP-06 | Phase 1 |
-| WXP-07 | Phase 1 |
-| WXP-08 | Phase 1 |
-| WXP-09 | Phase 1 |
-| WXP-10 | Phase 1 |
-| WXP-11 | Phase 1 |
-| WXP-12 | Phase 1 |
-| WXP-13 | Phase 1 |
-| WXP-14 | Phase 1 |
-| INC-01 | Phase 1 |
-| INC-02 | Phase 1 |
-| INC-03 | Phase 1 |
-| TST-01 | Phase 1 |
-| TST-02 | Phase 1 |
-| TST-03 | Phase 1 |
-| CLI-01 | Phase 2 |
-| CLI-02 | Phase 2 |
-| CLI-03 | Phase 2 |
-| CLI-04 | Phase 2 |
-| CLI-05 | Phase 2 |
-| CLI-06 | Phase 2 |
-| TYP-01 | Phase 3 |
-| TYP-02 | Phase 3 |
-| TYP-03 | Phase 3 |
-| TYP-04 | Phase 3 |
-| TYP-05 | Phase 3 |
-| TYP-06 | Phase 3 |
-| WFL-01 | Phase 4 |
-| WFL-02 | Phase 4 |
-| WFL-03 | Phase 4 |
-| WFL-04 | Phase 4 |
-| WFL-05 | Phase 4 |
-| HRN-01 | Phase 5 |
-| HRN-02 | Phase 5 |
-| HRN-03 | Phase 5 |
-| HRN-04 | Phase 5 |
-| HRN-05 | Phase 5 |
-| HRN-06 | Phase 5 |
-| HRN-07 | Phase 5 |
+| Requirement | Phase   |
+| ----------- | ------- |
+| WXP-01      | Phase 1 |
+| WXP-02      | Phase 1 |
+| WXP-03      | Phase 1 |
+| WXP-04      | Phase 1 |
+| WXP-05      | Phase 1 |
+| WXP-06      | Phase 1 |
+| WXP-07      | Phase 1 |
+| WXP-08      | Phase 1 |
+| WXP-09      | Phase 1 |
+| WXP-10      | Phase 1 |
+| WXP-11      | Phase 1 |
+| WXP-12      | Phase 1 |
+| WXP-13      | Phase 1 |
+| WXP-14      | Phase 1 |
+| INC-01      | Phase 1 |
+| INC-02      | Phase 1 |
+| INC-03      | Phase 1 |
+| TST-01      | Phase 1 |
+| TST-02      | Phase 1 |
+| TST-03      | Phase 1 |
+| CLI-01      | Phase 2 |
+| CLI-02      | Phase 2 |
+| CLI-03      | Phase 2 |
+| CLI-04      | Phase 2 |
+| CLI-05      | Phase 2 |
+| CLI-06      | Phase 2 |
+| TYP-01      | Phase 3 |
+| TYP-02      | Phase 3 |
+| TYP-03      | Phase 3 |
+| TYP-04      | Phase 3 |
+| TYP-05      | Phase 3 |
+| TYP-06      | Phase 3 |
+| WFL-01      | Phase 4 |
+| WFL-02      | Phase 4 |
+| WFL-03      | Phase 4 |
+| WFL-04      | Phase 4 |
+| WFL-05      | Phase 4 |
+| HRN-01      | Phase 5 |
+| HRN-02      | Phase 5 |
+| HRN-03      | Phase 5 |
+| HRN-04      | Phase 5 |
+| HRN-05      | Phase 5 |
+| HRN-06      | Phase 5 |
+| HRN-07      | Phase 5 |
 
 **Coverage:** 44/44 v1 requirements mapped ✓
 

@@ -2,15 +2,15 @@
 
 ## What This Is
 
-pi-gsd is a TypeScript port of the GSD (Get Shit Done) v1.30.0 planning framework for the pi coding agent. It ships as an npm package that installs a complete AI-native project-planning system — 57 slash-command skills, a `pi-gsd-tools` CLI, background hooks, and harness workflow files — directly into any pi project on `pi install npm:pi-gsd`.
+pi-gsd is a TypeScript port of the GSD (Get Shit Done) v1.30.0 planning framework for the pi coding agent. It ships as an npm package that installs a complete AI-native project-planning system - 57 slash-command skills, a `pi-gsd-tools` CLI, background hooks, and harness workflow files - directly into any pi project on `pi install npm:pi-gsd`.
 
 The core loop: `new-project → discuss-phase → plan-phase → execute-phase → verify-work → validate-phase → next phase`.
 
 ## Core Value
 
-Workflow files execute programmatically before the LLM ever sees them — zero shell round-trips, zero arbitrary command execution, fully typed from end to end.
+Workflow files execute programmatically before the LLM ever sees them - zero shell round-trips, zero arbitrary command execution, fully typed from end to end.
 
-## Current Milestone: v1.0 — WXP
+## Current Milestone: v1.0 - WXP
 
 **Goal:** Build the Workflow XML Preprocessor (WXP) engine, migrate the CLI to oclif, convert all workflow files to WXP, eliminate every `any`, and replace symlink-based harness distribution with a stable copy-on-first-run system.
 
@@ -40,7 +40,7 @@ Workflow files execute programmatically before the LLM ever sees them — zero s
 
 ### Active
 
-<!-- Current milestone scope — all are hypotheses until shipped -->
+<!-- Current milestone scope - all are hypotheses until shipped -->
 
 - [ ] WXP engine integrated into pi extension `context` event
 - [ ] `<gsd-arguments>` tag: typed argument schema with two-pass parser (flags + positionals)
@@ -83,18 +83,18 @@ Workflow files execute programmatically before the LLM ever sees them — zero s
 ## Context
 
 - **Existing codebase:** v1.12.4 is fully functional. `src/cli.ts` is ~9k lines with a lazy-loaded commander.js router. `src/lib/` has 16 domain modules. Harness files live in `.gsd/harnesses/pi/get-shit-done/` and are currently symlinked (fragile in worktrees and build scripts).
-- **Pain point being solved:** Workflow files embed raw bash that the LLM must `run_bash()` to execute — wastes tokens (the LLM runs `pi-gsd-tools init execute-phase "16"`, parses JSON output, continues), is provider-dependent, and creates a shell execution surface. `<gsd-include>` (v1.12) solved file injection but not command execution.
+- **Pain point being solved:** Workflow files embed raw bash that the LLM must `run_bash()` to execute - wastes tokens (the LLM runs `pi-gsd-tools init execute-phase "16"`, parses JSON output, continues), is provider-dependent, and creates a shell execution surface. `<gsd-include>` (v1.12) solved file injection but not command execution.
 - **Typing debt:** `FrontmatterObject = Record<string, any>` and scattered `eslint-disable-next-line @typescript-eslint/no-explicit-any` exist throughout. oclif's typed decorators eliminate this at the CLI layer; Zod-inferred types eliminate it in WXP.
 - **Harness fragility:** Symlinks break in git worktrees and get nuked by some build scripts. Copy-on-first-run with version tracking is the stable alternative.
 - **Test gap:** No automated test suite currently. vitest is added as part of Phase 1 (WXP foundation).
 
 ## Constraints
 
-- **Compatibility:** All `.planning/` data format compatibility with original GSD v1.30.0 is a hard constraint — no breaking changes to the state/roadmap/requirements/phase structure
+- **Compatibility:** All `.planning/` data format compatibility with original GSD v1.30.0 is a hard constraint - no breaking changes to the state/roadmap/requirements/phase structure
 - **Security:** No piped input to shell commands. WXP tags only processed in trusted paths (package harness + project harness). `.planning/` files NEVER processed (LLM can write there). Allowlist is additive only.
-- **Crash semantics:** WXP failure = total crash, no partial injection, no LLM fallback — all or nothing
+- **Crash semantics:** WXP failure = total crash, no partial injection, no LLM fallback - all or nothing
 - **Tech stack:** TypeScript, Node ≥18, tsup bundler, zod (already a dependency), vitest (new), oclif (new). No new runtime deps beyond these without explicit decision.
-- **CLI interface:** oclif migration IS a breaking change on the CLI interface — acceptable since `pi-gsd-tools` is consumed by workflow XML (internal), not directly by end users
+- **CLI interface:** oclif migration IS a breaking change on the CLI interface - acceptable since `pi-gsd-tools` is consumed by workflow XML (internal), not directly by end users
 - **`<gsd-include>` continuity:** Existing `<gsd-include>` selectors and behavior must be preserved unchanged during WXP introduction
 
 ## Key Decisions

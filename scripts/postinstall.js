@@ -7,7 +7,7 @@
  * \`.gsd/harnesses/pi/\` into the consumer project's \`.pi/gsd/\`
  * and installs the \`pi-gsd-hooks.ts\` extension into \`.pi/extensions/\`.
  *
- * Safe to re-run — files are skipped if already present (unless GSD_FORCE=1).
+ * Safe to re-run - files are skipped if already present (unless GSD_FORCE=1).
  */
 
 const fs = require("fs");
@@ -16,8 +16,8 @@ const path = require("path");
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FORCE =
-	process.env.GSD_FORCE_REINSTALL === "1" ||
-	process.argv.includes("--force-reinstall");
+    process.env.GSD_FORCE_REINSTALL === "1" ||
+    process.argv.includes("--force-reinstall");
 
 /**
  * Directory that contains this package's files.
@@ -60,32 +60,32 @@ const HARNESSES = [{ src: "pi", dest: ".pi", hooks: true, subdir: "gsd" }];
  * @returns {{ copied: number, skipped: number }}
  */
 function copyDir(src, dest, overwrite) {
-	let copied = 0;
-	let skipped = 0;
+    let copied = 0;
+    let skipped = 0;
 
-	if (!fs.existsSync(src)) return { copied, skipped };
+    if (!fs.existsSync(src)) return { copied, skipped };
 
-	fs.mkdirSync(dest, { recursive: true });
+    fs.mkdirSync(dest, { recursive: true });
 
-	for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-		const srcEntry = path.join(src, entry.name);
-		const destEntry = path.join(dest, entry.name);
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+        const srcEntry = path.join(src, entry.name);
+        const destEntry = path.join(dest, entry.name);
 
-		if (entry.isDirectory()) {
-			const sub = copyDir(srcEntry, destEntry, overwrite);
-			copied += sub.copied;
-			skipped += sub.skipped;
-		} else if (entry.isFile()) {
-			if (!overwrite && fs.existsSync(destEntry)) {
-				skipped++;
-			} else {
-				fs.copyFileSync(srcEntry, destEntry);
-				copied++;
-			}
-		}
-	}
+        if (entry.isDirectory()) {
+            const sub = copyDir(srcEntry, destEntry, overwrite);
+            copied += sub.copied;
+            skipped += sub.skipped;
+        } else if (entry.isFile()) {
+            if (!overwrite && fs.existsSync(destEntry)) {
+                skipped++;
+            } else {
+                fs.copyFileSync(srcEntry, destEntry);
+                copied++;
+            }
+        }
+    }
 
-	return { copied, skipped };
+    return { copied, skipped };
 }
 
 /**
@@ -96,203 +96,203 @@ function copyDir(src, dest, overwrite) {
  * @param {string} msg
  */
 function log(level, msg) {
-	const isTTY = process.stdout.isTTY;
-	const colours = {
-		ok: isTTY ? "\x1b[32m✓\x1b[0m" : "✓",
-		skip: isTTY ? "\x1b[33m–\x1b[0m" : "–",
-		warn: isTTY ? "\x1b[33m⚠\x1b[0m" : "⚠",
-		err: isTTY ? "\x1b[31m✗\x1b[0m" : "✗",
-	};
-	console.log(`  ${colours[level] || " "} ${msg}`);
+    const isTTY = process.stdout.isTTY;
+    const colours = {
+        ok: isTTY ? "\x1b[32m✓\x1b[0m" : "✓",
+        skip: isTTY ? "\x1b[33m–\x1b[0m" : "–",
+        warn: isTTY ? "\x1b[33m⚠\x1b[0m" : "⚠",
+        err: isTTY ? "\x1b[31m✗\x1b[0m" : "✗",
+    };
+    console.log(`  ${colours[level] || " "} ${msg}`);
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 function main() {
-	// Skip when running inside the package's own development tree
-	// (i.e. when INIT_CWD === the package directory itself).
-	if (path.resolve(PROJECT_ROOT) === path.resolve(PKG_DIR)) {
-		log(
-			"skip",
-			"Running inside package source tree - skipping harness install.",
-		);
-		return;
-	}
+    // Skip when running inside the package's own development tree
+    // (i.e. when INIT_CWD === the package directory itself).
+    if (path.resolve(PROJECT_ROOT) === path.resolve(PKG_DIR)) {
+        log(
+            "skip",
+            "Running inside package source tree - skipping harness install.",
+        );
+        return;
+    }
 
-	// Skip when explicitly opted out
-	if (process.env.GSD_SKIP_INSTALL === "1") {
-		log("skip", "GSD_SKIP_INSTALL=1 - skipping harness install.");
-		return;
-	}
+    // Skip when explicitly opted out
+    if (process.env.GSD_SKIP_INSTALL === "1") {
+        log("skip", "GSD_SKIP_INSTALL=1 - skipping harness install.");
+        return;
+    }
 
-	const harnessesRoot = path.join(PKG_DIR, ".gsd", "harnesses");
-	const hooksRoot = path.join(PKG_DIR, ".gsd", "hooks");
+    const harnessesRoot = path.join(PKG_DIR, ".gsd", "harnesses");
+    const hooksRoot = path.join(PKG_DIR, ".gsd", "hooks");
 
-	console.log("");
-	console.log("  GSD - installing harness files into your project…");
-	if (FORCE)
-		console.log("  (force-reinstall mode: existing files will be overwritten)");
-	console.log("");
+    console.log("");
+    console.log("  GSD - installing harness files into your project…");
+    if (FORCE)
+        console.log("  (force-reinstall mode: existing files will be overwritten)");
+    console.log("");
 
-	let totalCopied = 0;
-	let totalSkipped = 0;
-	let installed = 0;
+    let totalCopied = 0;
+    let totalSkipped = 0;
+    let installed = 0;
 
-	for (const harness of HARNESSES) {
-		const srcHarness = path.join(harnessesRoot, harness.src);
-		const destHarness = path.join(PROJECT_ROOT, harness.dest);
+    for (const harness of HARNESSES) {
+        const srcHarness = path.join(harnessesRoot, harness.src);
+        const destHarness = path.join(PROJECT_ROOT, harness.dest);
 
-		// ── get-shit-done/ content ──────────────────────────────────────────────
-		const srcGsd = path.join(srcHarness, harness.subdir);
-		const destGsd = path.join(destHarness, harness.subdir);
+        // ── get-shit-done/ content ──────────────────────────────────────────────
+        const srcGsd = path.join(srcHarness, harness.subdir);
+        const destGsd = path.join(destHarness, harness.subdir);
 
-		if (!fs.existsSync(srcHarness)) {
-			log(
-				"skip",
-				`${harness.dest}/${harness.subdir}  (source absent - skipped)`,
-			);
-			continue;
-		}
+        if (!fs.existsSync(srcHarness)) {
+            log(
+                "skip",
+                `${harness.dest}/${harness.subdir}  (source absent - skipped)`,
+            );
+            continue;
+        }
 
-		const { copied, skipped } = copyDir(srcGsd, destGsd, FORCE);
-		totalCopied += copied;
-		totalSkipped += skipped;
+        const { copied, skipped } = copyDir(srcGsd, destGsd, FORCE);
+        totalCopied += copied;
+        totalSkipped += skipped;
 
-		if (copied > 0 || skipped === 0) {
-			log(
-				"ok",
-				`${harness.dest}/${harness.subdir}  (${copied} file${copied === 1 ? "" : "s"} installed)`,
-			);
-		} else {
-			log(
-				"skip",
-				`${harness.dest}/${harness.subdir}  (already up-to-date, ${skipped} file${skipped === 1 ? "" : "s"} skipped)`,
-			);
-		}
+        if (copied > 0 || skipped === 0) {
+            log(
+                "ok",
+                `${harness.dest}/${harness.subdir}  (${copied} file${copied === 1 ? "" : "s"} installed)`,
+            );
+        } else {
+            log(
+                "skip",
+                `${harness.dest}/${harness.subdir}  (already up-to-date, ${skipped} file${skipped === 1 ? "" : "s"} skipped)`,
+            );
+        }
 
-		// ── gsd-file-manifest.json ──────────────────────────────────────────────
-		const manifestSrc = path.join(srcHarness, "gsd-file-manifest.json");
-		const manifestDest = path.join(destHarness, "gsd-file-manifest.json");
+        // ── gsd-file-manifest.json ──────────────────────────────────────────────
+        const manifestSrc = path.join(srcHarness, "gsd-file-manifest.json");
+        const manifestDest = path.join(destHarness, "gsd-file-manifest.json");
 
-		if (fs.existsSync(manifestSrc)) {
-			if (!FORCE && fs.existsSync(manifestDest)) {
-				totalSkipped++;
-			} else {
-				fs.mkdirSync(destHarness, { recursive: true });
-				fs.copyFileSync(manifestSrc, manifestDest);
-				totalCopied++;
-			}
-		}
+        if (fs.existsSync(manifestSrc)) {
+            if (!FORCE && fs.existsSync(manifestDest)) {
+                totalSkipped++;
+            } else {
+                fs.mkdirSync(destHarness, { recursive: true });
+                fs.copyFileSync(manifestSrc, manifestDest);
+                totalCopied++;
+            }
+        }
 
-		// ── hooks/ (platform-selective) ─────────────────────────────────────────
-		if (harness.hooks && fs.existsSync(hooksRoot)) {
-			const destHooks = path.join(destHarness, "hooks");
-			const h = copyDir(hooksRoot, destHooks, FORCE);
-			totalCopied += h.copied;
-			totalSkipped += h.skipped;
+        // ── hooks/ (platform-selective) ─────────────────────────────────────────
+        if (harness.hooks && fs.existsSync(hooksRoot)) {
+            const destHooks = path.join(destHarness, "hooks");
+            const h = copyDir(hooksRoot, destHooks, FORCE);
+            totalCopied += h.copied;
+            totalSkipped += h.skipped;
 
-			if (h.copied > 0) {
-				log(
-					"ok",
-					`${harness.dest}/hooks  (${h.copied} hook${h.copied === 1 ? "" : "s"} installed)`,
-				);
-			}
-		}
+            if (h.copied > 0) {
+                log(
+                    "ok",
+                    `${harness.dest}/hooks  (${h.copied} hook${h.copied === 1 ? "" : "s"} installed)`,
+                );
+            }
+        }
 
-		// ── skills/ (opencode only - present in .gsd/harnesses/opencode/skills) ─
-		const srcSkills = path.join(srcHarness, "skills");
-		const destSkills = path.join(destHarness, "skills");
+        // ── skills/ (opencode only - present in .gsd/harnesses/opencode/skills) ─
+        const srcSkills = path.join(srcHarness, "skills");
+        const destSkills = path.join(destHarness, "skills");
 
-		if (fs.existsSync(srcSkills)) {
-			const s = copyDir(srcSkills, destSkills, FORCE);
-			totalCopied += s.copied;
-			totalSkipped += s.skipped;
+        if (fs.existsSync(srcSkills)) {
+            const s = copyDir(srcSkills, destSkills, FORCE);
+            totalCopied += s.copied;
+            totalSkipped += s.skipped;
 
-			if (s.copied > 0) {
-				log(
-					"ok",
-					`${harness.dest}/skills  (${s.copied} skill file${s.copied === 1 ? "" : "s"} installed)`,
-				);
-			}
-		}
+            if (s.copied > 0) {
+                log(
+                    "ok",
+                    `${harness.dest}/skills  (${s.copied} skill file${s.copied === 1 ? "" : "s"} installed)`,
+                );
+            }
+        }
 
-		installed++;
-	}
+        installed++;
+    }
 
-	// ── Pi extension — served from npm package via pi.extensions in package.json ─────
-	// No local copying needed. Cleanup stale files from old install approach.
-	const extDir = path.join(PROJECT_ROOT, ".pi", "extensions");
-	const staleExts = ["gsd-hooks.ts", "pi-gsd-hooks.ts"];
-	for (const name of staleExts) {
-		const stale = path.join(extDir, name);
-		if (fs.existsSync(stale)) {
-			fs.rmSync(stale);
-			log("ok", `.pi/extensions/${name}  (removed — extension now served from package)`);
-		}
-	}
-	const settingsFile2 = path.join(PROJECT_ROOT, ".pi", "settings.json");
-	if (fs.existsSync(settingsFile2)) {
-		try {
-			const settings2 = JSON.parse(fs.readFileSync(settingsFile2, "utf8"));
-			if (Array.isArray(settings2.extensions)) {
-				const cleaned2 = settings2.extensions.filter((e) => !staleExts.some((n) => e.endsWith(n)));
-				if (cleaned2.length !== settings2.extensions.length) {
-					settings2.extensions = cleaned2;
-					fs.writeFileSync(settingsFile2, JSON.stringify(settings2, null, "\t"), "utf8");
-					log("ok", ".pi/settings.json  (removed stale extension entries)");
-				}
-			}
-		} catch { /* ignore */ }
-	}
-	// ── Pi prompt templates — cleanup stale local copies ───────────────────────
-	// Prompts are served directly from the npm package (user scope).
-	// Local copies in .pi/prompts/ cause collision warnings on every pi update.
-	// Remove any gsd-*.md files previously installed there.
-	// Also remove the old gsd-hooks.ts if present (renamed to pi-gsd-hooks.ts).
-	const promptsDest = path.join(PROJECT_ROOT, ".pi", "prompts");
-	if (fs.existsSync(promptsDest)) {
-		const stale = fs
-			.readdirSync(promptsDest)
-			.filter((f) => f.startsWith("gsd-") && f.endsWith(".md"));
-		if (stale.length > 0) {
-			for (const f of stale) fs.rmSync(path.join(promptsDest, f));
-			log(
-				"ok",
-				`.pi/prompts  (removed ${stale.length} stale local gsd-*.md — served from package instead)`,
-			);
-		}
-	}
-	const oldExt = path.join(PROJECT_ROOT, ".pi", "extensions", "gsd-hooks.ts");
-	if (fs.existsSync(oldExt)) {
-		fs.rmSync(oldExt);
-		log(
-			"ok",
-			".pi/extensions/gsd-hooks.ts  (removed — renamed to pi-gsd-hooks.ts)",
-		);
-	}
+    // ── Pi extension - served from npm package via pi.extensions in package.json ─────
+    // No local copying needed. Cleanup stale files from old install approach.
+    const extDir = path.join(PROJECT_ROOT, ".pi", "extensions");
+    const staleExts = ["gsd-hooks.ts", "pi-gsd-hooks.ts"];
+    for (const name of staleExts) {
+        const stale = path.join(extDir, name);
+        if (fs.existsSync(stale)) {
+            fs.rmSync(stale);
+            log("ok", `.pi/extensions/${name}  (removed - extension now served from package)`);
+        }
+    }
+    const settingsFile2 = path.join(PROJECT_ROOT, ".pi", "settings.json");
+    if (fs.existsSync(settingsFile2)) {
+        try {
+            const settings2 = JSON.parse(fs.readFileSync(settingsFile2, "utf8"));
+            if (Array.isArray(settings2.extensions)) {
+                const cleaned2 = settings2.extensions.filter((e) => !staleExts.some((n) => e.endsWith(n)));
+                if (cleaned2.length !== settings2.extensions.length) {
+                    settings2.extensions = cleaned2;
+                    fs.writeFileSync(settingsFile2, JSON.stringify(settings2, null, "\t"), "utf8");
+                    log("ok", ".pi/settings.json  (removed stale extension entries)");
+                }
+            }
+        } catch { /* ignore */ }
+    }
+    // ── Pi prompt templates - cleanup stale local copies ───────────────────────
+    // Prompts are served directly from the npm package (user scope).
+    // Local copies in .pi/prompts/ cause collision warnings on every pi update.
+    // Remove any gsd-*.md files previously installed there.
+    // Also remove the old gsd-hooks.ts if present (renamed to pi-gsd-hooks.ts).
+    const promptsDest = path.join(PROJECT_ROOT, ".pi", "prompts");
+    if (fs.existsSync(promptsDest)) {
+        const stale = fs
+            .readdirSync(promptsDest)
+            .filter((f) => f.startsWith("gsd-") && f.endsWith(".md"));
+        if (stale.length > 0) {
+            for (const f of stale) fs.rmSync(path.join(promptsDest, f));
+            log(
+                "ok",
+                `.pi/prompts  (removed ${stale.length} stale local gsd-*.md - served from package instead)`,
+            );
+        }
+    }
+    const oldExt = path.join(PROJECT_ROOT, ".pi", "extensions", "gsd-hooks.ts");
+    if (fs.existsSync(oldExt)) {
+        fs.rmSync(oldExt);
+        log(
+            "ok",
+            ".pi/extensions/gsd-hooks.ts  (removed - renamed to pi-gsd-hooks.ts)",
+        );
+    }
 
-	console.log("");
+    console.log("");
 
-	if (installed === 0) {
-		log("warn", "No harness source directories found inside the package.");
-		log(
-			"warn",
-			"The package may be incomplete. Try: npm install --force get-shit-done-cc",
-		);
-		console.log("");
-		return;
-	}
+    if (installed === 0) {
+        log("warn", "No harness source directories found inside the package.");
+        log(
+            "warn",
+            "The package may be incomplete. Try: npm install --force get-shit-done-cc",
+        );
+        console.log("");
+        return;
+    }
 
-	console.log(`  GSD v${getPackageVersion()} installed successfully.`);
-	console.log(
-		`  ${totalCopied} file${totalCopied === 1 ? "" : "s"} copied, ${totalSkipped} skipped.`,
-	);
-	console.log("");
-	console.log("  Next steps:");
-	console.log("    Run /gsd-new-project to initialise a project.");
-	console.log("");
-	console.log("  Docs: https://github.com/fulgidus/pi-gsd#readme");
-	console.log("");
+    console.log(`  GSD v${getPackageVersion()} installed successfully.`);
+    console.log(
+        `  ${totalCopied} file${totalCopied === 1 ? "" : "s"} copied, ${totalSkipped} skipped.`,
+    );
+    console.log("");
+    console.log("  Next steps:");
+    console.log("    Run /gsd-new-project to initialise a project.");
+    console.log("");
+    console.log("  Docs: https://github.com/fulgidus/pi-gsd#readme");
+    console.log("");
 }
 
 /**
@@ -302,14 +302,14 @@ function main() {
  * @returns {string}
  */
 function getPackageVersion() {
-	try {
-		const pkg = JSON.parse(
-			fs.readFileSync(path.join(PKG_DIR, "package.json"), "utf8"),
-		);
-		return pkg.version || "unknown";
-	} catch {
-		return "unknown";
-	}
+    try {
+        const pkg = JSON.parse(
+            fs.readFileSync(path.join(PKG_DIR, "package.json"), "utf8"),
+        );
+        return pkg.version || "unknown";
+    } catch {
+        return "unknown";
+    }
 }
 
 /**
@@ -327,100 +327,100 @@ function getPackageVersion() {
  * @param {function} callback   Called with (copied: boolean)
  */
 function installPiExtension(projectRoot, pkgDir, force, callback) {
-	const piDir = path.join(projectRoot, ".pi");
-	const extDir = path.join(piDir, "extensions");
-	const extDest = path.join(extDir, "pi-gsd-hooks.ts");
-	const extSrc = path.join(pkgDir, ".gsd", "extensions", "pi-gsd-hooks.ts");
+    const piDir = path.join(projectRoot, ".pi");
+    const extDir = path.join(piDir, "extensions");
+    const extDest = path.join(extDir, "pi-gsd-hooks.ts");
+    const extSrc = path.join(pkgDir, ".gsd", "extensions", "pi-gsd-hooks.ts");
 
-	if (!fs.existsSync(extSrc)) {
-		log("warn", ".pi/extensions/pi-gsd-hooks.ts  (source absent - skipped)");
-		callback(false);
-		return;
-	}
+    if (!fs.existsSync(extSrc)) {
+        log("warn", ".pi/extensions/pi-gsd-hooks.ts  (source absent - skipped)");
+        callback(false);
+        return;
+    }
 
-	// Always update the extension — it is owned by pi-gsd, not the user.
-	// Compare pi-gsd-extension-version comments to detect staleness.
-	const extractVersion = (file) => {
-		try {
-			const match = fs
-				.readFileSync(file, "utf8")
-				.match(/pi-gsd-extension-version:\s*([\d.]+)/);
-			return match ? match[1] : null;
-		} catch {
-			return null;
-		}
-	};
-	const srcVersion = extractVersion(extSrc);
-	const destVersion = fs.existsSync(extDest) ? extractVersion(extDest) : null;
-	const needsUpdate = force || !destVersion || destVersion !== srcVersion;
+    // Always update the extension - it is owned by pi-gsd, not the user.
+    // Compare pi-gsd-extension-version comments to detect staleness.
+    const extractVersion = (file) => {
+        try {
+            const match = fs
+                .readFileSync(file, "utf8")
+                .match(/pi-gsd-extension-version:\s*([\d.]+)/);
+            return match ? match[1] : null;
+        } catch {
+            return null;
+        }
+    };
+    const srcVersion = extractVersion(extSrc);
+    const destVersion = fs.existsSync(extDest) ? extractVersion(extDest) : null;
+    const needsUpdate = force || !destVersion || destVersion !== srcVersion;
 
-	if (!needsUpdate) {
-		log("skip", `.pi/extensions/pi-gsd-hooks.ts  (up-to-date v${destVersion})`);
-		callback(false);
-	} else {
-		try {
-			fs.mkdirSync(extDir, { recursive: true });
-			fs.copyFileSync(extSrc, extDest);
-			log(
-				"ok",
-				".pi/extensions/pi-gsd-hooks.ts  (GSD lifecycle extension installed)",
-			);
-			callback(true);
-		} catch (e) {
-			log(
-				"warn",
-				".pi/extensions/pi-gsd-hooks.ts  (install failed: " + e.message + ")",
-			);
-			callback(false);
-			return;
-		}
-	}
+    if (!needsUpdate) {
+        log("skip", `.pi/extensions/pi-gsd-hooks.ts  (up-to-date v${destVersion})`);
+        callback(false);
+    } else {
+        try {
+            fs.mkdirSync(extDir, { recursive: true });
+            fs.copyFileSync(extSrc, extDest);
+            log(
+                "ok",
+                ".pi/extensions/pi-gsd-hooks.ts  (GSD lifecycle extension installed)",
+            );
+            callback(true);
+        } catch (e) {
+            log(
+                "warn",
+                ".pi/extensions/pi-gsd-hooks.ts  (install failed: " + e.message + ")",
+            );
+            callback(false);
+            return;
+        }
+    }
 
-	// Update .pi/settings.json to include the extension path in the extensions array.
-	// The file is already auto-discovered from .pi/extensions/, but explicit registration
-	// is added as a belt-and-suspenders measure.
-	const settingsFile = path.join(piDir, "settings.json");
-	try {
-		let settings = {};
-		if (fs.existsSync(settingsFile)) {
-			try {
-				settings = JSON.parse(fs.readFileSync(settingsFile, "utf8"));
-			} catch {
-				// Unreadable settings - start fresh object
-			}
-		}
+    // Update .pi/settings.json to include the extension path in the extensions array.
+    // The file is already auto-discovered from .pi/extensions/, but explicit registration
+    // is added as a belt-and-suspenders measure.
+    const settingsFile = path.join(piDir, "settings.json");
+    try {
+        let settings = {};
+        if (fs.existsSync(settingsFile)) {
+            try {
+                settings = JSON.parse(fs.readFileSync(settingsFile, "utf8"));
+            } catch {
+                // Unreadable settings - start fresh object
+            }
+        }
 
-		const extensions = Array.isArray(settings.extensions)
-			? settings.extensions
-			: [];
+        const extensions = Array.isArray(settings.extensions)
+            ? settings.extensions
+            : [];
 
-		// Remove stale gsd-hooks.ts entry if present (renamed to pi-gsd-hooks.ts)
-		const oldExtPath = path.join(extDir, "gsd-hooks.ts");
-		const cleaned = extensions.filter((e) => e !== oldExtPath);
+        // Remove stale gsd-hooks.ts entry if present (renamed to pi-gsd-hooks.ts)
+        const oldExtPath = path.join(extDir, "gsd-hooks.ts");
+        const cleaned = extensions.filter((e) => e !== oldExtPath);
 
-		// Avoid duplicate entries
-		if (!cleaned.includes(extDest)) {
-			settings.extensions = [...cleaned, extDest];
-			fs.mkdirSync(piDir, { recursive: true });
-			fs.writeFileSync(
-				settingsFile,
-				JSON.stringify(settings, null, "\t"),
-				"utf8",
-			);
-			log("ok", ".pi/settings.json  (extensions array updated)");
-		} else if (cleaned.length !== extensions.length) {
-			// Removed stale entry but extDest already present
-			settings.extensions = cleaned;
-			fs.writeFileSync(
-				settingsFile,
-				JSON.stringify(settings, null, "\t"),
-				"utf8",
-			);
-			log("ok", ".pi/settings.json  (removed stale gsd-hooks.ts entry)");
-		}
-	} catch (e) {
-		log("warn", ".pi/settings.json  (could not update: " + e.message + ")");
-	}
+        // Avoid duplicate entries
+        if (!cleaned.includes(extDest)) {
+            settings.extensions = [...cleaned, extDest];
+            fs.mkdirSync(piDir, { recursive: true });
+            fs.writeFileSync(
+                settingsFile,
+                JSON.stringify(settings, null, "\t"),
+                "utf8",
+            );
+            log("ok", ".pi/settings.json  (extensions array updated)");
+        } else if (cleaned.length !== extensions.length) {
+            // Removed stale entry but extDest already present
+            settings.extensions = cleaned;
+            fs.writeFileSync(
+                settingsFile,
+                JSON.stringify(settings, null, "\t"),
+                "utf8",
+            );
+            log("ok", ".pi/settings.json  (removed stale gsd-hooks.ts entry)");
+        }
+    } catch (e) {
+        log("warn", ".pi/settings.json  (could not update: " + e.message + ")");
+    }
 }
 
 main();

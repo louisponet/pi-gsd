@@ -94,7 +94,7 @@ Valid GSD subagent types (use exact names - do not fall back to 'general-purpose
 
 ## 0. Initialize
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `commit_docs`.
 

@@ -142,7 +142,7 @@ plain-text numbered list and ask the user to type their choice number.
 <step name="initialize" priority="first">
 Phase number from argument (required).
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`,
 `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`,

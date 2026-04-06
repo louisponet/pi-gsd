@@ -66,7 +66,7 @@
       </shell>
     </then>
   </if>
-  <!-- SET _auto_chain_active when chain starts — cleared by chain completion/pause, not by absence of --auto -->
+  <!-- SET _auto_chain_active when chain starts - cleared by chain completion/pause, not by absence of --auto -->
   <shell command="pi-gsd-tools">
     <args>
       <arg string="config-set" />
@@ -108,7 +108,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 Parse `$ARGUMENTS` for `--from N` flag:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse JSON for: `milestone_version`, `milestone_name`, `phase_count`, `completed_phases`, `roadmap_exists`, `state_exists`, `commit_docs`.
 
@@ -136,7 +136,7 @@ If `FROM_PHASE` is set, display: `Starting from phase ${FROM_PHASE}`
 
 Run phase discovery:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse `has_context` from JSON.
 
@@ -150,7 +150,7 @@ Proceed to 3b.
 
 **If has_context is false:** Check if discuss is disabled via settings:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Check `has_context`. If false → go to handle_blocker: "Smart discuss for phase ${PHASE_NUM} did not produce CONTEXT.md."
 
@@ -158,7 +158,7 @@ Check `has_context`. If false → go to handle_blocker: "Smart discuss for phase
 
 Check if this phase has frontend indicators and whether a UI-SPEC already exists:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse `phase_dir` from the JSON.
 
@@ -219,7 +219,7 @@ Skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 Re-read verification status:
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse from JSON: `phase_dir`, `phase_slug`, `padded_phase`, `phase_name`.
 

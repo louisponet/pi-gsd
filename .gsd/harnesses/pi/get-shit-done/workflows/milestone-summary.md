@@ -72,7 +72,7 @@ Designed for team onboarding - a new contributor can read the output and underst
 
 ## Step 1: Resolve Version
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 This returns phase metadata. For each phase in the milestone scope:
 

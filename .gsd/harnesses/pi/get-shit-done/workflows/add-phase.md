@@ -86,7 +86,7 @@ Exit.
 <step name="init_context">
 Load phase operation context:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Check `roadmap_exists` from init JSON. If false:
 ```

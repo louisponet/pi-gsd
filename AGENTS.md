@@ -1,6 +1,6 @@
 # pi-gsd
 
-pi-gsd — TypeScript port of GSD (get-shit-done-cc) v1.30.0 for pi.
+pi-gsd - TypeScript port of GSD (get-shit-done-cc) v1.30.0 for pi.
 A pi package that distributes GSD workflows, skills, and tooling for pi.
 
 ## Commands
@@ -29,7 +29,7 @@ Individual commands:
 
 ## Conventions
 
-- **CJS modules** in `.gsd/bin/pi/lib/` are the canonical source — never edit assembled output directly
+- **CJS modules** in `.gsd/bin/pi/lib/` are the canonical source - never edit assembled output directly
 - **Hook files** in `.gsd/hooks/` are the canonical source for the pi extension
 - **Hook files are hardlinked** - `.gsd/hooks/`, `.agent/hooks/`, `.claude/hooks/`, `.gemini/hooks/`, `.opencode/hooks/` share a single inode. Editing one edits all. Never copy them.
 - **Command prefix rule** - `/gsd:<name>` (colon) is a Claude/Gemini internal dispatch mechanism only. Use `/gsd-<name>` (hyphen) everywhere else - in artefacts, error messages, ROADMAP entries.

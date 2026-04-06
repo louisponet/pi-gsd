@@ -1,7 +1,7 @@
 # Architecture Research: pi-gsd WXP Milestone
 
 **Research date:** 2026-04-06
-**Milestone:** v1.0 — WXP + oclif + type cleanup + harness distribution
+**Milestone:** v1.0 - WXP + oclif + type cleanup + harness distribution
 
 ## Existing Architecture
 
@@ -16,9 +16,9 @@ src/
     ├── phase.ts        (phase lifecycle)
     ├── milestone.ts    (milestone management)
     ├── config.ts       (config.json CRUD)
-    ├── frontmatter.ts  (YAML frontmatter r/w — has any debt)
+    ├── frontmatter.ts  (YAML frontmatter r/w - has any debt)
     ├── schemas.ts      (Zod schemas for .planning/ structures)
-    ├── security.ts     (existing — path validation)
+    ├── security.ts     (existing - path validation)
     ├── template.ts     (template selection/filling)
     ├── workstream.ts   (workstream management)
     ├── verify.ts       (health/consistency checks)
@@ -68,7 +68,7 @@ src/
 │   ├── workstream/
 │   ├── wxp/
 │   └── ...
-├── lib/                          (existing, cleaned up — zero any)
+├── lib/                          (existing, cleaned up - zero any)
 │   └── frontmatter.ts            FrontmatterObject → YamlValue recursive type
 ├── cli.ts                        oclif run() entrypoint (replaces 9k-line switch)
 └── output.ts
@@ -139,13 +139,13 @@ loop:
   6. Final gate: any WXP tag NOT marked done → throw WxpError
   7. Strip ALL WXP tags (including done markers) from final text
 
-Loop termination: max 50 iterations (configurable). Exceeding limit → WxpError "Resolution loop exceeded max iterations — check for circular includes"
+Loop termination: max 50 iterations (configurable). Exceeding limit → WxpError "Resolution loop exceeded max iterations - check for circular includes"
 ```
 
 **Done-marker pattern:**
 - Tags are mutated in the text string: `<gsd-execute>` → `<gsd-execute done>`
 - Final strip regex: `/<gsd-[a-z-]+[^>]*done[^>]*>[\s\S]*?<\/gsd-[a-z-]+>|<gsd-[a-z-]+[^>]*done[^>]*\/>/g`
-- String mutations make the loop stateful — each iteration works on the accumulated text
+- String mutations make the loop stateful - each iteration works on the accumulated text
 
 ---
 
@@ -154,9 +154,9 @@ Loop termination: max 50 iterations (configurable). Exceeding limit → WxpError
 **Build order (dependency graph):**
 
 ```
-1. src/wxp/schema.ts           (no deps — Zod schemas)
+1. src/wxp/schema.ts           (no deps - Zod schemas)
 2. src/wxp/variables.ts        (deps: schema)
-3. src/wxp/security.ts         (deps: schema — trusted paths, allowlist)
+3. src/wxp/security.ts         (deps: schema - trusted paths, allowlist)
 4. src/wxp/parser.ts           (deps: schema, variables)
 5. src/wxp/shell.ts            (deps: schema, variables, security)
 6. src/wxp/conditions.ts       (deps: schema, variables)
@@ -169,10 +169,10 @@ Loop termination: max 50 iterations (configurable). Exceeding limit → WxpError
 
 **Phase implications for roadmap:**
 - Phase 1 (WXP Foundation): modules 1-11 + integration into gsd-hooks.ts + tests
-- Phase 2 (oclif): `src/commands/` tree, remove commander.js — independent of Phase 1 (can overlap)
+- Phase 2 (oclif): `src/commands/` tree, remove commander.js - independent of Phase 1 (can overlap)
 - Phase 3 (Workflows): requires Phase 1 complete; converts .md files one-by-one
 - Phase 4 (Types): can start during Phase 1 (frontmatter.ts, config.ts are independent)
-- Phase 5 (Harness): independent of all others — purely extension code change
+- Phase 5 (Harness): independent of all others - purely extension code change
 
 ---
 

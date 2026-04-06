@@ -10,9 +10,9 @@ Completed Wave 4 of Phase 1: Executor + Main Entry + XSD Schema.
 
 ### Delivered
 
-- `src/wxp/executor.ts` — `executeBlock()` runs `<gsd-execute>` children (shell → `executeShell`, if → `evaluateCondition` + recurse, string-op → `executeStringOp`, nested execute → recurse). `WxpExecutionError` wraps failures with variable snapshot.
-- `src/wxp/index.ts` — `processWxp()` main entry. Resolution loop (50-iteration cap): include → arguments → execute → paste → repeat. Security check first (WXP-10). Any failure throws `WxpProcessingError` with full variable namespace + pending/completed op state (WXP-09). Re-exports all error types.
-- `src/schemas/wxp.xsd` — XSD 1.1 canonical schema covering all WXP tags: `gsd-version`, `gsd-include` (with `IncludeArgumentsMappingType`), `gsd-arguments` (positionals + flags), `gsd-execute` (shell, if, string-op), `gsd-paste`. Full attribute types, nesting rules, and documentation annotations.
+- `src/wxp/executor.ts` - `executeBlock()` runs `<gsd-execute>` children (shell → `executeShell`, if → `evaluateCondition` + recurse, string-op → `executeStringOp`, nested execute → recurse). `WxpExecutionError` wraps failures with variable snapshot.
+- `src/wxp/index.ts` - `processWxp()` main entry. Resolution loop (50-iteration cap): include → arguments → execute → paste → repeat. Security check first (WXP-10). Any failure throws `WxpProcessingError` with full variable namespace + pending/completed op state (WXP-09). Re-exports all error types.
+- `src/schemas/wxp.xsd` - XSD 1.1 canonical schema covering all WXP tags: `gsd-version`, `gsd-include` (with `IncludeArgumentsMappingType`), `gsd-arguments` (positionals + flags), `gsd-execute` (shell, if, string-op), `gsd-paste`. Full attribute types, nesting rules, and documentation annotations.
 
 ### Requirements Covered
 

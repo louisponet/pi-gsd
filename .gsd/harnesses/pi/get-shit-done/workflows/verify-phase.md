@@ -105,7 +105,7 @@ Then verify each level against the actual codebase.
 <step name="load_context" priority="first">
 Load phase operation context:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Extract from init JSON: `phase_dir`, `phase_number`, `phase_name`, `has_plans`, `plan_count`.
 

@@ -10,8 +10,8 @@ Completed Wave 2 of Phase 1: Parser + Shell.
 
 ### Delivered
 
-- `src/wxp/parser.ts` — `parseWxpDocument()` + `extractCodeFenceRegions()`. Code-fence skip implemented via dead-zone intervals. Parses `<gsd-execute>`, `<gsd-paste>`, `<gsd-arguments>`, `<gsd-include>` (self-closing and with-children), `<gsd-version>`. Validates AST via `WxpDocumentSchema.parse()`.
-- `src/wxp/shell.ts` — `executeShell()` with `execFileSync` (no bare `execSync`), 30s timeout, allowlist pre-check, `${varname}` arg interpolation. `WxpShellError` class for structured failures.
+- `src/wxp/parser.ts` - `parseWxpDocument()` + `extractCodeFenceRegions()`. Code-fence skip implemented via dead-zone intervals. Parses `<gsd-execute>`, `<gsd-paste>`, `<gsd-arguments>`, `<gsd-include>` (self-closing and with-children), `<gsd-version>`. Validates AST via `WxpDocumentSchema.parse()`.
+- `src/wxp/shell.ts` - `executeShell()` with `execFileSync` (no bare `execSync`), 30s timeout, allowlist pre-check, `${varname}` arg interpolation. `WxpShellError` class for structured failures.
 
 ### Requirements Covered
 

@@ -51,7 +51,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 <step name="initialize">
 Parse arguments and load project state:
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Parse from init JSON: `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `padded_phase`, `commit_docs`.
 

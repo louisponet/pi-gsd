@@ -121,7 +121,7 @@ Schema: <arg name="phase" type="number" />
         <arg name="gaps-only" type="flag" flag="--gaps-only" optional />
         <arg name="user-text" type="string" optional />
 
-Pass 1 — Flag extraction:
+Pass 1 - Flag extraction:
   Scan $ARGUMENTS for all declared flag patterns.
   For type="flag": extract --name, set variable to true. Remove from string.
   For type="flag" with value (future): extract --name <value>, set variable. Remove both.
@@ -132,7 +132,7 @@ Pass 1 — Flag extraction:
     gaps-only = true
     remaining = '16 fix the login bug'
 
-Pass 2 — Positional assignment (left-to-right):
+Pass 2 - Positional assignment (left-to-right):
   Split remaining string by delimiters (default: whitespace).
   For each non-flag arg in declaration order:
     - type="number": consume next token, parse as number. NaN → error.

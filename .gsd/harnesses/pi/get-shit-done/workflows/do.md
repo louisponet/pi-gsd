@@ -52,7 +52,7 @@ Wait for response before continuing.
 <step name="check_project">
 **Check if project exists.**
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Track whether `.planning/` exists - some routes require it, others don't.
 </step>

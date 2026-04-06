@@ -11,7 +11,7 @@
 
 **Warning sign:** Tests pass on clean input, fail when a workflow includes a ` ```xml ` code block showing WXP syntax examples (like tutorials or this very PRD).
 
-**Mechanism:** The parser naively scans for `<gsd-execute>` and finds one inside a ` ``` ` block — executes it as live code.
+**Mechanism:** The parser naively scans for `<gsd-execute>` and finds one inside a ` ``` ` block - executes it as live code.
 
 **Prevention:** First-pass code-fence detection. Build a list of `[start, end]` byte ranges for all fenced blocks. Token extraction skips any match whose offset falls in a fenced range.
 
@@ -37,7 +37,7 @@
 
 **Mechanism:** Naive `[^>]*` attribute regex stops at the `>` inside the attribute value.
 
-**Prevention:** Attribute regex must handle quoted values: `(?:"[^"]*"|'[^']*'|[^"'>\s]+)`. No unquoted attribute values with `>` allowed — XSD should enforce this.
+**Prevention:** Attribute regex must handle quoted values: `(?:"[^"]*"|'[^']*'|[^"'>\s]+)`. No unquoted attribute values with `>` allowed - XSD should enforce this.
 
 **Phase:** Phase 1 (parser.ts). Document in XSD as a constraint.
 
@@ -57,7 +57,7 @@
 
 ### Pitfall: Done-marker leaking into final output
 
-**Warning sign:** LLM receives text with `<gsd-execute done>` tags — looks like documentation but confuses the model.
+**Warning sign:** LLM receives text with `<gsd-execute done>` tags - looks like documentation but confuses the model.
 
 **Mechanism:** The final strip regex misses a done-marker variant (e.g., `<gsd-execute done="true">` from an attribute change).
 
@@ -69,13 +69,13 @@
 
 ### Pitfall: Variable populated after paste tag reads it
 
-**Warning sign:** `<gsd-paste name="x" />` appears before the `<gsd-execute>` that sets `x` — WxpError "Undefined variable: x" even though x is defined later in the file.
+**Warning sign:** `<gsd-paste name="x" />` appears before the `<gsd-execute>` that sets `x` - WxpError "Undefined variable: x" even though x is defined later in the file.
 
 **Mechanism:** Paste happens in the same loop iteration as execute; ordering is not guaranteed.
 
-**Prevention:** Resolution loop step 4 (paste) runs AFTER step 3 (execute) — this is correct by design. Enforce: paste step only runs after all execute blocks in the current iteration are done. Document this ordering constraint clearly.
+**Prevention:** Resolution loop step 4 (paste) runs AFTER step 3 (execute) - this is correct by design. Enforce: paste step only runs after all execute blocks in the current iteration are done. Document this ordering constraint clearly.
 
-**Phase:** Phase 1 — design the loop correctly from the start. Not fixable retroactively without breaking workflows.
+**Phase:** Phase 1 - design the loop correctly from the start. Not fixable retroactively without breaking workflows.
 
 ---
 
@@ -83,9 +83,9 @@
 
 ### Pitfall: Help format change breaks workflow XML
 
-**Warning sign:** A `<shell command="pi-gsd-tools">` with `<arg string="--help" />` in a workflow returns different text after migration — causes condition checks to fail.
+**Warning sign:** A `<shell command="pi-gsd-tools">` with `<arg string="--help" />` in a workflow returns different text after migration - causes condition checks to fail.
 
-**Prevention:** Audit all workflow XML files for `--help` usage before migration. (None expected — workflows call functional commands, not help.) Document the new help format.
+**Prevention:** Audit all workflow XML files for `--help` usage before migration. (None expected - workflows call functional commands, not help.) Document the new help format.
 
 **Phase:** Phase 2, pre-migration audit step.
 
@@ -95,7 +95,7 @@
 
 **Warning sign:** A `<shell>` with `<suppress-errors />` was relying on commander.js exiting with code 1 for missing args; oclif exits with code 2. Condition checks on `$?` (if any) break.
 
-**Prevention:** WXP shell runner checks for non-zero exit regardless of code value. Don't check specific exit codes in WXP XML — only presence/absence of `<suppress-errors />` matters.
+**Prevention:** WXP shell runner checks for non-zero exit regardless of code value. Don't check specific exit codes in WXP XML - only presence/absence of `<suppress-errors />` matters.
 
 **Phase:** Phase 2. Verify WXP shell.ts uses `exitCode !== 0` not `exitCode === 1`.
 
@@ -115,11 +115,11 @@
 
 ### Pitfall: Argument injection via variable content
 
-**Warning sign:** A variable set by `<shell>` stdout contains a space or shell metacharacter, and is then used as `<arg name="varname" />` in another shell call — the content becomes multiple arguments.
+**Warning sign:** A variable set by `<shell>` stdout contains a space or shell metacharacter, and is then used as `<arg name="varname" />` in another shell call - the content becomes multiple arguments.
 
-**Mechanism:** Even with `execFileSync` (not `execSync`), arguments are passed as an array. A variable value of `"foo bar"` passed as one array element is safe — it's one argument. But if the workflow author uses `wrap='"'` and the value contains `"`, the wrapped string could break.
+**Mechanism:** Even with `execFileSync` (not `execSync`), arguments are passed as an array. A variable value of `"foo bar"` passed as one array element is safe - it's one argument. But if the workflow author uses `wrap='"'` and the value contains `"`, the wrapped string could break.
 
-**Prevention:** The `wrap` attribute must only wrap the entire value in quotes for contexts where the CLI expects a quoted string (like `pi-gsd-tools init execute-phase "16"`). Document: `wrap` does NOT shell-escape the value. For values from shell output, use without `wrap` — `execFileSync` handles array args safely.
+**Prevention:** The `wrap` attribute must only wrap the entire value in quotes for contexts where the CLI expects a quoted string (like `pi-gsd-tools init execute-phase "16"`). Document: `wrap` does NOT shell-escape the value. For values from shell output, use without `wrap` - `execFileSync` handles array args safely.
 
 **Phase:** Phase 1 (shell.ts) + documentation in XSD.
 
@@ -156,9 +156,9 @@ Then fix callers one-by-one. Use `unknown` + type guards at JSON.parse boundarie
 
 ### Pitfall: `output.ts` AnyValue = any
 
-**Warning sign:** `type AnyValue = any` in output.ts is used in the JSONPath formatting path — making it `unknown` forces type guards at every consumer.
+**Warning sign:** `type AnyValue = any` in output.ts is used in the JSONPath formatting path - making it `unknown` forces type guards at every consumer.
 
-**Prevention:** Use `unknown` with runtime narrowing, or use the specific Zod-inferred types for toon output. Don't make it `AnyValue = unknown` blindly — that just shifts the errors downstream.
+**Prevention:** Use `unknown` with runtime narrowing, or use the specific Zod-inferred types for toon output. Don't make it `AnyValue = unknown` blindly - that just shifts the errors downstream.
 
 **Phase:** Phase 4.
 

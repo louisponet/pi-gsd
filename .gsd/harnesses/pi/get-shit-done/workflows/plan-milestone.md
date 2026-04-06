@@ -44,14 +44,14 @@ Plan all unplanned phases in the current milestone in a single orchestrated sess
 
 ---
 
-## Mode Selection (step 0 — always first)
+## Mode Selection (step 0 - always first)
 
 Ask the user ONE binary question:
 
 > **"Should I ask you questions during planning, or plan everything silently and flag doubts at the end?"**
 >
-> - **Interactive** — I'll ask targeted questions per phase when I hit real ambiguity
-> - **Silent** — Plan autonomously; collect flags for review at the end
+> - **Interactive** - I'll ask targeted questions per phase when I hit real ambiguity
+> - **Silent** - Plan autonomously; collect flags for review at the end
 
 Store the answer as `MODE` (interactive | silent). Do not ask again.
 
@@ -80,10 +80,10 @@ Read `.planning/REQUIREMENTS.md` and the phase entry from ROADMAP.md (goal + suc
 Ask internally: *"Does executing this phase risk implementing anything not covered by active requirements, or conflict with what previous phases were meant to deliver?"*
 
 Classify risk:
-- **low** — continue silently
-- **medium** — log in scope-notes, continue
-- **high + interactive** — surface to user before proceeding, ask whether to adjust or continue
-- **high + silent** — log prominently, continue, surface in final summary
+- **low** - continue silently
+- **medium** - log in scope-notes, continue
+- **high + interactive** - surface to user before proceeding, ask whether to adjust or continue
+- **high + silent** - log prominently, continue, surface in final summary
 
 ### 2. Plan the Phase
 
@@ -101,7 +101,7 @@ After each phase plan is committed:
 pi-gsd-tools state update current_phase ${N}
 ```
 
-Announce: `✓ Phase ${N} planned — ${plan_count} plan(s) created`
+Announce: `✓ Phase ${N} planned - ${plan_count} plan(s) created`
 
 Check context remaining. If < 25%: stop immediately, emit summary of planned vs remaining phases, suggest `/gsd-plan-milestone --from ${next_unplanned}` to continue.
 

@@ -28,7 +28,7 @@
       <out type="string" name="state" />
     </outs>
   </shell>
-  <!-- CLEAR _auto_chain_active — chain ends here -->
+  <!-- CLEAR _auto_chain_active - chain ends here -->
   <shell command="pi-gsd-tools">
     <args>
       <arg string="config-set" />
@@ -55,7 +55,7 @@
 
 **Use `roadmap analyze` for comprehensive readiness check:**
 
-<!-- Context pre-injected above via WXP — variables available via <gsd-paste name="..."> -->
+<!-- Context pre-injected above via WXP - variables available via <gsd-paste name="..."> -->
 
 Extract `branching_strategy`, `phase_branch_template`, `milestone_branch_template`, and `commit_docs` from init JSON.
 

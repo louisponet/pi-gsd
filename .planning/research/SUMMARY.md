@@ -7,13 +7,13 @@
 
 ## Stack Additions
 
-| Addition | Version | Why |
-|---|---|---|
-| `@oclif/core` | ^4.22 | Typed CLI commands, class-based, replaces commander.js |
-| `vitest` | ^2.x (4.1.2) | TypeScript-native tests, no config, tsup-compatible |
-| Custom XML lexer | N/A (in-tree) | Markdown-mixed XML; full XML parsers can't handle it |
-| XSD 1.1 schema | N/A (authored) | IDE auto-complete; no runtime dep |
-| Zod (expand) | ^3.x (existing) | All WXP types via `z.infer<>` — zero hand-written interfaces |
+| Addition         | Version         | Why                                                          |
+| ---------------- | --------------- | ------------------------------------------------------------ |
+| `@oclif/core`    | ^4.22           | Typed CLI commands, class-based, replaces commander.js       |
+| `vitest`         | ^2.x (4.1.2)    | TypeScript-native tests, no config, tsup-compatible          |
+| Custom XML lexer | N/A (in-tree)   | Markdown-mixed XML; full XML parsers can't handle it         |
+| XSD 1.1 schema   | N/A (authored)  | IDE auto-complete; no runtime dep                            |
+| Zod (expand)     | ^3.x (existing) | All WXP types via `z.infer<>` - zero hand-written interfaces |
 
 **Remove:** `commander` npm package after oclif migration completes.
 
@@ -47,17 +47,17 @@
 
 **Critical path risks:**
 
-1. **Code-fence skipping** — must be the first thing built in the parser; every other parser feature depends on it being correct. Test with a document that has WXP tags inside ` ```xml ` blocks.
+1. **Code-fence skipping** - must be the first thing built in the parser; every other parser feature depends on it being correct. Test with a document that has WXP tags inside ` ```xml ` blocks.
 
-2. **Resolution loop ordering** — paste runs after execute in the same loop iteration by design. Getting this wrong causes "undefined variable" errors for correctly-written workflows. Build and test the loop before any individual operator.
+2. **Resolution loop ordering** - paste runs after execute in the same loop iteration by design. Getting this wrong causes "undefined variable" errors for correctly-written workflows. Build and test the loop before any individual operator.
 
-3. **Circular include detection** — without it, a malformed workflow hangs the context event forever. Add the stack-based detector on day one of Phase 1.
+3. **Circular include detection** - without it, a malformed workflow hangs the context event forever. Add the stack-based detector on day one of Phase 1.
 
-4. **Symlink migration in Phase 5** — existing v1.12.x installations have symlinks. The copy-on-first-run check must detect and replace them, not skip them. Test on a project that was installed with v1.12.x before v2.0.
+4. **Symlink migration in Phase 5** - existing v1.12.x installations have symlinks. The copy-on-first-run check must detect and replace them, not skip them. Test on a project that was installed with v1.12.x before v2.0.
 
-5. **oclif exit code changes** — WXP shell.ts must check `exitCode !== 0`, not `exitCode === 1`. Verify before Phase 2 ships.
+5. **oclif exit code changes** - WXP shell.ts must check `exitCode !== 0`, not `exitCode === 1`. Verify before Phase 2 ships.
 
-6. **FrontmatterObject ripple** — changing from `any` to `YamlValue` touches 40+ call sites. Do Phase 4 as a focused burst, not mixed into other phases.
+6. **FrontmatterObject ripple** - changing from `any` to `YamlValue` touches 40+ call sites. Do Phase 4 as a focused burst, not mixed into other phases.
 
 ---
 
@@ -100,8 +100,8 @@ Phase 5: Harness Distribution (independent, can run after Phase 1)
 
 ## Key Unknowns / Questions for User
 
-1. **Phase ordering** — Phases 2 and 4 are independent of Phase 1 (after it starts). Should they be sequenced or truly parallel in execution? (Config setting: parallelization = true suggests parallel.)
+1. **Phase ordering** - Phases 2 and 4 are independent of Phase 1 (after it starts). Should they be sequenced or truly parallel in execution? (Config setting: parallelization = true suggests parallel.)
 
-2. **Workflow backup strategy** — The PRD says `cp <name>.md <name>.md.bak`. Should backups be committed to git or `.gitignore`d? Committed backups add noise; gitignored backups lose the rollback trail.
+2. **Workflow backup strategy** - The PRD says `cp <name>.md <name>.md.bak`. Should backups be committed to git or `.gitignore`d? Committed backups add noise; gitignored backups lose the rollback trail.
 
-3. **`pi-gsd-settings.json` scope** — Is this a project-level file or a global user file (`~/.gsd/pi-gsd-settings.json`)? The PRD implies project-level (`<project>/.pi/gsd/pi-gsd-settings.json`) for security config.
+3. **`pi-gsd-settings.json` scope** - Is this a project-level file or a global user file (`~/.gsd/pi-gsd-settings.json`)? The PRD implies project-level (`<project>/.pi/gsd/pi-gsd-settings.json`) for security config.

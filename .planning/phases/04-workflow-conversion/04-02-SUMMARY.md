@@ -11,10 +11,10 @@ Converted 4 high-traffic workflows to WXP.
 ### Delivered
 
 Backed up (committed as .bak) + WXP-converted:
-- `plan-phase.md` — PHASE positional + auto/skip-research flags + init/state/roadmap shells + 3 paste tags
-- `discuss-phase.md` — PHASE positional + auto flag + init/state shells + 2 paste tags
-- `new-project.md` — auto/skip-research flags + state/config shells + 2 paste tags
-- `new-milestone.md` — auto/skip-research flags + state/roadmap shells + 2 paste tags
+- `plan-phase.md` - PHASE positional + auto/skip-research flags + init/state/roadmap shells + 3 paste tags
+- `discuss-phase.md` - PHASE positional + auto flag + init/state shells + 2 paste tags
+- `new-project.md` - auto/skip-research flags + state/config shells + 2 paste tags
+- `new-milestone.md` - auto/skip-research flags + state/roadmap shells + 2 paste tags
 
 ### Requirements Covered
 

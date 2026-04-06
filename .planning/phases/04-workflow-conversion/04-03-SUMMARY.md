@@ -10,8 +10,8 @@ Converted all remaining 53 workflows + added do-not-update infrastructure.
 
 ### Delivered
 
-- All 53 remaining workflow .md files in `.gsd/harnesses/pi/get-shit-done/workflows/` now have `<gsd-version v="1.12.4" />` as first line (Category A conversion — pure instruction files, no bash init)
-- `src/wxp/index.ts`: `readWorkflowVersionTag(content)` exported — reads version + `doNotUpdate` flag from workflow content. Used by Phase 5 harness copy-on-first-run.
+- All 53 remaining workflow .md files in `.gsd/harnesses/pi/get-shit-done/workflows/` now have `<gsd-version v="1.12.4" />` as first line (Category A conversion - pure instruction files, no bash init)
+- `src/wxp/index.ts`: `readWorkflowVersionTag(content)` exported - reads version + `doNotUpdate` flag from workflow content. Used by Phase 5 harness copy-on-first-run.
 
 ### Requirements Covered
 

@@ -1,7 +1,7 @@
 # Requirements: pi-gsd
 
 **Defined:** 2026-04-06
-**Core Value:** Workflow files execute programmatically before the LLM ever sees them — zero shell round-trips, zero arbitrary command execution, fully typed from end to end.
+**Core Value:** Workflow files execute programmatically before the LLM ever sees them - zero shell round-trips, zero arbitrary command execution, fully typed from end to end.
 
 ---
 
@@ -15,22 +15,22 @@
 - [ ] **WXP-04**: `<if>/<equals>/<starts-with>` conditional blocks control execution of nested operation blocks
 - [ ] **WXP-05**: `<string-op op="split">` splits a variable value by a delimiter and stores the result
 - [ ] **WXP-06**: `<gsd-paste>` tag is replaced with the named variable's value; undefined variable reference aborts processing
-- [ ] **WXP-07**: Variable store maintains a typed namespace with collision detection — same-named variables from different included files are prefixed with their file's stem (e.g., `execute-phase:init`)
+- [ ] **WXP-07**: Variable store maintains a typed namespace with collision detection - same-named variables from different included files are prefixed with their file's stem (e.g., `execute-phase:init`)
 - [ ] **WXP-08**: Resolution loop processes tags iteratively (include → arguments → execute → paste → repeat) until no unprocessed tags remain, with a 50-iteration safety limit
-- [ ] **WXP-09**: Any WXP processing failure produces a total crash — no partial injection, no LLM fallback — with a full error notification containing the variable namespace and pending/completed block states
+- [ ] **WXP-09**: Any WXP processing failure produces a total crash - no partial injection, no LLM fallback - with a full error notification containing the variable namespace and pending/completed block states
 - [ ] **WXP-10**: Security module enforces that WXP tags are only processed in files from trusted paths (package harness + project harness); `.planning/` files are never processed
 - [ ] **WXP-11**: Security module enforces a shell allowlist (default: `pi-gsd-tools`, `git`, `node`, `cat`, `ls`, `echo`, `find`); any non-allowlisted command aborts processing
 - [ ] **WXP-12**: XSD 1.1 canonical schema authored at `src/schemas/wxp.xsd` covering all tag names, nesting rules, attribute types, and content models
 - [ ] **WXP-13**: Zod runtime schemas at `src/wxp/schema.ts` validate the parsed XML AST before execution; all TypeScript types in the WXP engine are inferred from these schemas (zero `any`)
 - [ ] **WXP-14**: WXP preprocessing is integrated into the pi extension's `context` event, running after `<gsd-include>` resolution and before the LLM receives messages
 
-### WXP Engine — `<gsd-include>` Extensions
+### WXP Engine - `<gsd-include>` Extensions
 
-- [ ] **INC-01**: `<gsd-include>` supports `include-arguments` flag — appends `$ARGUMENTS` inline when the file is injected (`<gsd-include path="..." include-arguments />`)
-- [ ] **INC-02**: `<gsd-include>` supports children syntax for composable workflows — `<gsd-include path="..."><gsd-arguments><arg name="local-var" as="target-var" /></gsd-arguments></gsd-include>` maps caller variables into the included file's namespace
+- [ ] **INC-01**: `<gsd-include>` supports `include-arguments` flag - appends `$ARGUMENTS` inline when the file is injected (`<gsd-include path="..." include-arguments />`)
+- [ ] **INC-02**: `<gsd-include>` supports children syntax for composable workflows - `<gsd-include path="..."><gsd-arguments><arg name="local-var" as="target-var" /></gsd-arguments></gsd-include>` maps caller variables into the included file's namespace
 - [ ] **INC-03**: Variable collision between included files is automatically resolved with owner-prefix disambiguation; references in each file are updated to use the prefixed name
 
-### WXP Engine — Tests
+### WXP Engine - Tests
 
 - [ ] **TST-01**: vitest unit tests cover all WXP modules (parser, arguments, variables, conditions, string-ops, security, shell (mocked), paste)
 - [ ] **TST-02**: vitest integration tests cover the full `processWxp()` pipeline with fixture files including: basic shell output, conditional branches, nested includes, variable collisions, and each failure mode
@@ -39,7 +39,7 @@
 ### CLI Migration (oclif)
 
 - [ ] **CLI-01**: All existing `pi-gsd-tools` commands are migrated to typed oclif classes in `src/commands/`
-- [ ] **CLI-02**: All command flags and positional arguments are typed via oclif `Flags.*` and `Args.*` decorators — no manual `parseNamedArgs()` or `Record<string, any>` arg parsing
+- [ ] **CLI-02**: All command flags and positional arguments are typed via oclif `Flags.*` and `Args.*` decorators - no manual `parseNamedArgs()` or `Record<string, any>` arg parsing
 - [ ] **CLI-03**: `pi-gsd-tools --help` and per-command `--help` are auto-generated from oclif class metadata
 - [ ] **CLI-04**: `pi-gsd-tools wxp` subcommand group provides direct CLI access to WXP operations
 - [ ] **CLI-05**: `commander` npm package is removed as a dependency after all commands are migrated
@@ -64,9 +64,9 @@
 
 ### Harness Distribution
 
-- [ ] **HRN-01**: On `session_start`, the extension checks `<project>/.pi/gsd/` and copies any missing files from the package harness — existing files are never overwritten
+- [ ] **HRN-01**: On `session_start`, the extension checks `<project>/.pi/gsd/` and copies any missing files from the package harness - existing files are never overwritten
 - [ ] **HRN-02**: If a project harness file has a `<gsd-version>` tag older than the package version, the user is prompted with options: `y` (overwrite), `n` (skip), `pick` (select files), `diff` (create diff file)
-- [ ] **HRN-03**: The extension detects and migrates existing symlinks at `<project>/.pi/gsd/` — replaces each symlink with a real file copy and logs a one-time notification
+- [ ] **HRN-03**: The extension detects and migrates existing symlinks at `<project>/.pi/gsd/` - replaces each symlink with a real file copy and logs a one-time notification
 - [ ] **HRN-04**: `ensureHarnessSymlink()` and all symlink-related code are removed from the codebase
 - [ ] **HRN-05**: `pi-gsd-settings.json` schema is authored at `src/schemas/pi-gsd-settings.schema.json` covering `trustedPaths`, `untrustedPaths`, `shellAllowlist`, `shellBanlist`, and `shellTimeoutMs`
 - [ ] **HRN-06**: Global user settings are read from `~/.gsd/pi-gsd-settings.json` (user-level security config and allowlist extensions)
@@ -96,13 +96,13 @@
 
 ## Out of Scope
 
-| Feature | Reason |
-|---|---|
-| Remote/URL file includes in `<gsd-include>` | Security surface; network dependency in a context event is unacceptable |
-| Plugin system for custom WXP tags | Premature; v1 tag set is sufficient |
-| WXP processing of `.planning/` files | Hard security invariant: LLM writes there; processing = arbitrary code execution via prompt injection |
-| Piped input to `<shell>` commands | Attack surface; `pi-gsd-tools` validates args directly |
-| Removing GSD v1.30.0 `.planning/` data compatibility | Hard constraint; format changes would break all existing GSD projects |
+| Feature                                              | Reason                                                                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Remote/URL file includes in `<gsd-include>`          | Security surface; network dependency in a context event is unacceptable                               |
+| Plugin system for custom WXP tags                    | Premature; v1 tag set is sufficient                                                                   |
+| WXP processing of `.planning/` files                 | Hard security invariant: LLM writes there; processing = arbitrary code execution via prompt injection |
+| Piped input to `<shell>` commands                    | Attack surface; `pi-gsd-tools` validates args directly                                                |
+| Removing GSD v1.30.0 `.planning/` data compatibility | Hard constraint; format changes would break all existing GSD projects                                 |
 
 ---
 
@@ -110,52 +110,52 @@
 
 *Populated during roadmap creation.*
 
-| Requirement | Phase | Status |
-|---|---|---|
-| WXP-01 | Phase 1 | Pending |
-| WXP-02 | Phase 1 | Pending |
-| WXP-03 | Phase 1 | Pending |
-| WXP-04 | Phase 1 | Pending |
-| WXP-05 | Phase 1 | Pending |
-| WXP-06 | Phase 1 | Pending |
-| WXP-07 | Phase 1 | Pending |
-| WXP-08 | Phase 1 | Pending |
-| WXP-09 | Phase 1 | Pending |
-| WXP-10 | Phase 1 | Pending |
-| WXP-11 | Phase 1 | Pending |
-| WXP-12 | Phase 1 | Pending |
-| WXP-13 | Phase 1 | Pending |
-| WXP-14 | Phase 1 | Pending |
-| INC-01 | Phase 1 | Pending |
-| INC-02 | Phase 1 | Pending |
-| INC-03 | Phase 1 | Pending |
-| TST-01 | Phase 1 | Pending |
-| TST-02 | Phase 1 | Pending |
-| TST-03 | Phase 1 | Pending |
-| CLI-01 | Phase 2 | Pending |
-| CLI-02 | Phase 2 | Pending |
-| CLI-03 | Phase 2 | Pending |
-| CLI-04 | Phase 2 | Pending |
-| CLI-05 | Phase 2 | Pending |
-| CLI-06 | Phase 2 | Pending |
-| TYP-01 | Phase 3 | Pending |
-| TYP-02 | Phase 3 | Pending |
-| TYP-03 | Phase 3 | Pending |
-| TYP-04 | Phase 3 | Pending |
-| TYP-05 | Phase 3 | Pending |
-| TYP-06 | Phase 3 | Pending |
-| WFL-01 | Phase 4 | Pending |
-| WFL-02 | Phase 4 | Pending |
-| WFL-03 | Phase 4 | Pending |
-| WFL-04 | Phase 4 | Pending |
-| WFL-05 | Phase 4 | Pending |
-| HRN-01 | Phase 5 | Pending |
-| HRN-02 | Phase 5 | Pending |
-| HRN-03 | Phase 5 | Pending |
-| HRN-04 | Phase 5 | Pending |
-| HRN-05 | Phase 5 | Pending |
-| HRN-06 | Phase 5 | Pending |
-| HRN-07 | Phase 5 | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| WXP-01      | Phase 1 | Pending |
+| WXP-02      | Phase 1 | Pending |
+| WXP-03      | Phase 1 | Pending |
+| WXP-04      | Phase 1 | Pending |
+| WXP-05      | Phase 1 | Pending |
+| WXP-06      | Phase 1 | Pending |
+| WXP-07      | Phase 1 | Pending |
+| WXP-08      | Phase 1 | Pending |
+| WXP-09      | Phase 1 | Pending |
+| WXP-10      | Phase 1 | Pending |
+| WXP-11      | Phase 1 | Pending |
+| WXP-12      | Phase 1 | Pending |
+| WXP-13      | Phase 1 | Pending |
+| WXP-14      | Phase 1 | Pending |
+| INC-01      | Phase 1 | Pending |
+| INC-02      | Phase 1 | Pending |
+| INC-03      | Phase 1 | Pending |
+| TST-01      | Phase 1 | Pending |
+| TST-02      | Phase 1 | Pending |
+| TST-03      | Phase 1 | Pending |
+| CLI-01      | Phase 2 | Pending |
+| CLI-02      | Phase 2 | Pending |
+| CLI-03      | Phase 2 | Pending |
+| CLI-04      | Phase 2 | Pending |
+| CLI-05      | Phase 2 | Pending |
+| CLI-06      | Phase 2 | Pending |
+| TYP-01      | Phase 3 | Pending |
+| TYP-02      | Phase 3 | Pending |
+| TYP-03      | Phase 3 | Pending |
+| TYP-04      | Phase 3 | Pending |
+| TYP-05      | Phase 3 | Pending |
+| TYP-06      | Phase 3 | Pending |
+| WFL-01      | Phase 4 | Pending |
+| WFL-02      | Phase 4 | Pending |
+| WFL-03      | Phase 4 | Pending |
+| WFL-04      | Phase 4 | Pending |
+| WFL-05      | Phase 4 | Pending |
+| HRN-01      | Phase 5 | Pending |
+| HRN-02      | Phase 5 | Pending |
+| HRN-03      | Phase 5 | Pending |
+| HRN-04      | Phase 5 | Pending |
+| HRN-05      | Phase 5 | Pending |
+| HRN-06      | Phase 5 | Pending |
+| HRN-07      | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total

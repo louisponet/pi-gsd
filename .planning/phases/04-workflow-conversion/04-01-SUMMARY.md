@@ -10,8 +10,8 @@ Completed Wave 1 of Phase 4: execute-phase.md pilot conversion.
 
 ### Delivered
 
-- `.gsd/harnesses/pi/get-shit-done/workflows/execute-phase.md.bak` — backup committed before conversion
-- `.gsd/harnesses/pi/get-shit-done/workflows/execute-phase.md` — WXP-converted:
+- `.gsd/harnesses/pi/get-shit-done/workflows/execute-phase.md.bak` - backup committed before conversion
+- `.gsd/harnesses/pi/get-shit-done/workflows/execute-phase.md` - WXP-converted:
   - `<gsd-version v="1.12.4" />` tag added at top
   - `<gsd-arguments>` block: PHASE positional + --auto/--no-transition/--ws flags
   - `<gsd-execute>` block: 3 shell commands (init execute-phase, state json, roadmap get-phase)

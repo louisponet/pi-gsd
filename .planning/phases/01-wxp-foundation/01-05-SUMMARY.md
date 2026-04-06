@@ -10,8 +10,8 @@ Completed Wave 5 of Phase 1: Pi Extension Integration.
 
 ### Delivered
 
-- `.gsd/extensions/pi-gsd-hooks.ts` — WXP post-processing wired into the existing `context` event handler. Runs after `<gsd-include>` resolution. Scans transformed messages for `<gsd-` tags; if found, calls `processWxpTrustedContent()` with a virtual trusted path inside `.pi/gsd/workflows/`. On `WxpProcessingError`: emits `ctx.ui.notify(..., "error")` and returns `{ messages: [] }` (blocks LLM). Non-WXP errors logged at info level without blocking.
-- `.pi/extensions/gsd-hooks.ts` — Deprecated; not updated.
+- `.gsd/extensions/pi-gsd-hooks.ts` - WXP post-processing wired into the existing `context` event handler. Runs after `<gsd-include>` resolution. Scans transformed messages for `<gsd-` tags; if found, calls `processWxpTrustedContent()` with a virtual trusted path inside `.pi/gsd/workflows/`. On `WxpProcessingError`: emits `ctx.ui.notify(..., "error")` and returns `{ messages: [] }` (blocks LLM). Non-WXP errors logged at info level without blocking.
+- `.pi/extensions/gsd-hooks.ts` - Deprecated; not updated.
 
 ### Key architectural decision
 

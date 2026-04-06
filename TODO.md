@@ -13,49 +13,49 @@ Format compatibility with original GSD v1.30.0 `.planning/` data is a hard const
 
 ---
 
-## [x] #1 — Fix skill execution_context paths
+## [x] #1 - Fix skill execution_context paths
 
 Skills were referencing `@.agent/get-shit-done/…`. Migrated to `@.pi/gsd/…` to match
 the `subdir: "gsd"` install target in postinstall. Confirmed 0 remaining `.agent/` refs.
 
 ---
 
-## [x] #2a — Hook registration for pi (postinstall)
+## [x] #2a - Hook registration for pi (postinstall)
 
 `postinstall.js` installs `.gsd/extensions/gsd-hooks.ts` into `.pi/extensions/` and
-updates `.pi/settings.json` `extensions` array. Auto-discovered by pi — no manual wiring.
+updates `.pi/settings.json` `extensions` array. Auto-discovered by pi - no manual wiring.
 Source: `.gsd/extensions/gsd-hooks.ts`
 
 ---
 
-## [x] #2b — `/gsd-setup-pi` skill
+## [x] #2b - `/gsd-setup-pi` skill
 
 `skills/gsd-setup-pi/SKILL.md` exists. Fallback for bun/manual installs that skip postinstall.
 
 ---
 
-## [x] #3 — Pi harness entry in HARNESS_CONFIG
+## [x] #3 - Pi harness entry in HARNESS_CONFIG
 
 `pi` key added to `HARNESS_CONFIG` in `src/lib/model-profiles.ts`.
 Uses `AGENTS.md` output (not `CLAUDE.md`), `/gsd-` cmdPrefix, pi branding.
 
 ---
 
-## [x] #4 — Toon output in skills (context optimization)
+## [x] #4 - Toon output in skills (context optimization)
 
 `/gsd-progress`, `/gsd-stats`, `/gsd-health` skills updated to use `--output toon`.
 Decision: comparable outputs, harness-neutral data, users can switch freely.
 
 ---
 
-## [x] #5 — Runtime validation with Zod
+## [x] #5 - Runtime validation with Zod
 
 `src/lib/schemas.ts` (286 lines) defines Zod schemas for all `.planning/` structures.
 
 Wired into:
-- `src/lib/config.ts` — `PlanningConfig` type
-- `src/lib/verify.ts` — `PlanningConfigSchema` in `validate health` (config.json)
-- `src/lib/verify.ts` — `StateFrontmatterSchema` in `validate health` → new W011 warning
+- `src/lib/config.ts` - `PlanningConfig` type
+- `src/lib/verify.ts` - `PlanningConfigSchema` in `validate health` (config.json)
+- `src/lib/verify.ts` - `StateFrontmatterSchema` in `validate health` → new W011 warning
 
 Smarter `--repair`:
 - `config.json` missing/invalid → schema defaults fill all fields at once ✅
@@ -63,7 +63,7 @@ Smarter `--repair`:
 
 ---
 
-## [x] #6 — TypeScript types for .planning/ structures
+## [x] #6 - TypeScript types for .planning/ structures
 
 Fixed 18 of 25 `any` casts. Remaining 3 need bigger refactors (tracked below):
 
@@ -81,13 +81,13 @@ Fixed 18 of 25 `any` casts. Remaining 3 need bigger refactors (tracked below):
 - `frontmatter.ts`: `stack`, `items`, `parsedValue`, `mergeData` tightened
 
 **Remaining (need dedicated PR):**
-- [ ] `core.ts` `loadConfig` `parsed` + `get()` — deep config object, 20+ typed call sites; needs `PlanningConfigSchema.parse()` refactor
-- [ ] `frontmatter.ts` `current` — YAML list parser; can be object OR scalar; needs recursive value type
-- [ ] `profile-output.ts` `loadAnalysis` body — JSON blob from disk with dynamic shape
+- [ ] `core.ts` `loadConfig` `parsed` + `get()` - deep config object, 20+ typed call sites; needs `PlanningConfigSchema.parse()` refactor
+- [ ] `frontmatter.ts` `current` - YAML list parser; can be object OR scalar; needs recursive value type
+- [ ] `profile-output.ts` `loadAnalysis` body - JSON blob from disk with dynamic shape
 
 ---
 
-## [x] #7 — Pi session history ingestion for `/gsd-profile-user`
+## [x] #7 - Pi session history ingestion for `/gsd-profile-user`
 
 `profile-pipeline.ts` detects `--harness pi`, reads `~/.pi/agent/sessions/`,
 lists pi sessions first as priority. Both harness types auto-detected.
@@ -96,11 +96,11 @@ lists pi sessions first as priority. Both harness types auto-detected.
 
 ## [x] Instant commands (gsd-hooks.ts)
 
-- [x] `/gsd-progress` — formatted output + `setEditorText()` pivot affordance
-- [x] `/gsd-stats` — formatted output + pivot
-- [x] `/gsd-health [--repair]` — formatted health output
-- [x] `/gsd-help` — instant command list
-- [x] `/gsd-next` — deterministic auto-advance, zero LLM, pre-fills editor
+- [x] `/gsd-progress` - formatted output + `setEditorText()` pivot affordance
+- [x] `/gsd-stats` - formatted output + pivot
+- [x] `/gsd-health [--repair]` - formatted health output
+- [x] `/gsd-help` - instant command list
+- [x] `/gsd-next` - deterministic auto-advance, zero LLM, pre-fills editor
 
 ---
 
