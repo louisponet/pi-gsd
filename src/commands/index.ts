@@ -7,6 +7,7 @@ export {
   StateAdvancePlanCommand,
   StateLoadCommand,
   StateUpdateProgressCommand,
+  StateReconcileCommand,
 } from "./state.js";
 
 export { InitCommand } from "./init.js";

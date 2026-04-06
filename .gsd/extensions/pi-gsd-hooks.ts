@@ -636,9 +636,14 @@ export default function (pi: ExtensionAPI) {
         return lines;
     };
 
-    const formatProgress = (
+    const reconcile = (cwd: string): void => {
+		try { runJson("state reconcile", cwd); } catch { /* silent */ }
+	};
+
+	const formatProgress = (
         cwd: string,
     ): { text: string; data: GsdProgress | null } => {
+		reconcile(cwd);
         const data = runJson<GsdProgress>("progress json", cwd);
         if (!data)
             return {
@@ -672,6 +677,7 @@ export default function (pi: ExtensionAPI) {
     const formatStats = (
         cwd: string,
     ): { text: string; data: GsdStats | null } => {
+		reconcile(cwd);
         const data = runJson<GsdStats>("stats json", cwd);
         if (!data)
             return {
@@ -797,6 +803,7 @@ export default function (pi: ExtensionAPI) {
     pi.registerCommand("gsd-next", {
         description: "Auto-advance to the next GSD action (instant, no LLM)",
         handler: async (_args, ctx) => {
+			reconcile(ctx.cwd);
             const data = runJson<GsdProgress>("progress json", ctx.cwd);
             if (!data) {
                 ctx.ui.notify(

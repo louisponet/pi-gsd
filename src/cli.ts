@@ -31,6 +31,7 @@ async function buildCommandMap(): Promise<Record<string, CommandConstructor>> {
     StateAdvancePlanCommand,
     StateLoadCommand,
     StateUpdateProgressCommand,
+    StateReconcileCommand,
     InitCommand,
     RoadmapAnalyzeCommand,
     RoadmapGetPhaseCommand,
@@ -84,6 +85,7 @@ async function buildCommandMap(): Promise<Record<string, CommandConstructor>> {
     "state advance-plan": StateAdvancePlanCommand as unknown as CommandConstructor,
     "state load": StateLoadCommand as unknown as CommandConstructor,
     "state update-progress": StateUpdateProgressCommand as unknown as CommandConstructor,
+    "state reconcile": StateReconcileCommand as unknown as CommandConstructor,
     // init
     "init": InitCommand as unknown as CommandConstructor,
     // roadmap

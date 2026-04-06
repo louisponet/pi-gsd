@@ -100,3 +100,15 @@ export class StateUpdateProgressCommand extends BaseCommand {
     state.cmdStateUpdateProgress(cwd, raw);
   }
 }
+
+export class StateReconcileCommand extends BaseCommand {
+  static override description = "Reconcile STATE.md with disk truth";
+  static override flags = { ...BaseCommand.baseFlags };
+
+  async run() {
+    const { flags } = await this.parse(StateReconcileCommand);
+    const { cwd, raw } = this.resolveContext(flags);
+    const state = await import("../lib/state.js");
+    state.cmdStateReconcile(cwd, raw);
+  }
+}

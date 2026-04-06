@@ -1173,3 +1173,130 @@ export function cmdSignalResume(cwd: string, raw: boolean): void {
 	}
 	output({ resumed: true, removed }, raw, removed ? "true" : "false");
 }
+
+// ─── State reconciliation ────────────────────────────────────────────────────
+
+/**
+ * Reconcile STATE.md with disk truth.
+ * Scans all phase directories, counts plans/summaries, marks phases complete
+ * when all plans have summaries. Updates progress counters in STATE.md.
+ *
+ * Called automatically before any state-dependent operation.
+ */
+export function cmdStateReconcile(cwd: string, raw: boolean): void {
+	const pp = planningPaths(cwd);
+	if (!fs.existsSync(pp.state)) {
+		output({ reconciled: false, reason: "no STATE.md" }, raw, "false");
+		return;
+	}
+	if (!fs.existsSync(pp.phases)) {
+		output({ reconciled: false, reason: "no phases dir" }, raw, "false");
+		return;
+	}
+
+	const isDirInMilestone = getMilestonePhaseFilter(cwd);
+	const phaseDirs = fs
+		.readdirSync(pp.phases, { withFileTypes: true })
+		.filter((e) => e.isDirectory())
+		.map((e) => e.name)
+		.filter(isDirInMilestone)
+		.sort();
+
+	let totalPlans = 0;
+	let totalSummaries = 0;
+	let phasesComplete = 0;
+	let phasesTotal = phaseDirs.length;
+	const reconciled: string[] = [];
+
+	const roadmapPath = pp.roadmap;
+	let roadmapContent = fs.existsSync(roadmapPath)
+		? fs.readFileSync(roadmapPath, "utf-8")
+		: "";
+
+	for (const dir of phaseDirs) {
+		const dirPath = path.join(pp.phases, dir);
+		const files = fs.readdirSync(dirPath);
+		const plans = files.filter((f) => f.match(/-PLAN\.md$/i));
+		const summaries = files.filter((f) => f.match(/-SUMMARY\.md$/i));
+		totalPlans += plans.length;
+		totalSummaries += summaries.length;
+
+		const allDone = plans.length > 0 && summaries.length >= plans.length;
+		const phaseNum = dir.match(/^(\d+(?:\.\d+)?)/)?.[1] ?? dir.split("-")[0];
+
+		// Check if already marked complete in ROADMAP.md
+		const isMarkedComplete =
+			roadmapContent.includes(`[x] Phase ${phaseNum}`) ||
+			roadmapContent.includes(`[x] **Phase ${phaseNum}`) ||
+			new RegExp(`\\|\\s*${phaseNum}\\.?\\s.*\\|.*Complete`, "i").test(roadmapContent);
+
+		if (allDone) {
+			phasesComplete++;
+			if (!isMarkedComplete && roadmapContent) {
+				// Mark it complete in roadmap
+				const today = new Date().toISOString().split("T")[0];
+				const checkboxPattern = new RegExp(
+					`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${phaseNum}[:\\s][^\\n]*)`,
+					"i",
+				);
+				const tablePattern = new RegExp(
+					`(\\|\\s*${phaseNum}\\.?\\s.*\\|[^|]*\\|[^|]*\\|[^|]*)\\b(?:Pending|In Progress|Planning|Executing|Verifying)\\b`,
+					"i",
+				);
+				if (checkboxPattern.test(roadmapContent)) {
+					roadmapContent = roadmapContent.replace(
+						checkboxPattern,
+						`$1x$2 (completed ${today})`,
+					);
+					reconciled.push(`Phase ${phaseNum}: marked complete (${summaries.length}/${plans.length} plans)`);
+				} else if (tablePattern.test(roadmapContent)) {
+					roadmapContent = roadmapContent.replace(
+						tablePattern,
+						`$1Complete`,
+					);
+					reconciled.push(`Phase ${phaseNum}: marked complete in table (${summaries.length}/${plans.length} plans)`);
+				}
+			}
+		}
+	}
+
+	// Write updated roadmap if changed
+	if (reconciled.length > 0 && roadmapContent) {
+		fs.writeFileSync(roadmapPath, roadmapContent, "utf-8");
+	}
+
+	// Update STATE.md progress
+	let stateContent = fs.readFileSync(pp.state, "utf-8");
+	const percent =
+		totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
+	const barWidth = 10;
+	const filled = Math.round((percent / 100) * barWidth);
+	const bar = "█".repeat(filled) + "░".repeat(barWidth - filled);
+	const progressStr = `[${bar}] ${percent}%`;
+	const boldPat = /(\*\*Progress:\*\*\s*).*/i;
+	const plainPat = /^(Progress:\s*).*/im;
+	if (boldPat.test(stateContent)) {
+		stateContent = stateContent.replace(boldPat, (_m, p) => `${p}${progressStr}`);
+	} else if (plainPat.test(stateContent)) {
+		stateContent = stateContent.replace(plainPat, (_m, p) => `${p}${progressStr}`);
+	}
+
+	// Update completed phases count in frontmatter
+	writeStateMd(pp.state, stateContent, cwd);
+
+	output(
+		{
+			reconciled: true,
+			changes: reconciled,
+			phases_complete: phasesComplete,
+			phases_total: phasesTotal,
+			plans_complete: totalSummaries,
+			plans_total: totalPlans,
+			percent,
+		},
+		raw,
+		reconciled.length > 0
+			? `Reconciled ${reconciled.length} phase(s): ${reconciled.join("; ")}`
+			: `State is consistent (${phasesComplete}/${phasesTotal} phases, ${totalSummaries}/${totalPlans} plans)`,
+	);
+}
