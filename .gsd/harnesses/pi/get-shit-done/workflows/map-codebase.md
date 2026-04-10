@@ -43,10 +43,9 @@ Each agent has fresh context, explores a specific focus area, and **writes docum
 Output: .planning/codebase/ folder with 7 structured documents about the codebase state.
 </purpose>
 
-<available_agent_types>
-Valid GSD subagent types (use exact names - do not fall back to 'general-purpose'):
-- gsd-codebase-mapper - Maps project structure and dependencies
-</available_agent_types>
+<available_agents>
+Use the `subagent` tool with `agent: "gsd-codebase-mapper"` for parallel codebase mapping.
+</available_agents>
 
 <philosophy>
 **Why dedicated mapper agents:**
@@ -121,170 +120,39 @@ mkdir -p .planning/codebase
 Continue to spawn_agents.
 </step>
 
-<step name="detect_runtime_capabilities">
-Before spawning agents, detect whether the current runtime supports the `Task` tool for subagent delegation.
+<step name="spawn_agents">
+Spawn 4 parallel gsd-codebase-mapper subagents using the `subagent` tool.
 
-**How to detect:** Check if you have access to a `Task` tool (may be capitalized as `Task` or lowercase as `task` depending on runtime). If you do NOT have a `Task`/`task` tool (or only have tools like `browser_subagent` which is for web browsing, NOT code analysis):
+All 4 agents run in parallel and write documents directly to `.planning/codebase/`.
 
-→ **Skip `spawn_agents` and `collect_confirmations`** - go directly to `sequential_mapping` instead.
-
-**CRITICAL:** Never use `browser_subagent` or `Explore` as a substitute for `Task`. The `browser_subagent` tool is exclusively for web page interaction and will fail for codebase analysis. If `Task` is unavailable, perform the mapping sequentially in-context.
-</step>
-
-<step name="spawn_agents" condition="Task tool is available">
-Spawn 4 parallel gsd-codebase-mapper agents.
-
-Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
-
-**CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore` or `browser_subagent`. The mapper agent writes documents directly.
-
-**Agent 1: Tech Focus**
+Call the subagent tool with parallel tasks:
 
 ```
-Task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase tech stack",
-  prompt="Focus: tech
-
-Analyze this codebase for technology stack and external integrations.
-
-Write these documents to .planning/codebase/:
-- STACK.md - Languages, runtime, frameworks, dependencies, configuration
-- INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
-
-Explore thoroughly. Write documents directly using templates. Return confirmation only.
-${AGENT_SKILLS_MAPPER}"
-)
+subagent({
+  tasks: [
+    {
+      agent: "gsd-codebase-mapper",
+      task: "Focus: tech\n\nAnalyze this codebase for technology stack and external integrations.\n\nWrite these documents to .planning/codebase/:\n- STACK.md - Languages, runtime, frameworks, dependencies, configuration\n- INTEGRATIONS.md - External APIs, databases, auth providers, webhooks\n\nExplore thoroughly. Write documents directly. Return confirmation only (document paths + line counts)."
+    },
+    {
+      agent: "gsd-codebase-mapper",
+      task: "Focus: arch\n\nAnalyze this codebase architecture and directory structure.\n\nWrite these documents to .planning/codebase/:\n- ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points\n- STRUCTURE.md - Directory layout, key locations, naming conventions\n\nExplore thoroughly. Write documents directly. Return confirmation only (document paths + line counts)."
+    },
+    {
+      agent: "gsd-codebase-mapper",
+      task: "Focus: quality\n\nAnalyze this codebase for coding conventions and testing patterns.\n\nWrite these documents to .planning/codebase/:\n- CONVENTIONS.md - Code style, naming, patterns, error handling\n- TESTING.md - Framework, structure, mocking, coverage\n\nExplore thoroughly. Write documents directly. Return confirmation only (document paths + line counts)."
+    },
+    {
+      agent: "gsd-codebase-mapper",
+      task: "Focus: concerns\n\nAnalyze this codebase for technical debt, known issues, and areas of concern.\n\nWrite this document to .planning/codebase/:\n- CONCERNS.md - Tech debt, bugs, security, performance, fragile areas\n\nExplore thoroughly. Write document directly. Return confirmation only (document paths + line counts)."
+    }
+  ]
+})
 ```
 
-**Agent 2: Architecture Focus**
-
-```
-Task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase architecture",
-  prompt="Focus: arch
-
-Analyze this codebase architecture and directory structure.
-
-Write these documents to .planning/codebase/:
-- ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
-- STRUCTURE.md - Directory layout, key locations, naming conventions
-
-Explore thoroughly. Write documents directly using templates. Return confirmation only.
-${AGENT_SKILLS_MAPPER}"
-)
-```
-
-**Agent 3: Quality Focus**
-
-```
-Task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase conventions",
-  prompt="Focus: quality
-
-Analyze this codebase for coding conventions and testing patterns.
-
-Write these documents to .planning/codebase/:
-- CONVENTIONS.md - Code style, naming, patterns, error handling
-- TESTING.md - Framework, structure, mocking, coverage
-
-Explore thoroughly. Write documents directly using templates. Return confirmation only.
-${AGENT_SKILLS_MAPPER}"
-)
-```
-
-**Agent 4: Concerns Focus**
-
-```
-Task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase concerns",
-  prompt="Focus: concerns
-
-Analyze this codebase for technical debt, known issues, and areas of concern.
-
-Write this document to .planning/codebase/:
-- CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
-
-Explore thoroughly. Write document directly using template. Return confirmation only.
-${AGENT_SKILLS_MAPPER}"
-)
-```
-
-Continue to collect_confirmations.
-</step>
-
-<step name="collect_confirmations">
-Wait for all 4 agents to complete using TaskOutput tool.
-
-**For each agent task_id returned by the Agent tool calls above:**
-```
-TaskOutput tool:
-  task_id: "{task_id from Agent result}"
-  block: true
-  timeout: 300000
-```
-
-Call TaskOutput for all 4 agents in parallel (single message with 4 TaskOutput calls).
-
-Once all TaskOutput calls return, read each agent's output file to collect confirmations.
-
-**Expected confirmation format from each agent:**
-```
-## Mapping Complete
-
-**Focus:** {focus}
-**Documents written:**
-- `.planning/codebase/{DOC1}.md` ({N} lines)
-- `.planning/codebase/{DOC2}.md` ({N} lines)
-
-Ready for orchestrator summary.
-```
-
-**What you receive:** Just file paths and line counts. NOT document contents.
+The subagent tool blocks until all 4 agents complete and returns their results.
 
 If any agent failed, note the failure and continue with successful documents.
-
-Continue to verify_output.
-</step>
-
-<step name="sequential_mapping" condition="Task tool is NOT available (e.g. Antigravity, Gemini CLI, Codex)">
-When the `Task` tool is unavailable, perform codebase mapping sequentially in the current context. This replaces `spawn_agents` and `collect_confirmations`.
-
-**IMPORTANT:** Do NOT use `browser_subagent`, `Explore`, or any browser-based tool. Use only file system tools (Read, Bash, Write, Grep, Glob, list_dir, view_file, grep_search, or equivalent tools available in your runtime).
-
-Perform all 4 mapping passes sequentially:
-
-**Pass 1: Tech Focus**
-- Explore package.json/Cargo.toml/go.mod/requirements.txt, config files, dependency trees
-- Write `.planning/codebase/STACK.md` - Languages, runtime, frameworks, dependencies, configuration
-- Write `.planning/codebase/INTEGRATIONS.md` - External APIs, databases, auth providers, webhooks
-
-**Pass 2: Architecture Focus**
-- Explore directory structure, entry points, module boundaries, data flow
-- Write `.planning/codebase/ARCHITECTURE.md` - Pattern, layers, data flow, abstractions, entry points
-- Write `.planning/codebase/STRUCTURE.md` - Directory layout, key locations, naming conventions
-
-**Pass 3: Quality Focus**
-- Explore code style, error handling patterns, test files, CI config
-- Write `.planning/codebase/CONVENTIONS.md` - Code style, naming, patterns, error handling
-- Write `.planning/codebase/TESTING.md` - Framework, structure, mocking, coverage
-
-**Pass 4: Concerns Focus**
-- Explore TODOs, known issues, fragile areas, security patterns
-- Write `.planning/codebase/CONCERNS.md` - Tech debt, bugs, security, performance, fragile areas
-
-Use the same document templates as the `gsd-codebase-mapper` agent. Include actual file paths formatted with backticks.
 
 Continue to verify_output.
 </step>
@@ -401,8 +269,7 @@ End workflow.
 
 <success_criteria>
 - .planning/codebase/ directory created
-- If Task tool available: 4 parallel gsd-codebase-mapper agents spawned with run_in_background=true
-- If Task tool NOT available: 4 sequential mapping passes performed inline (never using browser_subagent)
+- 4 parallel gsd-codebase-mapper subagents spawned via subagent tool
 - All 7 codebase documents exist
 - No empty documents (each should have >20 lines)
 - Clear completion summary with line counts
