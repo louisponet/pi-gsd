@@ -32,7 +32,7 @@ Before researching, discover project context:
 
 **Project instructions:** Read `./CLAUDE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
+**Project skills:** Check `.pi/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during research
@@ -203,7 +203,7 @@ Scan the output for suspicious patterns:
 
 ## Output: UI-SPEC.md
 
-Use template from `~/.claude/get-shit-done/templates/UI-SPEC.md`.
+Use template from `.pi/gsd/templates/UI-SPEC.md`.
 
 Write to: `$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md`
 
@@ -262,14 +262,14 @@ Batch questions into a single interaction where possible.
 
 ## Step 5: Compile UI-SPEC.md
 
-Read template: `~/.claude/get-shit-done/templates/UI-SPEC.md`
+Read template: `.pi/gsd/templates/UI-SPEC.md`
 
 Fill all sections. Write to `$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md`.
 
 ## Step 6: Commit (optional)
 
 ```bash
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" commit "docs($PHASE): UI design contract" --files "$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md"
+pi-gsd-tools commit "docs($PHASE): UI design contract" --files "$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md"
 ```
 
 ## Step 7: Return Structured Result

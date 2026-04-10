@@ -3,5 +3,6 @@ description: "Plan a phase with research→plan→verify loop. Args: phase (numb
 ---
 <gsd-include path=".pi/gsd/workflows/plan-phase.md" include-arguments />
 <gsd-include path=".pi/gsd/references/ui-brand.md" select="tag:core" />
+<gsd-include path=".pi/gsd/references/muninndb.md" />
 
 $ARGUMENTS

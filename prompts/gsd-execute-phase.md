@@ -3,5 +3,6 @@ description: "Execute all plans in a phase. Args: phase (number) - Flags: --auto
 ---
 <gsd-include path=".pi/gsd/workflows/execute-phase.md" include-arguments />
 <gsd-include path=".pi/gsd/references/ui-brand.md" />
+<gsd-include path=".pi/gsd/references/muninndb.md" />
 
 $ARGUMENTS

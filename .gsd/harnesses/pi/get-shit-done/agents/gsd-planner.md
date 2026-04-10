@@ -1,7 +1,7 @@
 ---
 name: gsd-planner
 description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd:plan-phase orchestrator.
-tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
+tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*, mcp__muninn__*
 color: green
 # hooks:
 #   PostToolUse:
@@ -35,12 +35,27 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 - Return structured results to orchestrator
 </role>
 
+<muninndb_memory>
+**MuninnDB** is the user's persistent memory system (MCP: `mcp__muninn__*`).
+
+**Before planning:** Recall past decisions and lessons for this project:
+```
+mcp__muninn__muninn_recall(context="<project> <phase scope>", vault="default")
+```
+This surfaces past architectural decisions, gotchas, and preferences that should inform the plan.
+
+**After planning:** If you made significant design decisions or identified constraints, store them:
+```
+mcp__muninn__muninn_decide(decision="...", rationale="...", vault="default")
+```
+</muninndb_memory>
+
 <project_context>
 Before planning, discover project context:
 
 **Project instructions:** Read `./CLAUDE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
+**Project skills:** Check `.pi/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during planning
@@ -429,8 +444,8 @@ Output: [Artifacts created]
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
+@.pi/gsd/workflows/execute-plan.md
+@.pi/gsd/templates/summary.md
 </execution_context>
 
 <context>
@@ -934,7 +949,7 @@ Group by plan, dimension, severity.
 ### Step 6: Commit
 
 ```bash
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE): revise plans based on checker feedback" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
+pi-gsd-tools commit "fix($PHASE): revise plans based on checker feedback" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
 ```
 
 ### Step 7: Return Revision Summary
@@ -1017,7 +1032,7 @@ Use standard PLANNING COMPLETE return format, adding a reviews section:
 Load planning context:
 
 ```bash
-INIT=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" init plan-phase "${PHASE}")
+INIT=$(pi-gsd-tools init plan-phase "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -1074,7 +1089,7 @@ Apply discovery level protocol (see discovery_levels section).
 
 **Step 1 — Generate digest index:**
 ```bash
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" history-digest
+pi-gsd-tools history-digest
 ```
 
 **Step 2 — Select relevant phases (typically 2-4):**
@@ -1202,7 +1217,7 @@ Include all frontmatter fields.
 Validate each created PLAN.md using gsd-tools:
 
 ```bash
-VALID=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" frontmatter validate "$PLAN_PATH" --schema plan)
+VALID=$(pi-gsd-tools frontmatter validate "$PLAN_PATH" --schema plan)
 ```
 
 Returns JSON: `{ valid, missing, present, schema }`
@@ -1215,7 +1230,7 @@ Required plan frontmatter fields:
 Also validate plan structure:
 
 ```bash
-STRUCTURE=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$PLAN_PATH")
+STRUCTURE=$(pi-gsd-tools verify plan-structure "$PLAN_PATH")
 ```
 
 Returns JSON: `{ valid, errors, warnings, task_count, tasks }`
@@ -1252,7 +1267,7 @@ Plans:
 
 <step name="git_commit">
 ```bash
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" commit "docs($PHASE): create phase plan" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md .planning/ROADMAP.md
+pi-gsd-tools commit "docs($PHASE): create phase plan" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md .planning/ROADMAP.md
 ```
 </step>
 

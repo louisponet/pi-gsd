@@ -1,7 +1,7 @@
 ---
 name: gsd-project-researcher
 description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators.
-tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
+tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*, mcp__muninn__*
 color: cyan
 # hooks:
 #   PostToolUse:
@@ -105,7 +105,7 @@ Always include current year. Use multiple query variations. Mark WebSearch-only 
 Check `brave_search` from orchestrator context. If `true`, use Brave Search for higher quality results:
 
 ```bash
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" websearch "your query" --limit 10
+pi-gsd-tools websearch "your query" --limit 10
 ```
 
 **Options:**

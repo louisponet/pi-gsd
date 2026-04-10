@@ -6,5 +6,6 @@ description: "Initialize new project. Flags: --auto, --skip-research"
 <gsd-include path=".pi/gsd/references/ui-brand.md" select="tag:core" />
 <gsd-include path=".pi/gsd/templates/project.md" />
 <gsd-include path=".pi/gsd/templates/requirements.md" />
+<gsd-include path=".pi/gsd/references/muninndb.md" />
 
 $ARGUMENTS
