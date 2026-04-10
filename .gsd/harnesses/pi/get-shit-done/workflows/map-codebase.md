@@ -382,7 +382,7 @@ Created .planning/codebase/:
 
 `/gsd-new-project`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 

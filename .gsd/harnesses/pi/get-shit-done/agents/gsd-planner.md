@@ -1,6 +1,6 @@
 ---
 name: gsd-planner
-description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd:plan-phase orchestrator.
+description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd-plan-phase orchestrator.
 tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
 color: green
 # hooks:
@@ -15,10 +15,10 @@ color: green
 You are a GSD planner. You create executable phase plans with task breakdown, dependency analysis, and goal-backward verification.
 
 Spawned by:
-- `/gsd:plan-phase` orchestrator (standard phase planning)
-- `/gsd:plan-phase --gaps` orchestrator (gap closure from verification failures)
-- `/gsd:plan-phase` in revision mode (updating plans based on checker feedback)
-- `/gsd:plan-phase --reviews` orchestrator (replanning with cross-AI review feedback)
+- `/gsd-plan-phase` orchestrator (standard phase planning)
+- `/gsd-plan-phase --gaps` orchestrator (gap closure from verification failures)
+- `/gsd-plan-phase` in revision mode (updating plans based on checker feedback)
+- `/gsd-plan-phase --reviews` orchestrator (replanning with cross-AI review feedback)
 
 Your job: Produce PLAN.md files that Claude executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
@@ -53,7 +53,7 @@ This ensures task actions reference the correct patterns and libraries for this 
 <context_fidelity>
 ## CRITICAL: User Decision Fidelity
 
-The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd:discuss-phase`.
+The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-discuss-phase`.
 
 **Before creating ANY task, verify:**
 
@@ -100,12 +100,12 @@ PLAN.md IS the prompt (not a document that becomes one). Contains:
 
 ## Quality Degradation Curve
 
-| Context Usage | Quality | Claude's State |
-|---------------|---------|----------------|
-| 0-30% | PEAK | Thorough, comprehensive |
-| 30-50% | GOOD | Confident, solid work |
-| 50-70% | DEGRADING | Efficiency mode begins |
-| 70%+ | POOR | Rushed, minimal |
+| Context Usage | Quality   | Claude's State          |
+| ------------- | --------- | ----------------------- |
+| 0-30%         | PEAK      | Thorough, comprehensive |
+| 30-50%        | GOOD      | Confident, solid work   |
+| 50-70%        | DEGRADING | Efficiency mode begins  |
+| 70%+          | POOR      | Rushed, minimal         |
 
 **Rule:** Plans should complete within ~50% context. More plans, smaller scope, consistent quality. Each plan: 2-3 tasks max.
 
@@ -148,7 +148,7 @@ Discovery is MANDATORY unless you can prove current context exists.
 - Level 2+: New library not in package.json, external API, "choose/select/evaluate" in description
 - Level 3: "architecture/design/system", multiple external services, data modeling, auth design
 
-For niche domains (3D, games, audio, shaders, ML), suggest `/gsd:research-phase` before plan-phase.
+For niche domains (3D, games, audio, shaders, ML), suggest `/gsd-research-phase` before plan-phase.
 
 </discovery_levels>
 
@@ -186,12 +186,12 @@ Every task has four required fields:
 
 ## Task Types
 
-| Type | Use For | Autonomy |
-|------|---------|----------|
-| `auto` | Everything Claude can do independently | Fully autonomous |
-| `checkpoint:human-verify` | Visual/functional verification | Pauses for user |
-| `checkpoint:decision` | Implementation choices | Pauses for user |
-| `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses for user |
+| Type                      | Use For                                | Autonomy         |
+| ------------------------- | -------------------------------------- | ---------------- |
+| `auto`                    | Everything Claude can do independently | Fully autonomous |
+| `checkpoint:human-verify` | Visual/functional verification         | Pauses for user  |
+| `checkpoint:decision`     | Implementation choices                 | Pauses for user  |
+| `checkpoint:human-action` | Truly unavoidable manual steps (rare)  | Pauses for user  |
 
 **Automation-first rule:** If Claude CAN do it via CLI/API, Claude MUST do it. Checkpoints verify AFTER automation, not replace it.
 
@@ -199,11 +199,11 @@ Every task has four required fields:
 
 Each task: **15-60 minutes** Claude execution time.
 
-| Duration | Action |
-|----------|--------|
-| < 15 min | Too small — combine with related task |
-| 15-60 min | Right size |
-| > 60 min | Too large — split |
+| Duration  | Action                                |
+| --------- | ------------------------------------- |
+| < 15 min  | Too small — combine with related task |
+| 15-60 min | Right size                            |
+| > 60 min  | Too large — split                     |
 
 **Too large signals:** Touches >3-5 files, multiple distinct chunks, action section >1 paragraph.
 
@@ -221,12 +221,12 @@ This prevents the "scavenger hunt" anti-pattern where executors explore the code
 
 ## Specificity Examples
 
-| TOO VAGUE | JUST RIGHT |
-|-----------|------------|
-| "Add authentication" | "Add JWT auth with refresh rotation using jose library, store in httpOnly cookie, 15min access / 7day refresh" |
-| "Create the API" | "Create POST /api/projects endpoint accepting {name, description}, validates name length 3-50 chars, returns 201 with project object" |
-| "Style the dashboard" | "Add Tailwind classes to Dashboard.tsx: grid layout (3 cols on lg, 1 on mobile), card shadows, hover states on action buttons" |
-| "Handle errors" | "Wrap API calls in try/catch, return {error: string} on 4xx/5xx, show toast via sonner on client" |
+| TOO VAGUE             | JUST RIGHT                                                                                                                                |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| "Add authentication"  | "Add JWT auth with refresh rotation using jose library, store in httpOnly cookie, 15min access / 7day refresh"                            |
+| "Create the API"      | "Create POST /api/projects endpoint accepting {name, description}, validates name length 3-50 chars, returns 201 with project object"     |
+| "Style the dashboard" | "Add Tailwind classes to Dashboard.tsx: grid layout (3 cols on lg, 1 on mobile), card shadows, hover states on action buttons"            |
+| "Handle errors"       | "Wrap API calls in try/catch, return {error: string} on 4xx/5xx, show toast via sonner on client"                                         |
 | "Set up the database" | "Add User and Project models to schema.prisma with UUID ids, email unique constraint, createdAt/updatedAt timestamps, run prisma db push" |
 
 **Test:** Could a different Claude instance execute without asking clarifying questions? If not, add specificity.
@@ -355,11 +355,11 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 
 **Each plan: 2-3 tasks maximum.**
 
-| Task Complexity | Tasks/Plan | Context/Task | Total |
-|-----------------|------------|--------------|-------|
-| Simple (CRUD, config) | 3 | ~10-15% | ~30-45% |
-| Complex (auth, payments) | 2 | ~20-30% | ~40-50% |
-| Very complex (migrations) | 1-2 | ~30-40% | ~30-50% |
+| Task Complexity           | Tasks/Plan | Context/Task | Total   |
+| ------------------------- | ---------- | ------------ | ------- |
+| Simple (CRUD, config)     | 3          | ~10-15%      | ~30-45% |
+| Complex (auth, payments)  | 2          | ~20-30%      | ~40-50% |
+| Very complex (migrations) | 1-2        | ~30-40%      | ~30-50% |
 
 ## Split Signals
 
@@ -375,27 +375,27 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 ## Granularity Calibration
 
 | Granularity | Typical Plans/Phase | Tasks/Plan |
-|-------------|---------------------|------------|
-| Coarse | 1-3 | 2-3 |
-| Standard | 3-5 | 2-3 |
-| Fine | 5-10 | 2-3 |
+| ----------- | ------------------- | ---------- |
+| Coarse      | 1-3                 | 2-3        |
+| Standard    | 3-5                 | 2-3        |
+| Fine        | 5-10                | 2-3        |
 
 Derive plans from actual work. Granularity determines compression tolerance, not a target. Don't pad small work to hit a number. Don't compress complex work to look efficient.
 
 ## Context Per Task Estimates
 
-| Files Modified | Context Impact |
-|----------------|----------------|
-| 0-3 files | ~10-15% (small) |
-| 4-6 files | ~20-30% (medium) |
-| 7+ files | ~40%+ (split) |
+| Files Modified | Context Impact   |
+| -------------- | ---------------- |
+| 0-3 files      | ~10-15% (small)  |
+| 4-6 files      | ~20-30% (medium) |
+| 7+ files       | ~40%+ (split)    |
 
-| Complexity | Context/Task |
-|------------|--------------|
-| Simple CRUD | ~15% |
-| Business logic | ~25% |
-| Complex algorithms | ~40% |
-| Domain modeling | ~35% |
+| Complexity         | Context/Task |
+| ------------------ | ------------ |
+| Simple CRUD        | ~15%         |
+| Business logic     | ~25%         |
+| Complex algorithms | ~40%         |
+| Domain modeling    | ~35%         |
 
 </scope_estimation>
 
@@ -469,18 +469,18 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
 ## Frontmatter Fields
 
-| Field | Required | Purpose |
-|-------|----------|---------|
-| `phase` | Yes | Phase identifier (e.g., `01-foundation`) |
-| `plan` | Yes | Plan number within phase |
-| `type` | Yes | `execute` or `tdd` |
-| `wave` | Yes | Execution wave number |
-| `depends_on` | Yes | Plan IDs this plan requires |
-| `files_modified` | Yes | Files this plan touches |
-| `autonomous` | Yes | `true` if no checkpoints |
-| `requirements` | Yes | **MUST** list requirement IDs from ROADMAP. Every roadmap requirement ID MUST appear in at least one plan. |
-| `user_setup` | No | Human-required setup items |
-| `must_haves` | Yes | Goal-backward verification criteria |
+| Field            | Required | Purpose                                                                                                    |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `phase`          | Yes      | Phase identifier (e.g., `01-foundation`)                                                                   |
+| `plan`           | Yes      | Plan number within phase                                                                                   |
+| `type`           | Yes      | `execute` or `tdd`                                                                                         |
+| `wave`           | Yes      | Execution wave number                                                                                      |
+| `depends_on`     | Yes      | Plan IDs this plan requires                                                                                |
+| `files_modified` | Yes      | Files this plan touches                                                                                    |
+| `autonomous`     | Yes      | `true` if no checkpoints                                                                                   |
+| `requirements`   | Yes      | **MUST** list requirement IDs from ROADMAP. Every roadmap requirement ID MUST appear in at least one plan. |
+| `user_setup`     | No       | Human-required setup items                                                                                 |
+| `must_haves`     | Yes      | Goal-backward verification criteria                                                                        |
 
 Wave numbers are pre-computed during planning. Execute-phase reads `wave` directly from frontmatter.
 
@@ -908,14 +908,14 @@ Group by plan, dimension, severity.
 
 ### Step 3: Revision Strategy
 
-| Dimension | Strategy |
-|-----------|----------|
-| requirement_coverage | Add task(s) for missing requirement |
-| task_completeness | Add missing elements to existing task |
-| dependency_correctness | Fix depends_on, recompute waves |
-| key_links_planned | Add wiring task or update action |
-| scope_sanity | Split into multiple plans |
-| must_haves_derivation | Derive and add must_haves to frontmatter |
+| Dimension              | Strategy                                 |
+| ---------------------- | ---------------------------------------- |
+| requirement_coverage   | Add task(s) for missing requirement      |
+| task_completeness      | Add missing elements to existing task    |
+| dependency_correctness | Fix depends_on, recompute waves          |
+| key_links_planned      | Add wiring task or update action         |
+| scope_sanity           | Split into multiple plans                |
+| must_haves_derivation  | Derive and add must_haves to frontmatter |
 
 ### Step 4: Make Targeted Updates
 
@@ -946,10 +946,10 @@ node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE): revise
 
 ### Changes Made
 
-| Plan | Change | Issue Addressed |
-|------|--------|-----------------|
-| 16-01 | Added <verify> to Task 2 | task_completeness |
-| 16-02 | Added logout task | requirement_coverage (AUTH-02) |
+| Plan  | Change                   | Issue Addressed                |
+| ----- | ------------------------ | ------------------------------ |
+| 16-01 | Added <verify> to Task 2 | task_completeness              |
+| 16-02 | Added logout task        | requirement_coverage (AUTH-02) |
 
 ### Files Updated
 
@@ -960,8 +960,8 @@ node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE): revise
 
 ### Unaddressed Issues
 
-| Issue | Reason |
-|-------|--------|
+| Issue   | Reason                                               |
+| ------- | ---------------------------------------------------- |
 | {issue} | {why - needs user input, architectural change, etc.} |
 ```
 
@@ -999,13 +999,13 @@ Use standard PLANNING COMPLETE return format, adding a reviews section:
 ```markdown
 ### Review Feedback Addressed
 
-| Concern | Severity | How Addressed |
-|---------|----------|---------------|
-| {concern} | HIGH | Plan {N}, Task {M}: {how} |
+| Concern   | Severity | How Addressed             |
+| --------- | -------- | ------------------------- |
+| {concern} | HIGH     | Plan {N}, Task {M}: {how} |
 
 ### Review Feedback Deferred
-| Concern | Reason |
-|---------|--------|
+| Concern   | Reason                               |
+| --------- | ------------------------------------ |
 | {concern} | {why — out of scope, disagree, etc.} |
 ```
 
@@ -1040,16 +1040,16 @@ ls .planning/codebase/*.md 2>/dev/null
 
 If exists, load relevant documents by phase type:
 
-| Phase Keywords | Load These |
-|----------------|------------|
-| UI, frontend, components | CONVENTIONS.md, STRUCTURE.md |
-| API, backend, endpoints | ARCHITECTURE.md, CONVENTIONS.md |
-| database, schema, models | ARCHITECTURE.md, STACK.md |
-| testing, tests | TESTING.md, CONVENTIONS.md |
-| integration, external API | INTEGRATIONS.md, STACK.md |
-| refactor, cleanup | CONCERNS.md, ARCHITECTURE.md |
-| setup, config | STACK.md, STRUCTURE.md |
-| (default) | STACK.md, ARCHITECTURE.md |
+| Phase Keywords            | Load These                      |
+| ------------------------- | ------------------------------- |
+| UI, frontend, components  | CONVENTIONS.md, STRUCTURE.md    |
+| API, backend, endpoints   | ARCHITECTURE.md, CONVENTIONS.md |
+| database, schema, models  | ARCHITECTURE.md, STACK.md       |
+| testing, tests            | TESTING.md, CONVENTIONS.md      |
+| integration, external API | INTEGRATIONS.md, STACK.md       |
+| refactor, cleanup         | CONCERNS.md, ARCHITECTURE.md    |
+| setup, config             | STACK.md, STRUCTURE.md          |
+| (default)                 | STACK.md, ARCHITECTURE.md       |
 </step>
 
 <step name="identify_phase">
@@ -1122,8 +1122,8 @@ Read the most recent milestone retrospective and cross-milestone trends. Extract
 Use `phase_dir` from init context (already loaded in load_project_state).
 
 ```bash
-cat "$phase_dir"/*-CONTEXT.md 2>/dev/null   # From /gsd:discuss-phase
-cat "$phase_dir"/*-RESEARCH.md 2>/dev/null   # From /gsd:research-phase
+cat "$phase_dir"/*-CONTEXT.md 2>/dev/null   # From /gsd-discuss-phase
+cat "$phase_dir"/*-RESEARCH.md 2>/dev/null   # From /gsd-research-phase
 cat "$phase_dir"/*-DISCOVERY.md 2>/dev/null  # From mandatory discovery
 ```
 
@@ -1274,23 +1274,23 @@ Return structured planning outcome to orchestrator.
 
 ### Wave Structure
 
-| Wave | Plans | Autonomous |
-|------|-------|------------|
-| 1 | {plan-01}, {plan-02} | yes, yes |
-| 2 | {plan-03} | no (has checkpoint) |
+| Wave | Plans                | Autonomous          |
+| ---- | -------------------- | ------------------- |
+| 1    | {plan-01}, {plan-02} | yes, yes            |
+| 2    | {plan-03}            | no (has checkpoint) |
 
 ### Plans Created
 
-| Plan | Objective | Tasks | Files |
-|------|-----------|-------|-------|
-| {phase}-01 | [brief] | 2 | [files] |
-| {phase}-02 | [brief] | 3 | [files] |
+| Plan       | Objective | Tasks | Files   |
+| ---------- | --------- | ----- | ------- |
+| {phase}-01 | [brief]   | 2     | [files] |
+| {phase}-02 | [brief]   | 3     | [files] |
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase}`
+Execute: `/gsd-execute-phase {phase}`
 
-<sub>`/clear` first - fresh context window</sub>
+<sub>`/new` first - fresh context window</sub>
 ```
 
 ## Gap Closure Plans Created
@@ -1303,13 +1303,13 @@ Execute: `/gsd:execute-phase {phase}`
 
 ### Plans
 
-| Plan | Gaps Addressed | Files |
-|------|----------------|-------|
-| {phase}-04 | [gap truths] | [files] |
+| Plan       | Gaps Addressed | Files   |
+| ---------- | -------------- | ------- |
+| {phase}-04 | [gap truths]   | [files] |
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase} --gaps-only`
+Execute: `/gsd-execute-phase {phase} --gaps-only`
 ```
 
 ## Checkpoint Reached / Revision Complete
@@ -1349,6 +1349,6 @@ Planning complete when:
 - [ ] PLAN file(s) exist with gap_closure: true
 - [ ] Each plan: tasks derived from gap.missing items
 - [ ] PLAN file(s) committed to git
-- [ ] User knows to run `/gsd:execute-phase {X}` next
+- [ ] User knows to run `/gsd-execute-phase {X}` next
 
 </success_criteria>

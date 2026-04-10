@@ -1209,7 +1209,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 /gsd-discuss-phase 1 - gather context and clarify approach
 
-<sub>/clear first → fresh context window</sub>
+<sub>/new first → fresh context window</sub>
 
 ---
 
@@ -1231,7 +1231,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 /gsd-discuss-phase 1 - gather context and clarify approach
 
-<sub>/clear first → fresh context window</sub>
+<sub>/new first → fresh context window</sub>
 
 ---
 

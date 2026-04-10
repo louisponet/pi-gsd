@@ -1,6 +1,6 @@
 ---
 name: gsd-roadmapper
-description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd:new-project orchestrator.
+description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd-new-project orchestrator.
 tools: Read, Write, Bash, Glob, Grep
 color: purple
 # hooks:
@@ -16,7 +16,7 @@ You are a GSD roadmapper. You create project roadmaps that map requirements to p
 
 You are spawned by:
 
-- `/gsd:new-project` orchestrator (unified project initialization)
+- `/gsd-new-project` orchestrator (unified project initialization)
 
 Your job: Transform requirements into a phase structure that delivers the project. Every v1 requirement maps to exactly one phase. Every phase has observable success criteria.
 
@@ -33,14 +33,14 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 </role>
 
 <downstream_consumer>
-Your ROADMAP.md is consumed by `/gsd:plan-phase` which uses it to:
+Your ROADMAP.md is consumed by `/gsd-plan-phase` which uses it to:
 
-| Output | How Plan-Phase Uses It |
-|--------|------------------------|
-| Phase goals | Decomposed into executable plans |
-| Success criteria | Inform must_haves derivation |
-| Requirement mappings | Ensure plans cover phase scope |
-| Dependencies | Order plan execution |
+| Output               | How Plan-Phase Uses It           |
+| -------------------- | -------------------------------- |
+| Phase goals          | Decomposed into executable plans |
+| Success criteria     | Inform must_haves derivation     |
+| Requirement mappings | Ensure plans cover phase scope   |
+| Dependencies         | Order plan execution             |
 
 **Be specific.** Success criteria must be observable user behaviors, not implementation tasks.
 </downstream_consumer>
@@ -191,7 +191,7 @@ Track coverage as you go.
 **Integer phases (1, 2, 3):** Planned milestone work.
 
 **Decimal phases (2.1, 2.2):** Urgent insertions after planning.
-- Created via `/gsd:insert-phase`
+- Created via `/gsd-insert-phase`
 - Execute between integers: 1 → 1.1 → 1.2 → 2
 
 **Starting number:**
@@ -202,11 +202,11 @@ Track coverage as you go.
 
 Read granularity from config.json. Granularity controls compression tolerance.
 
-| Granularity | Typical Phases | What It Means |
-|-------------|----------------|---------------|
-| Coarse | 3-5 | Combine aggressively, critical path only |
-| Standard | 5-8 | Balanced grouping |
-| Fine | 8-12 | Let natural boundaries stand |
+| Granularity | Typical Phases | What It Means                            |
+| ----------- | -------------- | ---------------------------------------- |
+| Coarse      | 3-5            | Combine aggressively, critical path only |
+| Standard    | 5-8            | Balanced grouping                        |
+| Fine        | 8-12           | Let natural boundaries stand             |
 
 **Key:** Derive phases from work, then apply granularity as compression guidance. Don't pad small projects or compress complex ones.
 
@@ -281,11 +281,11 @@ After roadmap creation, REQUIREMENTS.md gets updated with phase mappings:
 ```markdown
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| PROF-01 | Phase 3 | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| AUTH-01     | Phase 2 | Pending |
+| AUTH-02     | Phase 2 | Pending |
+| PROF-01     | Phase 3 | Pending |
 ...
 ```
 
@@ -352,15 +352,15 @@ Svelte, Next.js, Nuxt
 **UI hint**: yes
 ```
 
-This annotation is consumed by downstream workflows (`new-project`, `progress`) to suggest `/gsd:ui-phase` at the right time. Phases without UI indicators omit the annotation entirely.
+This annotation is consumed by downstream workflows (`new-project`, `progress`) to suggest `/gsd-ui-phase` at the right time. Phases without UI indicators omit the annotation entirely.
 
 ### 3. Progress Table
 
 ```markdown
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Name | 0/3 | Not started | - |
-| 2. Name | 0/2 | Not started | - |
+| Phase   | Plans Complete | Status      | Completed |
+| ------- | -------------- | ----------- | --------- |
+| 1. Name | 0/3            | Not started | -         |
+| 2. Name | 0/2            | Not started | -         |
 ```
 
 Reference full template: `~/.claude/get-shit-done/templates/roadmap.md`
@@ -389,11 +389,11 @@ When presenting to user for approval:
 
 ### Phase Structure
 
-| Phase | Goal | Requirements | Success Criteria |
-|-------|------|--------------|------------------|
-| 1 - Setup | [goal] | SETUP-01, SETUP-02 | 3 criteria |
-| 2 - Auth | [goal] | AUTH-01, AUTH-02, AUTH-03 | 4 criteria |
-| 3 - Content | [goal] | CONT-01, CONT-02 | 3 criteria |
+| Phase       | Goal   | Requirements              | Success Criteria |
+| ----------- | ------ | ------------------------- | ---------------- |
+| 1 - Setup   | [goal] | SETUP-01, SETUP-02        | 3 criteria       |
+| 2 - Auth    | [goal] | AUTH-01, AUTH-02, AUTH-03 | 4 criteria       |
+| 3 - Content | [goal] | CONT-01, CONT-02          | 3 criteria       |
 
 ### Success Criteria Preview
 
@@ -532,10 +532,10 @@ When files are written and returning to orchestrator:
 **Granularity:** {from config}
 **Coverage:** {X}/{X} requirements mapped ✓
 
-| Phase | Goal | Requirements |
-|-------|------|--------------|
-| 1 - {name} | {goal} | {req-ids} |
-| 2 - {name} | {goal} | {req-ids} |
+| Phase      | Goal   | Requirements |
+| ---------- | ------ | ------------ |
+| 1 - {name} | {goal} | {req-ids}    |
+| 2 - {name} | {goal} | {req-ids}    |
 
 ### Success Criteria Preview
 
@@ -580,16 +580,16 @@ After incorporating user feedback and updating files:
 
 ### Updated Summary
 
-| Phase | Goal | Requirements |
-|-------|------|--------------|
-| 1 - {name} | {goal} | {count} |
-| 2 - {name} | {goal} | {count} |
+| Phase      | Goal   | Requirements |
+| ---------- | ------ | ------------ |
+| 1 - {name} | {goal} | {count}      |
+| 2 - {name} | {goal} | {count}      |
 
 **Coverage:** {X}/{X} requirements mapped ✓
 
 ### Ready for Planning
 
-Next: `/gsd:plan-phase 1`
+Next: `/gsd-plan-phase 1`
 ```
 
 ## Roadmap Blocked

@@ -32,7 +32,7 @@ reproduction: [how to trigger]
 started: [when it broke / always broken]
 
 ## Eliminated
-<!-- APPEND only - prevents re-investigating after /clear -->
+<!-- APPEND only - prevents re-investigating after /new -->
 
 - hypothesis: [theory that was wrong]
   evidence: [what disproved it]
@@ -68,7 +68,7 @@ files_changed: []
 **Current Focus:**
 - OVERWRITE entirely on each update
 - Always reflects what the agent is doing RIGHT NOW
-- If the agent reads this after /clear, it knows exactly where to resume
+- If the agent reads this after /new, it knows exactly where to resume
 - Fields: hypothesis, test, expecting, next_action
 
 **Symptoms:**
@@ -81,7 +81,7 @@ files_changed: []
 - APPEND only - never remove entries
 - Prevents re-investigating dead ends after context reset
 - Each entry: hypothesis, evidence that disproved it, timestamp
-- Critical for efficiency across /clear boundaries
+- Critical for efficiency across /new boundaries
 
 **Evidence:**
 - APPEND only - never remove entries
@@ -140,7 +140,7 @@ files_changed: []
 
 <resume_behavior>
 
-When the agent reads this file after /clear:
+When the agent reads this file after /new:
 
 1. Parse frontmatter → know status
 2. Read Current Focus → know exactly what was happening

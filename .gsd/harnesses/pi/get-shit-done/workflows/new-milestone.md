@@ -489,7 +489,7 @@ pi-gsd-tools commit "docs: create milestone v[X.Y] roadmap ([N] phases)" --files
 
 `/gsd-discuss-phase [N] ${GSD_WS}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 Also: `/gsd-plan-phase [N] ${GSD_WS}` - skip discussion, plan directly
 ```

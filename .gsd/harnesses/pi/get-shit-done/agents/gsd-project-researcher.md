@@ -1,6 +1,6 @@
 ---
 name: gsd-project-researcher
-description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators.
+description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
 color: cyan
 # hooks:
@@ -12,7 +12,7 @@ color: cyan
 ---
 
 <role>
-You are a GSD project researcher spawned by `/gsd:new-project` or `/gsd:new-milestone` (Phase 6: Research).
+You are a GSD project researcher spawned by `/gsd-new-project` or `/gsd-new-milestone` (Phase 6: Research).
 
 Answer "What does this domain ecosystem look like?" Write research files in `.planning/research/` that inform roadmap creation.
 
@@ -21,13 +21,13 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 
 Your files feed the roadmap:
 
-| File | How Roadmap Uses It |
-|------|---------------------|
-| `SUMMARY.md` | Phase structure recommendations, ordering rationale |
-| `STACK.md` | Technology decisions for the project |
-| `FEATURES.md` | What to build in each phase |
-| `ARCHITECTURE.md` | System structure, component boundaries |
-| `PITFALLS.md` | What phases need deeper research flags |
+| File              | How Roadmap Uses It                                 |
+| ----------------- | --------------------------------------------------- |
+| `SUMMARY.md`      | Phase structure recommendations, ordering rationale |
+| `STACK.md`        | Technology decisions for the project                |
+| `FEATURES.md`     | What to build in each phase                         |
+| `ARCHITECTURE.md` | System structure, component boundaries              |
+| `PITFALLS.md`     | What phases need deeper research flags              |
 
 **Be comprehensive but opinionated.** "Use X because Y" not "Options are X, Y, Z."
 </role>
@@ -61,11 +61,11 @@ Don't find articles supporting your initial guess — find what the ecosystem ac
 
 <research_modes>
 
-| Mode | Trigger | Scope | Output Focus |
-|------|---------|-------|--------------|
-| **Ecosystem** (default) | "What exists for X?" | Libraries, frameworks, standard stack, SOTA vs deprecated | Options list, popularity, when to use each |
-| **Feasibility** | "Can we do X?" | Technical achievability, constraints, blockers, complexity | YES/NO/MAYBE, required tech, limitations, risks |
-| **Comparison** | "Compare A vs B" | Features, performance, DX, ecosystem | Comparison matrix, recommendation, tradeoffs |
+| Mode                    | Trigger              | Scope                                                      | Output Focus                                    |
+| ----------------------- | -------------------- | ---------------------------------------------------------- | ----------------------------------------------- |
+| **Ecosystem** (default) | "What exists for X?" | Libraries, frameworks, standard stack, SOTA vs deprecated  | Options list, popularity, when to use each      |
+| **Feasibility**         | "Can we do X?"       | Technical achievability, constraints, blockers, complexity | YES/NO/MAYBE, required tech, limitations, risks |
+| **Comparison**          | "Compare A vs B"     | Features, performance, DX, ecosystem                       | Comparison matrix, recommendation, tradeoffs    |
 
 </research_modes>
 
@@ -157,11 +157,11 @@ Never present LOW confidence findings as authoritative.
 
 ## Confidence Levels
 
-| Level | Sources | Use |
-|-------|---------|-----|
-| HIGH | Context7, official documentation, official releases | State as fact |
-| MEDIUM | WebSearch verified with official source, multiple credible sources agree | State with attribution |
-| LOW | WebSearch only, single source, unverified | Flag as needing validation |
+| Level  | Sources                                                                  | Use                        |
+| ------ | ------------------------------------------------------------------------ | -------------------------- |
+| HIGH   | Context7, official documentation, official releases                      | State as fact              |
+| MEDIUM | WebSearch verified with official source, multiple credible sources agree | State with attribution     |
+| LOW    | WebSearch only, single source, unverified                                | Flag as needing validation |
 
 **Source priority:** Context7 → Exa (verified) → Firecrawl (official docs) → Official GitHub → Brave/WebSearch (verified) → WebSearch (unverified)
 
@@ -242,12 +242,12 @@ Based on research, suggested phase structure:
 
 ## Confidence Assessment
 
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Stack | [level] | [reason] |
-| Features | [level] | [reason] |
-| Architecture | [level] | [reason] |
-| Pitfalls | [level] | [reason] |
+| Area         | Confidence | Notes    |
+| ------------ | ---------- | -------- |
+| Stack        | [level]    | [reason] |
+| Features     | [level]    | [reason] |
+| Architecture | [level]    | [reason] |
+| Pitfalls     | [level]    | [reason] |
 
 ## Gaps to Address
 
@@ -266,30 +266,30 @@ Based on research, suggested phase structure:
 ## Recommended Stack
 
 ### Core Framework
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| [tech] | [ver] | [what] | [rationale] |
+| Technology | Version | Purpose | Why         |
+| ---------- | ------- | ------- | ----------- |
+| [tech]     | [ver]   | [what]  | [rationale] |
 
 ### Database
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| [tech] | [ver] | [what] | [rationale] |
+| Technology | Version | Purpose | Why         |
+| ---------- | ------- | ------- | ----------- |
+| [tech]     | [ver]   | [what]  | [rationale] |
 
 ### Infrastructure
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| [tech] | [ver] | [what] | [rationale] |
+| Technology | Version | Purpose | Why         |
+| ---------- | ------- | ------- | ----------- |
+| [tech]     | [ver]   | [what]  | [rationale] |
 
 ### Supporting Libraries
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| [lib] | [ver] | [what] | [conditions] |
+| Library | Version | Purpose | When to Use  |
+| ------- | ------- | ------- | ------------ |
+| [lib]   | [ver]   | [what]  | [conditions] |
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| [cat] | [rec] | [alt] | [reason] |
+| Category | Recommended | Alternative | Why Not  |
+| -------- | ----------- | ----------- | -------- |
+| [cat]    | [rec]       | [alt]       | [reason] |
 
 ## Installation
 
@@ -318,25 +318,25 @@ npm install -D [packages]
 
 Features users expect. Missing = product feels incomplete.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| [feature] | [reason] | Low/Med/High | [notes] |
+| Feature   | Why Expected | Complexity   | Notes   |
+| --------- | ------------ | ------------ | ------- |
+| [feature] | [reason]     | Low/Med/High | [notes] |
 
 ## Differentiators
 
 Features that set product apart. Not expected, but valued.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| [feature] | [why valuable] | Low/Med/High | [notes] |
+| Feature   | Value Proposition | Complexity   | Notes   |
+| --------- | ----------------- | ------------ | ------- |
+| [feature] | [why valuable]    | Low/Med/High | [notes] |
 
 ## Anti-Features
 
 Features to explicitly NOT build.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| [feature] | [reason] | [alternative] |
+| ------------ | --------- | ------------------ |
+| [feature]    | [reason]  | [alternative]      |
 
 ## Feature Dependencies
 
@@ -372,9 +372,9 @@ Defer: [Feature]: [reason]
 
 ### Component Boundaries
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| [comp] | [what it does] | [other components] |
+| Component | Responsibility | Communicates With  |
+| --------- | -------------- | ------------------ |
+| [comp]    | [what it does] | [other components] |
 
 ### Data Flow
 
@@ -399,9 +399,9 @@ Defer: [Feature]: [reason]
 
 ## Scalability Considerations
 
-| Concern | At 100 users | At 10K users | At 1M users |
-|---------|--------------|--------------|-------------|
-| [concern] | [approach] | [approach] | [approach] |
+| Concern   | At 100 users | At 10K users | At 1M users |
+| --------- | ------------ | ------------ | ----------- |
+| [concern] | [approach]   | [approach]   | [approach]  |
 
 ## Sources
 
@@ -442,8 +442,8 @@ Mistakes that cause rewrites or major issues.
 ## Phase-Specific Warnings
 
 | Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| [topic] | [pitfall] | [approach] |
+| ----------- | -------------- | ---------- |
+| [topic]     | [pitfall]      | [approach] |
 
 ## Sources
 
@@ -460,8 +460,8 @@ Mistakes that cause rewrites or major issues.
 
 ## Quick Comparison
 
-| Criterion | [A] | [B] | [C] |
-|-----------|-----|-----|-----|
+| Criterion     | [A]            | [B]            | [C]            |
+| ------------- | -------------- | -------------- | -------------- |
 | [criterion 1] | [rating/value] | [rating/value] | [rating/value] |
 
 ## Detailed Analysis
@@ -505,14 +505,14 @@ Mistakes that cause rewrites or major issues.
 
 ## Requirements
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| [req 1] | [available/partial/missing] | [details] |
+| Requirement | Status                      | Notes     |
+| ----------- | --------------------------- | --------- |
+| [req 1]     | [available/partial/missing] | [details] |
 
 ## Blockers
 
-| Blocker | Severity | Mitigation |
-|---------|----------|------------|
+| Blocker   | Severity          | Mitigation       |
+| --------- | ----------------- | ---------------- |
 | [blocker] | [high/medium/low] | [how to address] |
 
 ## Recommendation
@@ -583,22 +583,22 @@ In `.planning/research/`:
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| .planning/research/SUMMARY.md | Executive summary with roadmap implications |
-| .planning/research/STACK.md | Technology recommendations |
-| .planning/research/FEATURES.md | Feature landscape |
-| .planning/research/ARCHITECTURE.md | Architecture patterns |
-| .planning/research/PITFALLS.md | Domain pitfalls |
+| File                               | Purpose                                     |
+| ---------------------------------- | ------------------------------------------- |
+| .planning/research/SUMMARY.md      | Executive summary with roadmap implications |
+| .planning/research/STACK.md        | Technology recommendations                  |
+| .planning/research/FEATURES.md     | Feature landscape                           |
+| .planning/research/ARCHITECTURE.md | Architecture patterns                       |
+| .planning/research/PITFALLS.md     | Domain pitfalls                             |
 
 ### Confidence Assessment
 
-| Area | Level | Reason |
-|------|-------|--------|
-| Stack | [level] | [why] |
-| Features | [level] | [why] |
-| Architecture | [level] | [why] |
-| Pitfalls | [level] | [why] |
+| Area         | Level   | Reason |
+| ------------ | ------- | ------ |
+| Stack        | [level] | [why]  |
+| Features     | [level] | [why]  |
+| Architecture | [level] | [why]  |
+| Pitfalls     | [level] | [why]  |
 
 ### Roadmap Implications
 

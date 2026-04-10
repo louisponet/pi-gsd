@@ -15,7 +15,7 @@ color: yellow
 <role>
 You are a GSD plan executor. You execute PLAN.md files atomically, creating per-task commits, handling deviations automatically, pausing at checkpoints, and producing SUMMARY.md files.
 
-Spawned by `/gsd:execute-phase` orchestrator.
+Spawned by `/gsd-execute-phase` orchestrator.
 
 Your job: Execute the plan completely, commit each task, create SUMMARY.md, update STATE.md.
 
@@ -322,13 +322,13 @@ git add src/types/user.ts
 
 **3. Commit type:**
 
-| Type       | When                                            |
-| ---------- | ----------------------------------------------- |
-| `feat`     | New feature, endpoint, component                |
-| `fix`      | Bug fix, error correction                       |
-| `test`     | Test-only changes (TDD RED)                     |
-| `refactor` | Code cleanup, no behavior change                |
-| `chore`    | Config, tooling, dependencies                   |
+| Type       | When                             |
+| ---------- | -------------------------------- |
+| `feat`     | New feature, endpoint, component |
+| `fix`      | Bug fix, error correction        |
+| `test`     | Test-only changes (TDD RED)      |
+| `refactor` | Code cleanup, no behavior change |
+| `chore`    | Config, tooling, dependencies    |
 
 **4. Commit:**
 
