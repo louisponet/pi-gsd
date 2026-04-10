@@ -15,7 +15,7 @@ commands across every harness is:
 /gsd-<command-name>
 ```
 
-The `gsd:` colon-separated variant (e.g. `/gsd:discuss-phase`) is a **Claude Code / Gemini CLI
+The `gsd:` colon-separated variant (e.g. `/gsd-discuss-phase`) is a **Claude Code / Gemini CLI
 internal-workflow shorthand** used only within workflow `.md` files and Skill invocations - it is
 **not** a runtime command prefix emitted by the binary tools. It must never appear in generated
 scaffold files (CONTEXT.md, etc.) or binary error messages, because those artifacts are read by
@@ -27,8 +27,8 @@ all harnesses including ones (e.g. Codex, `.agent`) that do not recognise the co
 
 | Harness         | Config Dir   | Slash-command prefix | Workflow internal refs                 | Hook support                  |
 | --------------- | ------------ | -------------------- | -------------------------------------- | ----------------------------- |
-| Claude Code     | `.claude/`   | `/gsd-<cmd>`         | `/gsd:<cmd>` (in `.md` workflows only) | ✅ Full (4 hooks + statusline) |
-| Gemini CLI      | `.gemini/`   | `/gsd-<cmd>`         | `/gsd:<cmd>` (in `.md` workflows only) | ✅ Full (AfterTool/BeforeTool) |
+| Claude Code     | `.claude/`   | `/gsd-<cmd>`         | `/gsd-<cmd>` (in `.md` workflows only) | ✅ Full (4 hooks + statusline) |
+| Gemini CLI      | `.gemini/`   | `/gsd-<cmd>`         | `/gsd-<cmd>` (in `.md` workflows only) | ✅ Full (AfterTool/BeforeTool) |
 | OpenCode        | `.opencode/` | `/gsd-<cmd>`         | `gsd:<cmd>` (in Skill() calls only)    | ✅ Hooks + opencode.json       |
 | Codex           | `.codex/`    | `/gsd-<cmd>`         | `gsd:<cmd>` (in Skill() calls only)    | ✅ SessionStart only           |
 | Agent (generic) | `.agent/`    | `/gsd-<cmd>`         | `/gsd-<cmd>`                           | ✅ Hooks                       |
@@ -36,7 +36,7 @@ all harnesses including ones (e.g. Codex, `.agent`) that do not recognise the co
 | Windsurf        | `.windsurf/` | `/gsd-<cmd>`         | `/gsd-<cmd>`                           | ❌ None                        |
 | GitHub Copilot  | `.github/`   | `/gsd-<cmd>`         | `/gsd-<cmd>`                           | ❌ None                        |
 
-**Key distinction:** the `/gsd:<cmd>` colon form in Claude/Gemini workflow files is an
+**Key distinction:** the `/gsd-<cmd>` colon form in Claude/Gemini workflow files is an
 internal harness mechanism (Claude's `SlashCommand()`/Gemini's command dispatch) and is
 intentionally distinct from the binary-tool-emitted `/gsd-<cmd>` dash form. However, any
 **generated artefact** (CONTEXT.md scaffold content, error messages written to stdout/stderr by
@@ -46,7 +46,7 @@ intentionally distinct from the binary-tool-emitted `/gsd-<cmd>` dash form. Howe
 
 ## Divergence Found and Fixed (2026-04-03)
 
-The following files contained `/gsd:<cmd>` colon-form strings in positions where they would be
+The following files contained `/gsd-<cmd>` colon-form strings in positions where they would be
 **written into generated files or emitted as user-visible error messages** - causing confusion for
 agents in `.agent`/Codex/Cursor/Windsurf harnesses that expect only the dash form.
 
@@ -55,7 +55,7 @@ agents in `.agent`/Codex/Cursor/Windsurf harnesses that expect only the dash for
 `cmdScaffold()` - `case 'context'` template string written into `*-CONTEXT.md` files:
 
 ```diff
-- _Decisions will be captured during /gsd:discuss-phase ${phase}_
+- _Decisions will be captured during /gsd-discuss-phase ${phase}_
 + _Decisions will be captured during /gsd-discuss-phase ${phase}_
 ```
 
@@ -64,9 +64,9 @@ agents in `.agent`/Codex/Cursor/Windsurf harnesses that expect only the dash for
 `cmdInitManager()` - prerequisite-check error messages:
 
 ```diff
-- error('No ROADMAP.md found. Run /gsd:new-milestone first.');
+- error('No ROADMAP.md found. Run /gsd-new-milestone first.');
 + error('No ROADMAP.md found. Run /gsd-new-milestone first.');
-- error('No STATE.md found. Run /gsd:new-milestone first.');
+- error('No STATE.md found. Run /gsd-new-milestone first.');
 + error('No STATE.md found. Run /gsd-new-milestone first.');
 ```
 
@@ -83,7 +83,7 @@ agents in `.agent`/Codex/Cursor/Windsurf harnesses that expect only the dash for
 
 ---
 
-## Legitimate Use of `/gsd:<cmd>` (Do NOT change these)
+## Legitimate Use of `/gsd-<cmd>` (Do NOT change these)
 
 The following occurrences of the colon form are **intentional** and must not be altered.
 They live exclusively inside harness-specific workflow markdown files where the harness
@@ -151,9 +151,9 @@ All 60+ commands use the `/gsd-<name>` dash prefix. Key commands by workflow sta
 ## Rule for Future Maintenance
 
 > **Any string written to disk by `gsd-tools.cjs`** (scaffold templates, error messages, state
-> files, HANDOFF.json, etc.) **must use `/gsd-<cmd>`** - never `/gsd:<cmd>`.
+> files, HANDOFF.json, etc.) **must use `/gsd-<cmd>`** - never `/gsd-<cmd>`.
 >
-> The `/gsd:<cmd>` colon form may only appear inside harness-specific workflow `.md` files
+> The `/gsd-<cmd>` colon form may only appear inside harness-specific workflow `.md` files
 > where the host harness (Claude Code, Gemini CLI) performs its own slash-command dispatch.
 >
 > This rule applies to all files under `*/get-shit-done/bin/lib/` in all 8 harness directories.

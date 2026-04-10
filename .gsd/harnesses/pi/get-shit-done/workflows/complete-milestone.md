@@ -234,7 +234,7 @@ Tag: v[X.Y]
 
 `/gsd-new-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 ```

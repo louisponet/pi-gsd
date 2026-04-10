@@ -297,7 +297,7 @@ Based on user selection, route to appropriate workflow:
 
   `/gsd-execute-phase {phase} ${GSD_WS}`
 
-  <sub>`/clear` first → fresh context window</sub>
+  <sub>`/new` first → fresh context window</sub>
 
   ---
   ```
@@ -311,7 +311,7 @@ Based on user selection, route to appropriate workflow:
 
   `/gsd-plan-phase [phase-number] ${GSD_WS}`
 
-  <sub>`/clear` first → fresh context window</sub>
+  <sub>`/new` first → fresh context window</sub>
 
   ---
 

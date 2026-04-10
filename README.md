@@ -49,7 +49,7 @@ Then start your first project:
                                 └─► (next phase or /gsd-complete-milestone)
 ```
 
-All project state lives in `.planning/` - committed to git, survives `/clear` and context resets.
+All project state lives in `.planning/` - committed to git, survives `/new` and context resets.
 
 ---
 

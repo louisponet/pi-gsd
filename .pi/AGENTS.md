@@ -44,7 +44,7 @@ dist/                   # Build output (gitignored)
 
 - **Tier-1 modules are byte-identical** to original GSD behavior
 - **Tier-2 modules** live in `.pi/`
-- **Command prefix**: use `/gsd-<name>` (hyphen) everywhere; `/gsd:<name>` (colon) is never used
+- **Command prefix**: use `/gsd-<name>` (hyphen) everywhere; `/gsd-<name>` (colon) is never used
 - **Commits**: Conventional Commits format
 - **Never touch**: `*.lock`, `.env*`, `.git/hooks/*`
 

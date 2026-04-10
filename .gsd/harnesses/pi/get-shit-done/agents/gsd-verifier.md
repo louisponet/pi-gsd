@@ -184,11 +184,11 @@ For each artifact in result:
 
 **Artifact status mapping:**
 
-| exists | issues empty | Status      |
-| ------ | ------------ | ----------- |
-| true   | true         | ✓ VERIFIED  |
-| true   | false        | ✗ STUB      |
-| false  | -            | ✗ MISSING   |
+| exists | issues empty | Status     |
+| ------ | ------------ | ---------- |
+| true   | true         | ✓ VERIFIED |
+| true   | false        | ✗ STUB     |
+| false  | -            | ✗ MISSING  |
 
 **For wiring verification (Level 3)**, check imports/usage manually for artifacts that pass Levels 1-2:
 
@@ -207,12 +207,12 @@ grep -r "$artifact_name" "${search_path:-src/}" --include="*.ts" --include="*.ts
 
 ### Final Artifact Status
 
-| Exists | Substantive | Wired | Status      |
-| ------ | ----------- | ----- | ----------- |
-| ✓      | ✓           | ✓     | ✓ VERIFIED  |
+| Exists | Substantive | Wired | Status     |
+| ------ | ----------- | ----- | ---------- |
+| ✓      | ✓           | ✓     | ✓ VERIFIED |
 | ✓      | ✓           | ✗     | ⚠️ ORPHANED |
-| ✓      | ✗           | -     | ✗ STUB      |
-| ✗      | -           | -     | ✗ MISSING   |
+| ✓      | ✗           | -     | ✗ STUB     |
+| ✗      | -           | -     | ✗ MISSING  |
 
 ## Step 4b: Data-Flow Trace (Level 4)
 
@@ -254,22 +254,22 @@ grep -r -A 3 "<${COMPONENT_NAME}" "${search_path:-src/}" --include="*.tsx" 2>/de
 
 **Data-flow status:**
 
-| Data Source | Produces Real Data | Status |
-| ---------- | ------------------ | ------ |
-| DB query found | Yes | ✓ FLOWING |
-| Fetch exists, static fallback only | No | ⚠️ STATIC |
-| No data source found | N/A | ✗ DISCONNECTED |
-| Props hardcoded empty at call site | No | ✗ HOLLOW_PROP |
+| Data Source                        | Produces Real Data | Status         |
+| ---------------------------------- | ------------------ | -------------- |
+| DB query found                     | Yes                | ✓ FLOWING      |
+| Fetch exists, static fallback only | No                 | ⚠️ STATIC       |
+| No data source found               | N/A                | ✗ DISCONNECTED |
+| Props hardcoded empty at call site | No                 | ✗ HOLLOW_PROP  |
 
 **Final Artifact Status (updated with Level 4):**
 
-| Exists | Substantive | Wired | Data Flows | Status |
-| ------ | ----------- | ----- | ---------- | ------ |
-| ✓ | ✓ | ✓ | ✓ | ✓ VERIFIED |
-| ✓ | ✓ | ✓ | ✗ | ⚠️ HOLLOW — wired but data disconnected |
-| ✓ | ✓ | ✗ | - | ⚠️ ORPHANED |
-| ✓ | ✗ | - | - | ✗ STUB |
-| ✗ | - | - | - | ✗ MISSING |
+| Exists | Substantive | Wired | Data Flows | Status                                 |
+| ------ | ----------- | ----- | ---------- | -------------------------------------- |
+| ✓      | ✓           | ✓     | ✓          | ✓ VERIFIED                             |
+| ✓      | ✓           | ✓     | ✗          | ⚠️ HOLLOW — wired but data disconnected |
+| ✓      | ✓           | ✗     | -          | ⚠️ ORPHANED                             |
+| ✓      | ✗           | -     | -          | ✗ STUB                                 |
+| ✗      | -           | -     | -          | ✗ MISSING                              |
 
 ## Step 5: Verify Key Links (Wiring)
 
@@ -423,9 +423,9 @@ npm test -- --grep "$PHASE_TEST_PATTERN" 2>&1 | grep -q "passing"
 
 **Spot-check status:**
 
-| Behavior | Command | Result | Status |
-| -------- | ------- | ------ | ------ |
-| {truth} | {command} | {output} | ✓ PASS / ✗ FAIL / ? SKIP |
+| Behavior | Command   | Result   | Status                   |
+| -------- | --------- | -------- | ------------------------ |
+| {truth}  | {command} | {output} | ✓ PASS / ✗ FAIL / ? SKIP |
 
 3. **Classification:**
    - ✓ PASS: Command succeeded and output matches expected
@@ -466,7 +466,7 @@ npm test -- --grep "$PHASE_TEST_PATTERN" 2>&1 | grep -q "passing"
 
 ## Step 10: Structure Gap Output (If Gaps Found)
 
-Structure gaps in YAML frontmatter for `/gsd:plan-phase --gaps`:
+Structure gaps in YAML frontmatter for `/gsd-plan-phase --gaps`:
 
 ```yaml
 gaps:
@@ -568,7 +568,7 @@ human_verification: # Only if status: human_needed
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
-| ----------- | ---------- | ----------- | ------ | -------- |
+| ----------- | ----------- | ----------- | ------ | -------- |
 
 ### Anti-Patterns Found
 
@@ -611,7 +611,7 @@ All must-haves verified. Phase goal achieved. Ready to proceed.
 1. **{Truth 1}** — {reason}
    - Missing: {what needs to be added}
 
-Structured gaps in VERIFICATION.md frontmatter for `/gsd:plan-phase --gaps`.
+Structured gaps in VERIFICATION.md frontmatter for `/gsd-plan-phase --gaps`.
 
 {If human_needed:}
 ### Human Verification Required
@@ -632,7 +632,7 @@ Automated checks passed. Awaiting human verification.
 
 **DO NOT skip key link verification.** 80% of stubs hide here — pieces exist but aren't connected.
 
-**Structure gaps in YAML frontmatter** for `/gsd:plan-phase --gaps`.
+**Structure gaps in YAML frontmatter** for `/gsd-plan-phase --gaps`.
 
 **DO flag for human verification when uncertain** (visual, real-time, external service).
 

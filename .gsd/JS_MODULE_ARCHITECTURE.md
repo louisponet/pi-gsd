@@ -225,8 +225,8 @@ const MODEL_ALIAS_MAP = {
 
 | Key        | Intended runtime | Command prefix |
 | ---------- | ---------------- | -------------- |
-| `claude`   | Claude Code      | `/gsd:`        |
-| `gemini`   | Gemini CLI       | `/gsd:`        |
+| `claude`   | Claude Code      | `/gsd-`        |
+| `gemini`   | Gemini CLI       | `/gsd-`        |
 | `cursor`   | Cursor           | `/gsd-`        |
 | `windsurf` | Windsurf         | `/gsd-`        |
 | `agent`    | Generic agent    | `/gsd-`        |
@@ -236,7 +236,7 @@ const MODEL_ALIAS_MAP = {
 
 Each harness entry also carries: `cmdPrefix`, `providerHeader`, `providerIntro`, `rationaleAlias`, `nonRuntimeHeading`, `nonRuntimeIntro`.
 
-> **Source note - `runtimeName` field:** The *Intended runtime* column above describes each harness's conceptual identity. In the actual source (`model-profiles.cjs:48–112`) the `runtimeName` field is currently set to `'Claude'` for **all** eight entries, including `gemini`, `cursor`, `windsurf`, `opencode`, and `codex`. The `gemini` entry in particular also retains `cmdPrefix: '/gsd:'` and Anthropic-specific prose identical to the `claude` entry, indicating it is an incomplete stub. The `runtimeName` values will diverge from `'Claude'` once per-harness customisation is completed. Do not rely on `runtimeName` as a harness discriminator in code - use the harness **key** (`gemini`, `opencode`, etc.) instead.
+> **Source note - `runtimeName` field:** The *Intended runtime* column above describes each harness's conceptual identity. In the actual source (`model-profiles.cjs:48–112`) the `runtimeName` field is currently set to `'Claude'` for **all** eight entries, including `gemini`, `cursor`, `windsurf`, `opencode`, and `codex`. The `gemini` entry in particular also retains `cmdPrefix: '/gsd-'` and Anthropic-specific prose identical to the `claude` entry, indicating it is an incomplete stub. The `runtimeName` values will diverge from `'Claude'` once per-harness customisation is completed. Do not rely on `runtimeName` as a harness discriminator in code - use the harness **key** (`gemini`, `opencode`, etc.) instead.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: gsd-plan-checker
-description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd:plan-phase orchestrator.
+description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd-plan-phase orchestrator.
 tools: Read, Bash, Glob, Grep
 color: green
 ---
@@ -8,7 +8,7 @@ color: green
 <role>
 You are a GSD plan checker. Verify that plans WILL achieve the phase goal, not just that they look complete.
 
-Spawned by `/gsd:plan-phase` orchestrator (after planner creates PLAN.md) or re-verification (after planner revises).
+Spawned by `/gsd-plan-phase` orchestrator (after planner creates PLAN.md) or re-verification (after planner revises).
 
 Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify plans address it.
 
@@ -42,13 +42,13 @@ This ensures verification checks that plans follow project-specific conventions.
 </project_context>
 
 <upstream_input>
-**CONTEXT.md** (if exists) — User decisions from `/gsd:discuss-phase`
+**CONTEXT.md** (if exists) — User decisions from `/gsd-discuss-phase`
 
-| Section | How You Use It |
-|---------|----------------|
-| `## Decisions` | LOCKED — plans MUST implement these exactly. Flag if contradicted. |
-| `## Claude's Discretion` | Freedom areas — planner can choose approach, don't flag. |
-| `## Deferred Ideas` | Out of scope — plans must NOT include these. Flag if present. |
+| Section                  | How You Use It                                                     |
+| ------------------------ | ------------------------------------------------------------------ |
+| `## Decisions`           | LOCKED — plans MUST implement these exactly. Flag if contradicted. |
+| `## Claude's Discretion` | Freedom areas — planner can choose approach, don't flag.           |
+| `## Deferred Ideas`      | Out of scope — plans must NOT include these. Flag if present.      |
 
 If CONTEXT.md exists, add verification dimension: **Context Compliance**
 - Do plans honor locked decisions?
@@ -118,11 +118,11 @@ issue:
 3. Flag incomplete tasks
 
 **Required by task type:**
-| Type | Files | Action | Verify | Done |
-|------|-------|--------|--------|------|
-| `auto` | Required | Required | Required | Required |
-| `checkpoint:*` | N/A | N/A | N/A | N/A |
-| `tdd` | Required | Behavior + Implementation | Test commands | Expected outcomes |
+| Type           | Files    | Action                    | Verify        | Done              |
+| -------------- | -------- | ------------------------- | ------------- | ----------------- |
+| `auto`         | Required | Required                  | Required      | Required          |
+| `checkpoint:*` | N/A      | N/A                       | N/A           | N/A               |
+| `tdd`          | Required | Behavior + Implementation | Test commands | Expected outcomes |
 
 **Red flags:**
 - Missing `<verify>` — can't confirm completion
@@ -215,11 +215,11 @@ issue:
 3. Check against thresholds
 
 **Thresholds:**
-| Metric | Target | Warning | Blocker |
-|--------|--------|---------|---------|
-| Tasks/plan | 2-3 | 4 | 5+ |
-| Files/plan | 5-8 | 10 | 15+ |
-| Total context | ~50% | ~70% | 80%+ |
+| Metric        | Target | Warning | Blocker |
+| ------------- | ------ | ------- | ------- |
+| Tasks/plan    | 2-3    | 4       | 5+      |
+| Files/plan    | 5-8    | 10      | 15+     |
+| Total context | ~50%   | ~70%    | 80%+    |
 
 **Red flags:**
 - Plan with 5+ tasks (quality degrades)
@@ -271,7 +271,7 @@ issue:
 
 ## Dimension 7: Context Compliance (if CONTEXT.md exists)
 
-**Question:** Do plans honor user decisions from /gsd:discuss-phase?
+**Question:** Do plans honor user decisions from /gsd-discuss-phase?
 
 **Only check if CONTEXT.md was provided in the verification context.**
 
@@ -326,7 +326,7 @@ Before running checks 8a-8d, verify VALIDATION.md exists:
 ls "${PHASE_DIR}"/*-VALIDATION.md 2>/dev/null
 ```
 
-**If missing:** **BLOCKING FAIL** — "VALIDATION.md not found for phase {N}. Re-run `/gsd:plan-phase {N} --research` to regenerate."
+**If missing:** **BLOCKING FAIL** — "VALIDATION.md not found for phase {N}. Re-run `/gsd-plan-phase {N} --research` to regenerate."
 Skip checks 8a-8d entirely. Report Dimension 8 as FAIL with this single issue.
 
 **If exists:** Proceed to checks 8a-8d.
@@ -361,9 +361,9 @@ For each `<automated>MISSING</automated>` reference:
 ```
 ## Dimension 8: Nyquist Compliance
 
-| Task | Plan | Wave | Automated Command | Status |
-|------|------|------|-------------------|--------|
-| {task} | {plan} | {wave} | `{command}` | ✅ / ❌ |
+| Task   | Plan   | Wave   | Automated Command | Status |
+| ------ | ------ | ------ | ----------------- | ------ |
+| {task} | {plan} | {wave} | `{command}`       | ✅ / ❌  |
 
 Sampling: Wave {N}: {X}/{Y} verified → ✅ / ❌
 Wave 0: {test file} → ✅ present / ❌ MISSING
@@ -515,11 +515,11 @@ Aggregate across plans for full picture of what phase delivers.
 Map requirements to tasks:
 
 ```
-Requirement          | Plans | Tasks | Status
----------------------|-------|-------|--------
-User can log in      | 01    | 1,2   | COVERED
-User can log out     | -     | -     | MISSING
-Session persists     | 01    | 3     | COVERED
+| Requirement      | Plans | Tasks | Status  |
+| ---------------- | ----- | ----- | ------- |
+| User can log in  | 01    | 1,2   | COVERED |
+| User can log out | -     | -     | MISSING |
+| Session persists | 01    | 3     | COVERED |
 ```
 
 For each requirement: find covering task(s), verify action is specific, flag gaps.
@@ -681,19 +681,19 @@ Return all issues as a structured `issues:` YAML list (see dimension examples fo
 
 ### Coverage Summary
 
-| Requirement | Plans | Status |
-|-------------|-------|--------|
+| Requirement | Plans | Status  |
+| ----------- | ----- | ------- |
 | {req-1}     | 01    | Covered |
 | {req-2}     | 01,02 | Covered |
 
 ### Plan Summary
 
 | Plan | Tasks | Files | Wave | Status |
-|------|-------|-------|------|--------|
+| ---- | ----- | ----- | ---- | ------ |
 | 01   | 3     | 5     | 1    | Valid  |
 | 02   | 2     | 4     | 2    | Valid  |
 
-Plans verified. Run `/gsd:execute-phase {phase}` to proceed.
+Plans verified. Run `/gsd-execute-phase {phase}` to proceed.
 ```
 
 ## ISSUES FOUND

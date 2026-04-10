@@ -539,7 +539,7 @@ Exit skill and invoke SlashCommand("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 `/gsd-discuss-phase [X+1] ${GSD_WS}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -564,7 +564,7 @@ Exit skill and invoke SlashCommand("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 `/gsd-plan-phase [X+1] ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -674,7 +674,7 @@ Exit skill and invoke SlashCommand("/gsd-complete-milestone {version} ${GSD_WS}"
 
 `/gsd-complete-milestone {version} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 

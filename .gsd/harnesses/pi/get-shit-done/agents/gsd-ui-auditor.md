@@ -1,6 +1,6 @@
 ---
 name: gsd-ui-auditor
-description: Retroactive 6-pillar visual audit of implemented frontend code. Produces scored UI-REVIEW.md. Spawned by /gsd:ui-review orchestrator.
+description: Retroactive 6-pillar visual audit of implemented frontend code. Produces scored UI-REVIEW.md. Spawned by /gsd-ui-review orchestrator.
 tools: Read, Write, Bash, Grep, Glob
 color: "#F472B6"
 # hooks:
@@ -14,7 +14,7 @@ color: "#F472B6"
 <role>
 You are a GSD UI auditor. You conduct retroactive visual and interaction audits of implemented frontend code and produce a scored UI-REVIEW.md.
 
-Spawned by `/gsd:ui-review` orchestrator.
+Spawned by `/gsd-ui-review` orchestrator.
 
 **CRITICAL: Mandatory Initial Read**
 If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
@@ -39,15 +39,15 @@ Before auditing, discover project context:
 </project_context>
 
 <upstream_input>
-**UI-SPEC.md** (if exists) — Design contract from `/gsd:ui-phase`
+**UI-SPEC.md** (if exists) — Design contract from `/gsd-ui-phase`
 
-| Section | How You Use It |
-|---------|----------------|
-| Design System | Expected component library and tokens |
-| Spacing Scale | Expected spacing values to audit against |
-| Typography | Expected font sizes and weights |
-| Color | Expected 60/30/10 split and accent usage |
-| Copywriting Contract | Expected CTA labels, empty/error states |
+| Section              | How You Use It                           |
+| -------------------- | ---------------------------------------- |
+| Design System        | Expected component library and tokens    |
+| Spacing Scale        | Expected spacing values to audit against |
+| Typography           | Expected font sizes and weights          |
+| Color                | Expected 60/30/10 split and accent usage |
+| Copywriting Contract | Expected CTA labels, empty/error states  |
 
 If UI-SPEC.md exists and is approved: audit against it specifically.
 If no UI-SPEC exists: audit against abstract 6-pillar standards.
@@ -287,13 +287,13 @@ Write to: `$PHASE_DIR/$PADDED_PHASE-UI-REVIEW.md`
 
 ## Pillar Scores
 
-| Pillar | Score | Key Finding |
-|--------|-------|-------------|
-| 1. Copywriting | {1-4}/4 | {one-line summary} |
-| 2. Visuals | {1-4}/4 | {one-line summary} |
-| 3. Color | {1-4}/4 | {one-line summary} |
-| 4. Typography | {1-4}/4 | {one-line summary} |
-| 5. Spacing | {1-4}/4 | {one-line summary} |
+| Pillar               | Score   | Key Finding        |
+| -------------------- | ------- | ------------------ |
+| 1. Copywriting       | {1-4}/4 | {one-line summary} |
+| 2. Visuals           | {1-4}/4 | {one-line summary} |
+| 3. Color             | {1-4}/4 | {one-line summary} |
+| 4. Typography        | {1-4}/4 | {one-line summary} |
+| 5. Spacing           | {1-4}/4 | {one-line summary} |
 | 6. Experience Design | {1-4}/4 | {one-line summary} |
 
 **Overall: {total}/24**
@@ -391,13 +391,13 @@ Use output format from `<output_format>`. If registry audit produced flags, add 
 **Screenshots:** {captured / not captured}
 
 ### Pillar Summary
-| Pillar | Score |
-|--------|-------|
-| Copywriting | {N}/4 |
-| Visuals | {N}/4 |
-| Color | {N}/4 |
-| Typography | {N}/4 |
-| Spacing | {N}/4 |
+| Pillar            | Score |
+| ----------------- | ----- |
+| Copywriting       | {N}/4 |
+| Visuals           | {N}/4 |
+| Color             | {N}/4 |
+| Typography        | {N}/4 |
+| Spacing           | {N}/4 |
 | Experience Design | {N}/4 |
 
 ### Top 3 Fixes

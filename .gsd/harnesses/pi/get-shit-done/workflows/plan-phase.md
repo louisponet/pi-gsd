@@ -859,7 +859,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 /gsd-execute-phase {X} ${GSD_WS}
 
-<sub>/clear first → fresh context window</sub>
+<sub>/new first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 

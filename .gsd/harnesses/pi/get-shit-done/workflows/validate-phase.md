@@ -227,7 +227,7 @@ GSD > PHASE {N} VALIDATED (PARTIAL)
 ▶ Retry: /gsd-validate-phase {N} ${GSD_WS}
 ```
 
-Display `/clear` reminder.
+Display `/new` reminder.
 
 </process>
 

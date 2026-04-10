@@ -913,7 +913,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 `/gsd-plan-phase ${PHASE} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -1045,7 +1045,7 @@ This keeps the auto-advance chain flat - discuss, plan, and execute all run at t
   Auto-advance pipeline finished: discuss → plan → execute
 
   Next: /gsd-discuss-phase ${NEXT_PHASE} --auto ${GSD_WS}
-  <sub>/clear first → fresh context window</sub>
+  <sub>/new first → fresh context window</sub>
   ```
 - **PLANNING COMPLETE** → Planning done, execution didn't complete:
   ```

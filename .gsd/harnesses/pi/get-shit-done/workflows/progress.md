@@ -273,7 +273,7 @@ Read its `<objective>` section.
 
 `/gsd-execute-phase {phase} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 ```
@@ -303,7 +303,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 `/gsd-plan-phase {phase-number} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 ```
@@ -319,7 +319,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 `/gsd-discuss-phase {phase}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -342,7 +342,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 `/gsd-discuss-phase {phase} ${GSD_WS}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -368,7 +368,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 `/gsd-plan-phase {phase} --gaps ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -394,7 +394,7 @@ UAT.md exists with `status: partial` - testing session ended before all items re
 
 `/gsd-verify-work {phase} ${GSD_WS}` - resume testing from where you left off
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -450,7 +450,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 `/gsd-discuss-phase {Z+1}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -475,7 +475,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 `/gsd-discuss-phase {Z+1} ${GSD_WS}` - gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -503,7 +503,7 @@ All {N} phases finished!
 
 `/gsd-complete-milestone ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 
@@ -534,7 +534,7 @@ Ready to plan the next milestone.
 
 `/gsd-new-milestone ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/new` first → fresh context window</sub>
 
 ---
 ```

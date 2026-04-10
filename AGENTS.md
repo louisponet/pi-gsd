@@ -32,7 +32,7 @@ Individual commands:
 - **CJS modules** in `.gsd/bin/pi/lib/` are the canonical source - never edit assembled output directly
 - **Hook files** in `.gsd/hooks/` are the canonical source for the pi extension
 - **Hook files are hardlinked** - `.gsd/hooks/`, `.agent/hooks/`, `.claude/hooks/`, `.gemini/hooks/`, `.opencode/hooks/` share a single inode. Editing one edits all. Never copy them.
-- **Command prefix rule** - `/gsd:<name>` (colon) is a Claude/Gemini internal dispatch mechanism only. Use `/gsd-<name>` (hyphen) everywhere else - in artefacts, error messages, ROADMAP entries.
+- **Command prefix rule** - `/gsd-<name>` (colon) is a Claude/Gemini internal dispatch mechanism only. Use `/gsd-<name>` (hyphen) everywhere else - in artefacts, error messages, ROADMAP entries.
 - **Published files** - only `skills/`, `dist/`, `scripts/postinstall.js` ship. Do not add harness runtime dirs to `package.json` `files` field.
 - **Never touch** - `*.lock`, `.env*`, `.git/hooks/*`
 - **After ANY change to `model-profiles.cjs`** - run `validate-model-profiles.cjs` and stage updated markdown files

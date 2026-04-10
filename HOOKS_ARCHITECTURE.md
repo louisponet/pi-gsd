@@ -61,7 +61,7 @@ stat -c "%i %h %n" \
 | `gsd-context-monitor.js` | PostToolUse / AfterTool | Reads bridge file; injects advisory `additionalContext` warning at 35% / 25% remaining context                             |
 | `gsd-prompt-guard.js`    | PreToolUse / BeforeTool | Scans content written to `.planning/` for 13 prompt-injection patterns; advisory only (never blocks)                       |
 | `gsd-check-update.js`    | SessionStart            | Spawns background `npm view get-shit-done-cc version` check; caches result in `{configDir}/cache/gsd-update-check.json`    |
-| `gsd-workflow-guard.js`  | PreToolUse / BeforeTool | Detects direct file edits outside a GSD workflow context; advisory nudge to use `/gsd:fast` or `/gsd:quick`                |
+| `gsd-workflow-guard.js`  | PreToolUse / BeforeTool | Detects direct file edits outside a GSD workflow context; advisory nudge to use `/gsd-fast` or `/gsd-quick`                |
 
 All five hooks share identical source across all harnesses (same inode). There are **zero
 harness-specific branches** inside the hook source files. Harness identity is detected
