@@ -102,29 +102,11 @@ Resolve model for:
 ## Step 4: Spawn Researcher
 
 ```
-Task(
-  prompt="<objective>
-Research implementation approach for Phase {phase}: {name}
-</objective>
-
-<files_to_read>
-- {context_path} (USER DECISIONS from /gsd-discuss-phase)
-- {requirements_path} (Project requirements)
-- {state_path} (Project decisions and history)
-</files_to_read>
-
-${AGENT_SKILLS_RESEARCHER}
-
-<additional_context>
-Phase description: {description}
-</additional_context>
-
-<output>
-Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
-</output>",
-  subagent_type="gsd-phase-researcher",
-  model="{researcher_model}"
-)
+subagent({
+  agent: "gsd-phase-researcher",
+  task: "<objective>\nResearch implementation approach for Phase {phase}: {name}\n</objective>\n\n<files_to_read>\n- {context_path} (USER DECISIONS from /gsd-discuss-phase)\n- {requirements_path} (Project requirements)\n- {state_path} (Project decisions and history)\n</files_to_read>\n\n${AGENT_SKILLS_RESEARCHER}\n\n<additional_context>\nPhase description: {description}\n</additional_context>\n\n<output>\nWrite to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md\n</output>",
+  model: "{researcher_model}"
+})
 ```
 
 ## Step 5: Handle Return

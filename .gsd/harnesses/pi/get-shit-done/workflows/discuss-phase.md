@@ -527,10 +527,11 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 
 1. Display brief status: "Researching {N} areas..."
 
-2. For EACH user-selected gray area, spawn a Task() in parallel:
+2. For EACH user-selected gray area, spawn a subagent in parallel:
 
-   Task(
-     prompt="First, read @.pi/gsd/agents/gsd-advisor-researcher.md for your role and instructions.
+   subagent({
+     agent: "general-purpose",
+     task: "First, read @.pi/gsd/agents/gsd-advisor-researcher.md for your role and instructions.
 
      <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
      <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
@@ -539,12 +540,10 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 
      Research this gray area and return a structured comparison table with rationale.
      ${AGENT_SKILLS_ADVISOR}",
-     subagent_type="general-purpose",
-     model="{ADVISOR_MODEL}",
-     description="Research: {area_name}"
-   )
+     model: "{ADVISOR_MODEL}"
+   })
 
-   All Task() calls spawn simultaneously - do NOT wait for one before starting the next.
+   All subagent() calls spawn simultaneously - do NOT wait for one before starting the next.
 
 3. After ALL agents return, SYNTHESIZE results before presenting:
    For each agent's return:
@@ -1028,12 +1027,12 @@ Display banner:
 Context captured. Launching plan-phase...
 ```
 
-Launch plan-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting - see #686):
+Launch plan-phase using the Skill tool to avoid nested subagent sessions (which cause runtime freezes due to deep agent nesting - see #686):
 ```
 Skill(skill="gsd-plan-phase", args="${PHASE} --auto ${GSD_WS}")
 ```
 
-This keeps the auto-advance chain flat - discuss, plan, and execute all run at the same nesting level rather than spawning increasingly deep Task agents.
+This keeps the auto-advance chain flat - discuss, plan, and execute all run at the same nesting level rather than spawning increasingly deep subagents.
 
 **Handle plan-phase return:**
 - **PHASE COMPLETE** → Full chain succeeded. Display:

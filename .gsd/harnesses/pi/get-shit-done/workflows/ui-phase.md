@@ -223,12 +223,7 @@ padded_phase: {padded_phase}
 Omit null file paths from `<files_to_read>`.
 
 ```
-Task(
-  prompt=ui_research_prompt,
-  subagent_type="gsd-ui-researcher",
-  model="{UI_RESEARCHER_MODEL}",
-  description="UI Design Contract Phase {N}"
-)
+subagent({ agent: "gsd-ui-researcher", task: ui_research_prompt, model: "{UI_RESEARCHER_MODEL}" })
 ```
 
 ## 6. Handle Researcher Return
@@ -274,12 +269,7 @@ ui_safety_gate: {ui_safety_gate config value}
 ```
 
 ```
-Task(
-  prompt=ui_checker_prompt,
-  subagent_type="gsd-ui-checker",
-  model="{UI_CHECKER_MODEL}",
-  description="Verify UI-SPEC Phase {N}"
-)
+subagent({ agent: "gsd-ui-checker", task: ui_checker_prompt, model: "{UI_CHECKER_MODEL}" })
 ```
 
 ## 8. Handle Checker Return

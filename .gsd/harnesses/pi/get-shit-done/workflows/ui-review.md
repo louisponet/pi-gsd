@@ -169,12 +169,7 @@ padded_phase: {padded_phase}
 Omit null file paths.
 
 ```
-Task(
-  prompt=ui_audit_prompt,
-  subagent_type="gsd-ui-auditor",
-  model="{UI_AUDITOR_MODEL}",
-  description="UI Audit Phase {N}"
-)
+subagent({ agent: "gsd-ui-auditor", task: ui_audit_prompt, model: "{UI_AUDITOR_MODEL}" })
 ```
 
 ## 4. Handle Return

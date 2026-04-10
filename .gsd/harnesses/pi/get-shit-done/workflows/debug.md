@@ -176,12 +176,7 @@ OR
 ```
 
 ```
-Task(
-  prompt=debug_prompt,
-  subagent_type="gsd-debugger",
-  model="{DEBUGGER_MODEL}",
-  description="Debug: {description}"
-)
+subagent({ agent: "gsd-debugger", task: debug_prompt, model: "{DEBUGGER_MODEL}" })
 ```
 </step>
 

@@ -476,8 +476,9 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-Task(
-  prompt="""
+subagent({
+  agent: "gsd-planner",
+  task: """
 <planning_context>
 
 **Phase:** {phase_number}
@@ -498,10 +499,8 @@ Output consumed by /gsd-execute-phase
 Plans must be executable prompts.
 </downstream_consumer>
 """,
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Plan gap fixes for Phase {phase}"
-)
+  model: "{planner_model}"
+})
 ```
 
 On return:
@@ -526,8 +525,9 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-Task(
-  prompt="""
+subagent({
+  agent: "gsd-plan-checker",
+  task: """
 <verification_context>
 
 **Phase:** {phase_number}
@@ -547,10 +547,8 @@ Return one of:
 - ## ISSUES FOUND - structured issue list
 </expected_output>
 """,
-  subagent_type="gsd-plan-checker",
-  model="{checker_model}",
-  description="Verify Phase {phase} fix plans"
-)
+  model: "{checker_model}"
+})
 ```
 
 On return:
@@ -568,8 +566,9 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-Task(
-  prompt="""
+subagent({
+  agent: "gsd-planner",
+  task: """
 <revision_context>
 
 **Phase:** {phase_number}
@@ -591,10 +590,8 @@ Read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Revise Phase {phase} plans"
-)
+  model: "{planner_model}"
+})
 ```
 
 After planner returns → spawn checker again (verify_gap_plans logic)

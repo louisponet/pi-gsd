@@ -125,23 +125,11 @@ With phase context collected:
 Extract `MILESTONE_REQ_IDS` from REQUIREMENTS.md traceability table - all REQ-IDs assigned to phases in this milestone.
 
 ```
-Task(
-  prompt="Check cross-phase integration and E2E flows.
-
-Phases: {phase_dirs}
-Phase exports: {from SUMMARYs}
-API routes: {routes created}
-
-Milestone Requirements:
-{MILESTONE_REQ_IDS - list each REQ-ID with description and assigned phase}
-
-MUST map each integration finding to affected requirement IDs where applicable.
-
-Verify cross-phase wiring and E2E user flows.
-${AGENT_SKILLS_CHECKER}",
-  subagent_type="gsd-integration-checker",
-  model="{integration_checker_model}"
-)
+subagent({
+  agent: "gsd-integration-checker",
+  task: "Check cross-phase integration and E2E flows.\n\nPhases: {phase_dirs}\nPhase exports: {from SUMMARYs}\nAPI routes: {routes created}\n\nMilestone Requirements:\n{MILESTONE_REQ_IDS - list each REQ-ID with description and assigned phase}\n\nMUST map each integration finding to affected requirement IDs where applicable.\n\nVerify cross-phase wiring and E2E user flows.\n${AGENT_SKILLS_CHECKER}",
+  model: "{integration_checker_model}"
+})
 ```
 
 ## 4. Collect Results

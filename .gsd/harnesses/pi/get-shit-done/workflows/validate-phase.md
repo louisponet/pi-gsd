@@ -164,17 +164,16 @@ Call AskUserQuestion with gap table and options:
 ## 5. Spawn gsd-nyquist-auditor
 
 ```
-Task(
-  prompt="Read .pi/gsd/agents/gsd-nyquist-auditor.md for instructions.\n\n" +
+subagent({
+  agent: "gsd-nyquist-auditor",
+  task: "Read .pi/gsd/agents/gsd-nyquist-auditor.md for instructions.\n\n" +
     "<files_to_read>{PLAN, SUMMARY, impl files, VALIDATION.md}</files_to_read>" +
     "<gaps>{gap list}</gaps>" +
     "<test_infrastructure>{framework, config, commands}</test_infrastructure>" +
     "<constraints>Never modify impl files. Max 3 debug iterations. Escalate impl bugs.</constraints>" +
     "${AGENT_SKILLS_AUDITOR}",
-  subagent_type="gsd-nyquist-auditor",
-  model="{AUDITOR_MODEL}",
-  description="Fill validation gaps for Phase {N}"
-)
+  model: "{AUDITOR_MODEL}"
+})
 ```
 
 Handle return:

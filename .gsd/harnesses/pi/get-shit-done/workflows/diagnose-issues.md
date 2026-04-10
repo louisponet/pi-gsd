@@ -126,12 +126,12 @@ AGENT_SKILLS_DEBUGGER=$(pi-gsd-tools agent-skills gsd-debugger 2>/dev/null)
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-Task(
-  prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}",
-  subagent_type="gsd-debugger",
-  isolation="worktree",
-  description="Debug: {truth_short}"
-)
+subagent({
+  tasks: gaps.map(gap => ({
+    agent: "gsd-debugger",
+    task: filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}"
+  }))
+})
 ```
 
 **All agents spawn in single message** (parallel execution).

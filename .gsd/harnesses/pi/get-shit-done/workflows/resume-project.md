@@ -197,7 +197,7 @@ Present complete project status to user:
     Task: [task description from agent-history.json]
     Interrupted: [timestamp]
 
-    Resume with: Task tool (resume parameter with agent ID)
+    Resume with: subagent tool (resume parameter with agent ID)
 
 [If pending todos exist:]
 📋 [N] pending todos - /gsd-check-todos to review
@@ -217,7 +217,7 @@ Present complete project status to user:
 Based on project state, determine the most logical next action:
 
 **If interrupted agent exists:**
-→ Primary: Resume interrupted agent (Task tool with resume parameter)
+→ Primary: Resume interrupted agent (subagent tool with resume parameter)
 → Option: Start fresh (abandon agent work)
 
 **If HANDOFF.json exists:**

@@ -106,7 +106,7 @@ AskUserQuestion([
     multiSelect: false,
     options: [
       { label: "No (Recommended)", description: "Manual /new + paste between stages" },
-      { label: "Yes", description: "Chain stages via Task() subagents (same isolation)" }
+      { label: "Yes", description: "Chain stages via subagent() subagents (same isolation)" }
     ]
   },
   {

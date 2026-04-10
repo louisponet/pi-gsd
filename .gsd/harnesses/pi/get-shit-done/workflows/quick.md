@@ -383,8 +383,8 @@ Display banner:
 Spawn a single focused researcher (not 4 parallel researchers like full phases - quick tasks need targeted research, not broad domain surveys):
 
 ```
-Task(
-  prompt="
+subagent({
+  task: "
 <research_context>
 
 **Mode:** quick-task
@@ -418,10 +418,9 @@ Use standard research format but keep it lean - skip sections that don't apply.
 Return: ## RESEARCH COMPLETE with file path
 </output>
 ",
-  subagent_type="gsd-phase-researcher",
-  model="{planner_model}",
-  description="Research: ${DESCRIPTION}"
-)
+  agent: "gsd-phase-researcher",
+  model: "{planner_model}"
+})
 ```
 
 After researcher returns:
@@ -439,8 +438,8 @@ If research file not found, warn but continue: "Research agent did not produce o
 **If NOT `$FULL_MODE`:** Use standard `quick` mode.
 
 ```
-Task(
-  prompt="
+subagent({
+  task: "
 <planning_context>
 
 **Mode:** ${FULL_MODE ? 'quick-full' : 'quick'}
@@ -474,10 +473,9 @@ Write plan to: ${QUICK_DIR}/${quick_id}-PLAN.md
 Return: ## PLANNING COMPLETE with plan path
 </output>
 ",
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Quick plan: ${DESCRIPTION}"
-)
+  agent: "gsd-planner",
+  model: "{planner_model}"
+})
 ```
 
 After planner returns:
@@ -536,12 +534,7 @@ ${DISCUSS_MODE ? '- Context compliance: Does the plan honor locked decisions fro
 ```
 
 ```
-Task(
-  prompt=checker_prompt,
-  subagent_type="gsd-plan-checker",
-  model="{checker_model}",
-  description="Check quick plan: ${DESCRIPTION}"
-)
+subagent({ agent: "gsd-plan-checker", task: checker_prompt, model: "{checker_model}" })
 ```
 
 **Handle checker return:**
@@ -581,12 +574,7 @@ Return what changed.
 ```
 
 ```
-Task(
-  prompt=revision_prompt,
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Revise quick plan: ${DESCRIPTION}"
-)
+subagent({ agent: "gsd-planner", task: revision_prompt, model: "{planner_model}" })
 ```
 
 After planner returns → spawn checker again, increment iteration_count.
@@ -604,8 +592,8 @@ Offer: 1) Force proceed, 2) Abort
 Spawn gsd-executor with plan reference:
 
 ```
-Task(
-  prompt="
+subagent({
+  task: "
 Execute quick task ${quick_id}.
 
 <files_to_read>
@@ -624,11 +612,10 @@ ${AGENT_SKILLS_EXECUTOR}
 - Do NOT update ROADMAP.md (quick tasks are separate from planned phases)
 </constraints>
 ",
-  subagent_type="gsd-executor",
-  model="{executor_model}",
-  isolation="worktree",
-  description="Execute: ${DESCRIPTION}"
-)
+  agent: "gsd-executor",
+  model: "{executor_model}",
+  worktree: true
+})
 ```
 
 After executor returns:
@@ -658,8 +645,8 @@ Display banner:
 ```
 
 ```
-Task(
-  prompt="Verify quick task goal achievement.
+subagent({
+  task: "Verify quick task goal achievement.
 Task directory: ${QUICK_DIR}
 Task goal: ${DESCRIPTION}
 
@@ -670,10 +657,9 @@ Task goal: ${DESCRIPTION}
 ${AGENT_SKILLS_VERIFIER}
 
 Check must_haves against actual codebase. Create VERIFICATION.md at ${QUICK_DIR}/${quick_id}-VERIFICATION.md.",
-  subagent_type="gsd-verifier",
-  model="{verifier_model}",
-  description="Verify: ${DESCRIPTION}"
-)
+  agent: "gsd-verifier",
+  model: "{verifier_model}"
+})
 ```
 
 Read verification status:

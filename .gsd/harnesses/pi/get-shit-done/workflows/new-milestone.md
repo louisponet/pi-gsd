@@ -238,7 +238,9 @@ Spawn 4 parallel gsd-project-researcher agents. Each uses this template with dim
 
 **Common structure for all 4 researchers:**
 ```
-Task(prompt="
+subagent({
+  agent: "gsd-project-researcher",
+  task: "
 <research_type>Project Research - {DIMENSION} for [new features].</research_type>
 
 <milestone_context>
@@ -263,7 +265,9 @@ ${AGENT_SKILLS_RESEARCHER}
 Write to: .planning/research/{FILE}
 Use template: .pi/gsd/templates/research-project/{FILE}
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="{DIMENSION} research")
+",
+  model: "{researcher_model}"
+})
 ```
 
 **Dimension-specific fields:**
@@ -279,7 +283,9 @@ Use template: .pi/gsd/templates/research-project/{FILE}
 After all 4 complete, spawn synthesizer:
 
 ```
-Task(prompt="
+subagent({
+  agent: "gsd-research-synthesizer",
+  task: "
 Synthesize research outputs into SUMMARY.md.
 
 <files_to_read>
@@ -294,7 +300,9 @@ ${AGENT_SKILLS_SYNTHESIZER}
 Write to: .planning/research/SUMMARY.md
 Use template: .pi/gsd/templates/research-project/SUMMARY.md
 Commit after writing.
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+",
+  model: "{synthesizer_model}"
+})
 ```
 
 Display key findings from SUMMARY.md:
@@ -396,7 +404,9 @@ pi-gsd-tools commit "docs: define milestone v[X.Y] requirements" --files .planni
 - Otherwise, continue from the previous milestone's last phase number (v1.0 ended at phase 5 → v1.1 starts at phase 6)
 
 ```
-Task(prompt="
+subagent({
+  agent: "gsd-roadmapper",
+  task: "
 <planning_context>
 <files_to_read>
 - .planning/PROJECT.md
@@ -424,7 +434,9 @@ Create roadmap for milestone v[X.Y]:
 
 Write files first, then return.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
+",
+  model: "{roadmapper_model}"
+})
 ```
 
 **Handle return:**

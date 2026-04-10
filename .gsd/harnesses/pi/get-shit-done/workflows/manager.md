@@ -283,10 +283,10 @@ After discuss completes, loop back to dashboard step.
 Planning runs autonomously. Spawn a background agent:
 
 ```
-Task(
-  description="Plan phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD plan-phase workflow for phase {N} of the project.
+subagent({
+  agent: "gsd-manager-worker",
+  async: true,
+  task: "You are running the GSD plan-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} - {phase_name}
@@ -297,12 +297,12 @@ Steps:
 2. Run: pi-gsd-tools init plan-phase {N}
 3. Follow the workflow steps to produce PLAN.md files for this phase.
 4. If research is enabled in config, run the research step first.
-5. Spawn a gsd-planner subagent via Task() to create the plans.
+5. Spawn a gsd-planner subagent via subagent() to create the plans.
 6. If plan-checker is enabled, spawn a gsd-plan-checker subagent to verify.
 7. Commit plan files when complete.
 
 Important: You are running in the background. Do NOT use AskUserQuestion - make autonomous decisions based on project context. If you hit a blocker, write it to STATE.md as a blocker and stop. Do NOT silently work around permission or file access errors - let them fail so the manager can surface them with resolution hints."
-)
+})
 ```
 
 Display:
@@ -318,10 +318,10 @@ Loop back to dashboard step.
 Execution runs autonomously. Spawn a background agent:
 
 ```
-Task(
-  description="Execute phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD execute-phase workflow for phase {N} of the project.
+subagent({
+  agent: "gsd-manager-worker",
+  async: true,
+  task: "You are running the GSD execute-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} - {phase_name}
@@ -331,13 +331,13 @@ Steps:
 1. Read the execute-phase workflow: cat .pi/gsd/workflows/execute-phase.md
 2. Run: pi-gsd-tools init execute-phase {N}
 3. Follow the workflow steps: discover plans, analyze dependencies, group into waves.
-4. For each wave, spawn gsd-executor subagents via Task() to execute plans in parallel.
+4. For each wave, spawn gsd-executor subagents via subagent() to execute plans in parallel.
 5. After all waves complete, spawn a gsd-verifier subagent if verifier is enabled.
 6. Update ROADMAP.md and STATE.md with progress.
 7. Commit all changes.
 
 Important: You are running in the background. Do NOT use AskUserQuestion - make autonomous decisions. Use --no-verify on git commits. If you hit a permission error, file lock, or any access issue, do NOT work around it - let it fail and write the error to STATE.md as a blocker so the manager can surface it with resolution guidance."
-)
+})
 ```
 
 Display:
@@ -420,8 +420,8 @@ Display final status with progress bar:
 - [ ] Dependency resolution: blocked phases show which deps are missing
 - [ ] Recommendations prioritize: execute > plan > discuss
 - [ ] Discuss phases run inline via Skill() - interactive questions work
-- [ ] Plan phases spawn background Task agents - return to dashboard immediately
-- [ ] Execute phases spawn background Task agents - return to dashboard immediately
+- [ ] Plan phases spawn background subagents - return to dashboard immediately
+- [ ] Execute phases spawn background subagents - return to dashboard immediately
 - [ ] Dashboard refreshes pick up changes from background agents via disk state
 - [ ] Background agent completion triggers notification and dashboard refresh
 - [ ] Background agent errors present retry/skip options

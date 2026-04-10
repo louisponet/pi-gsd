@@ -650,171 +650,38 @@ Display spawning indicator:
 Spawn 4 parallel gsd-project-researcher agents with path references:
 
 ```
-Task(prompt="<research_type>
-Project Research - Stack dimension for [domain].
-</research_type>
-
-<milestone_context>
-[greenfield OR subsequent]
-
-Greenfield: Research the standard stack for building [domain] from scratch.
-Subsequent: Research what's needed to add [target features] to an existing [domain] app. Don't re-research the existing system.
-</milestone_context>
-
-<question>
-What's the standard 2025 stack for [domain]?
-</question>
-
-<files_to_read>
-- {project_path} (Project context and goals)
-</files_to_read>
-
-${AGENT_SKILLS_RESEARCHER}
-
-<downstream_consumer>
-Your STACK.md feeds into roadmap creation. Be prescriptive:
-- Specific libraries with versions
-- Clear rationale for each choice
-- What NOT to use and why
-</downstream_consumer>
-
-<quality_gate>
-- [ ] Versions are current (verify with Context7/official docs, not training data)
-- [ ] Rationale explains WHY, not just WHAT
-- [ ] Confidence levels assigned to each recommendation
-</quality_gate>
-
-<output>
-Write to: .planning/research/STACK.md
-Use template: .pi/gsd/templates/research-project/STACK.md
-</output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
-
-Task(prompt="<research_type>
-Project Research - Features dimension for [domain].
-</research_type>
-
-<milestone_context>
-[greenfield OR subsequent]
-
-Greenfield: What features do [domain] products have? What's table stakes vs differentiating?
-Subsequent: How do [target features] typically work? What's expected behavior?
-</milestone_context>
-
-<question>
-What features do [domain] products have? What's table stakes vs differentiating?
-</question>
-
-<files_to_read>
-- {project_path} (Project context)
-</files_to_read>
-
-${AGENT_SKILLS_RESEARCHER}
-
-<downstream_consumer>
-Your FEATURES.md feeds into requirements definition. Categorize clearly:
-- Table stakes (must have or users leave)
-- Differentiators (competitive advantage)
-- Anti-features (things to deliberately NOT build)
-</downstream_consumer>
-
-<quality_gate>
-- [ ] Categories are clear (table stakes vs differentiators vs anti-features)
-- [ ] Complexity noted for each feature
-- [ ] Dependencies between features identified
-</quality_gate>
-
-<output>
-Write to: .planning/research/FEATURES.md
-Use template: .pi/gsd/templates/research-project/FEATURES.md
-</output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
-
-Task(prompt="<research_type>
-Project Research - Architecture dimension for [domain].
-</research_type>
-
-<milestone_context>
-[greenfield OR subsequent]
-
-Greenfield: How are [domain] systems typically structured? What are major components?
-Subsequent: How do [target features] integrate with existing [domain] architecture?
-</milestone_context>
-
-<question>
-How are [domain] systems typically structured? What are major components?
-</question>
-
-<files_to_read>
-- {project_path} (Project context)
-</files_to_read>
-
-${AGENT_SKILLS_RESEARCHER}
-
-<downstream_consumer>
-Your ARCHITECTURE.md informs phase structure in roadmap. Include:
-- Component boundaries (what talks to what)
-- Data flow (how information moves)
-- Suggested build order (dependencies between components)
-</downstream_consumer>
-
-<quality_gate>
-- [ ] Components clearly defined with boundaries
-- [ ] Data flow direction explicit
-- [ ] Build order implications noted
-</quality_gate>
-
-<output>
-Write to: .planning/research/ARCHITECTURE.md
-Use template: .pi/gsd/templates/research-project/ARCHITECTURE.md
-</output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
-
-Task(prompt="<research_type>
-Project Research - Pitfalls dimension for [domain].
-</research_type>
-
-<milestone_context>
-[greenfield OR subsequent]
-
-Greenfield: What do [domain] projects commonly get wrong? Critical mistakes?
-Subsequent: What are common mistakes when adding [target features] to [domain]?
-</milestone_context>
-
-<question>
-What do [domain] projects commonly get wrong? Critical mistakes?
-</question>
-
-<files_to_read>
-- {project_path} (Project context)
-</files_to_read>
-
-${AGENT_SKILLS_RESEARCHER}
-
-<downstream_consumer>
-Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
-- Warning signs (how to detect early)
-- Prevention strategy (how to avoid)
-- Which phase should address it
-</downstream_consumer>
-
-<quality_gate>
-- [ ] Pitfalls are specific to this domain (not generic advice)
-- [ ] Prevention strategies are actionable
-- [ ] Phase mapping included where relevant
-</quality_gate>
-
-<output>
-Write to: .planning/research/PITFALLS.md
-Use template: .pi/gsd/templates/research-project/PITFALLS.md
-</output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
+subagent({
+  tasks: [
+    {
+      agent: "gsd-project-researcher",
+      task: "<research_type>\nProject Research - Stack dimension for [domain].\n</research_type>\n\n<milestone_context>\n[greenfield OR subsequent]\n\nGreenfield: Research the standard stack for building [domain] from scratch.\nSubsequent: Research what's needed to add [target features] to an existing [domain] app. Don't re-research the existing system.\n</milestone_context>\n\n<question>\nWhat's the standard 2025 stack for [domain]?\n</question>\n\n<files_to_read>\n- {project_path} (Project context and goals)\n</files_to_read>\n\n${AGENT_SKILLS_RESEARCHER}\n\n<downstream_consumer>\nYour STACK.md feeds into roadmap creation. Be prescriptive:\n- Specific libraries with versions\n- Clear rationale for each choice\n- What NOT to use and why\n</downstream_consumer>\n\n<quality_gate>\n- [ ] Versions are current (verify with Context7/official docs, not training data)\n- [ ] Rationale explains WHY, not just WHAT\n- [ ] Confidence levels assigned to each recommendation\n</quality_gate>\n\n<output>\nWrite to: .planning/research/STACK.md\nUse template: .pi/gsd/templates/research-project/STACK.md\n</output>",
+      model: "{researcher_model}"
+    },
+    {
+      agent: "gsd-project-researcher",
+      task: "<research_type>\nProject Research - Features dimension for [domain].\n</research_type>\n\n<milestone_context>\n[greenfield OR subsequent]\n\nGreenfield: What features do [domain] products have? What's table stakes vs differentiating?\nSubsequent: How do [target features] typically work? What's expected behavior?\n</milestone_context>\n\n<question>\nWhat features do [domain] products have? What's table stakes vs differentiating?\n</question>\n\n<files_to_read>\n- {project_path} (Project context)\n</files_to_read>\n\n${AGENT_SKILLS_RESEARCHER}\n\n<downstream_consumer>\nYour FEATURES.md feeds into requirements definition. Categorize clearly:\n- Table stakes (must have or users leave)\n- Differentiators (competitive advantage)\n- Anti-features (things to deliberately NOT build)\n</downstream_consumer>\n\n<quality_gate>\n- [ ] Categories are clear (table stakes vs differentiators vs anti-features)\n- [ ] Complexity noted for each feature\n- [ ] Dependencies between features identified\n</quality_gate>\n\n<output>\nWrite to: .planning/research/FEATURES.md\nUse template: .pi/gsd/templates/research-project/FEATURES.md\n</output>",
+      model: "{researcher_model}"
+    },
+    {
+      agent: "gsd-project-researcher",
+      task: "<research_type>\nProject Research - Architecture dimension for [domain].\n</research_type>\n\n<milestone_context>\n[greenfield OR subsequent]\n\nGreenfield: How are [domain] systems typically structured? What are major components?\nSubsequent: How do [target features] integrate with existing [domain] architecture?\n</milestone_context>\n\n<question>\nHow are [domain] systems typically structured? What are major components?\n</question>\n\n<files_to_read>\n- {project_path} (Project context)\n</files_to_read>\n\n${AGENT_SKILLS_RESEARCHER}\n\n<downstream_consumer>\nYour ARCHITECTURE.md informs phase structure in roadmap. Include:\n- Component boundaries (what talks to what)\n- Data flow (how information moves)\n- Suggested build order (dependencies between components)\n</downstream_consumer>\n\n<quality_gate>\n- [ ] Components clearly defined with boundaries\n- [ ] Data flow direction explicit\n- [ ] Build order implications noted\n</quality_gate>\n\n<output>\nWrite to: .planning/research/ARCHITECTURE.md\nUse template: .pi/gsd/templates/research-project/ARCHITECTURE.md\n</output>",
+      model: "{researcher_model}"
+    },
+    {
+      agent: "gsd-project-researcher",
+      task: "<research_type>\nProject Research - Pitfalls dimension for [domain].\n</research_type>\n\n<milestone_context>\n[greenfield OR subsequent]\n\nGreenfield: What do [domain] projects commonly get wrong? Critical mistakes?\nSubsequent: What are common mistakes when adding [target features] to [domain]?\n</milestone_context>\n\n<question>\nWhat do [domain] projects commonly get wrong? Critical mistakes?\n</question>\n\n<files_to_read>\n- {project_path} (Project context)\n</files_to_read>\n\n${AGENT_SKILLS_RESEARCHER}\n\n<downstream_consumer>\nYour PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:\n- Warning signs (how to detect early)\n- Prevention strategy (how to avoid)\n- Which phase should address it\n</downstream_consumer>\n\n<quality_gate>\n- [ ] Pitfalls are specific to this domain (not generic advice)\n- [ ] Prevention strategies are actionable\n- [ ] Phase mapping included where relevant\n</quality_gate>\n\n<output>\nWrite to: .planning/research/PITFALLS.md\nUse template: .pi/gsd/templates/research-project/PITFALLS.md\n</output>",
+      model: "{researcher_model}"
+    }
+  ]
+})
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
 
 ```
-Task(prompt="
+subagent({
+  agent: "gsd-research-synthesizer",
+  task: "
 <task>
 Synthesize research outputs into SUMMARY.md.
 </task>
@@ -833,7 +700,9 @@ Write to: .planning/research/SUMMARY.md
 Use template: .pi/gsd/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+",
+  model: "{synthesizer_model}"
+})
 ```
 
 Display research complete banner and key findings:
@@ -1023,7 +892,9 @@ Display stage banner:
 Spawn gsd-roadmapper agent with path references:
 
 ```
-Task(prompt="
+subagent({
+  agent: "gsd-roadmapper",
+  task: "
 <planning_context>
 
 <files_to_read>
@@ -1048,7 +919,9 @@ Create roadmap:
 
 Write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
+",
+  model: "{roadmapper_model}"
+})
 ```
 
 **Handle roadmapper return:**
@@ -1120,7 +993,9 @@ Use AskUserQuestion:
 - Re-spawn roadmapper with revision context:
 
   ```
-  Task(prompt="
+  subagent({
+    agent: "gsd-roadmapper",
+    task: "
   <revision>
   User feedback on roadmap:
   [user's notes]
@@ -1134,7 +1009,9 @@ Use AskUserQuestion:
   Update the roadmap based on feedback. Edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
-  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
+  ",
+    model: "{roadmapper_model}"
+  })
   ```
 
 - Present revised roadmap

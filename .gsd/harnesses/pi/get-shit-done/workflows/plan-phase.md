@@ -276,7 +276,7 @@ Otherwise use AskUserQuestion:
 
 If "Continue without context": Proceed to step 5.
 If "Run discuss-phase first":
-  **IMPORTANT:** Do NOT invoke discuss-phase as a nested Skill/Task call - AskUserQuestion
+  **IMPORTANT:** Do NOT invoke discuss-phase as a nested Skill/subagent call - AskUserQuestion
   does not work correctly in nested subcontexts (#1009). Instead, display the command
   and exit so the user runs it as a top-level command:
   ```
@@ -371,12 +371,11 @@ Write to: {phase_dir}/{phase_num}-RESEARCH.md
 ```
 
 ```
-Task(
-  prompt=research_prompt,
-  subagent_type="gsd-phase-researcher",
-  model="{researcher_model}",
-  description="Research Phase {phase}"
-)
+subagent({
+  agent: "gsd-phase-researcher",
+  task: research_prompt,
+  model: "{researcher_model}"
+})
 ```
 
 ### Handle Researcher Return
@@ -603,12 +602,11 @@ Every task MUST include these fields - they are NOT optional:
 ```
 
 ```
-Task(
-  prompt=filled_prompt,
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Plan Phase {phase}"
-)
+subagent({
+  agent: "gsd-planner",
+  task: filled_prompt,
+  model: "{planner_model}"
+})
 ```
 
 ## 9. Handle Planner Return
@@ -658,12 +656,11 @@ ${AGENT_SKILLS_CHECKER}
 ```
 
 ```
-Task(
-  prompt=checker_prompt,
-  subagent_type="gsd-plan-checker",
-  model="{checker_model}",
-  description="Verify Phase {phase} plans"
-)
+subagent({
+  agent: "gsd-plan-checker",
+  task: checker_prompt,
+  model: "{checker_model}"
+})
 ```
 
 ## 11. Handle Checker Return
@@ -704,12 +701,11 @@ Return what changed.
 ```
 
 ```
-Task(
-  prompt=revision_prompt,
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Revise Phase {phase} plans"
-)
+subagent({
+  agent: "gsd-planner",
+  task: revision_prompt,
+  model: "{planner_model}"
+})
 ```
 
 After planner returns -> spawn checker again (step 10), increment iteration_count.
@@ -803,12 +799,12 @@ Display banner:
 Plans ready. Launching execute-phase...
 ```
 
-Launch execute-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting):
+Launch execute-phase using the Skill tool to avoid nested subagent sessions (which cause runtime freezes due to deep agent nesting):
 ```
 Skill(skill="gsd-execute-phase", args="${PHASE} --auto --no-transition ${GSD_WS}")
 ```
 
-The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat - each phase runs at the same nesting level rather than spawning deeper Task agents.
+The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat - each phase runs at the same nesting level rather than spawning deeper subagents.
 
 **Handle execute-phase return:**
 - **PHASE COMPLETE** → Display final summary:

@@ -308,7 +308,9 @@ If no USER-PROFILE.md: calibration_tier = "standard"
 **Spawn Explore subagent:**
 
 ```
-Task(subagent_type="gsd-assumptions-analyzer", prompt="""
+subagent({
+  agent: "gsd-assumptions-analyzer",
+  task: """
 Analyze the codebase for Phase {PHASE}: {phase_name}.
 
 Phase goal: {roadmap_description}
@@ -345,7 +347,8 @@ Return EXACTLY this structure:
 ecosystem best practices, etc. Leave empty if codebase provides enough evidence.]
 
 ${AGENT_SKILLS_ANALYZER}
-""")
+"""
+})
 ```
 
 Parse the subagent's response. Extract:
@@ -364,7 +367,9 @@ Parse the subagent's response. Extract:
 If research topics were flagged, spawn a general-purpose research agent:
 
 ```
-Task(subagent_type="general-purpose", prompt="""
+subagent({
+  agent: "general-purpose",
+  task: """
 Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:
@@ -377,7 +382,8 @@ For each topic, return:
 
 Use Context7 (resolve-library-id then query-docs) for library-specific questions.
 Use WebSearch for ecosystem/best-practice questions.
-""")
+"""
+})
 ```
 
 Merge findings back into assumptions:
